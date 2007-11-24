@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ConfigNode.cc,v 1.1 2007-11-24 02:00:05 debug Exp $
+ *  $Id: ConfigNode.cc,v 1.2 2007-11-24 10:05:22 debug Exp $
  *
  *  A class describing a Configuration Node.
  */
@@ -36,18 +36,31 @@
 
 ConfigNode::ConfigNode(const string& strName)
 	: m_strName(strName)
+	, m_parentNode(NULL)
 {
 }
 
 
 ConfigNode::~ConfigNode()
 {
+	if (!m_parentNode.IsNULL())
+		m_parentNode->RemoveChild(this);
+
+	std::cout << "Removing ConfigNode " << m_strName << "\n";
 }
 
 
-void ConfigNode::AddChild(const ConfigNode& node)
+void ConfigNode::AddChild(ConfigNode* pNode)
 {
-	m_childNodes.push_back(node);
+	m_childNodes.insert(pNode);
+}
+
+
+void ConfigNode::RemoveChild(ConfigNode* pNode)
+{
+	ConfigNodes::iterator it = m_childNodes.find(pNode);
+	if (it != m_childNodes.end())
+		m_childNodes.erase(it);
 }
 
 
@@ -57,24 +70,25 @@ string ConfigNode::ToString(int indentation) const
 	int i;
 
 	for (i=0; i<indentation; i++)
-		str += "    ";
+		str += "\t";
 
 	str += "\"" + m_strName + "\"\n";
 
 	for (i=0; i<indentation; i++)
-		str += "    ";
+		str += "\t";
 
 	str += "{\n";
 
-	for (size_t j=0; j<m_childNodes.size(); j++) {
-		if (j > 0)
+	for (ConfigNodes::iterator it = m_childNodes.begin();
+	    it != m_childNodes.end(); ++it) {
+		if (it != m_childNodes.begin())
 			str += "\n";
 
-		str += m_childNodes[j].ToString(indentation + 1);
+		str += (*it)->ToString(indentation + 1);
 	}
 
 	for (i=0; i<indentation; i++)
-		str += "    ";
+		str += "\t";
 
 	str += "}\n";
 
@@ -86,15 +100,25 @@ string ConfigNode::ToString(int indentation) const
 
 int main(int argc, char *argv[])
 {
-	ConfigNode rootNode("emulation");
+	refcount_ptr<ConfigNode> rootNode = new ConfigNode("emulation");
+	refcount_ptr<ConfigNode> machineB = new ConfigNode("machine B");
 
-	ConfigNode machineA("machine");
-	ConfigNode machineB("machine");
+	{
+		refcount_ptr<ConfigNode> machineA = new ConfigNode("machine A");
 
-	rootNode.AddChild(machineA);
-	rootNode.AddChild(machineB);
+		refcount_ptr<ConfigNode> pcibus(new ConfigNode("pcibus"));
 
-	// std::cout << rootNode.ToString();
+		rootNode->AddChild(machineA);
+		rootNode->AddChild(machineB);
+
+		machineA->AddChild(pcibus);
+	}
+
+	std::cout << rootNode->ToString();
+
+	machineB = NULL;
+
+	std::cout << rootNode->ToString();
 
 	std::cout << "TEST OK: ConfigNode\n";
 	return 0;

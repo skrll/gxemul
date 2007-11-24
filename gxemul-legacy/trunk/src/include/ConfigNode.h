@@ -28,30 +28,33 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ConfigNode.h,v 1.1 2007-11-24 02:00:05 debug Exp $
+ *  $Id: ConfigNode.h,v 1.2 2007-11-24 10:05:22 debug Exp $
  *
  *  A class describing a Configuration Node.
  */
 
 #include "misc.h"
-#include <vector>
+
 
 class ConfigNode
+	: public ReferenceCountable
 {
 public:
-	typedef std::vector<ConfigNode> ConfigNodeVector;
+	typedef set< refcount_ptr<ConfigNode> > ConfigNodes;
 
 public:
 	ConfigNode(const string& strName);
 	~ConfigNode();
 
-	void AddChild(const ConfigNode& node);
+	void AddChild(ConfigNode* pNode);
+	void RemoveChild(ConfigNode* pNode);
 
 	string ToString(int indentation = 0) const;
 
 private:
-	string			m_strName;
-	ConfigNodeVector	m_childNodes;
+	string				m_strName;
+	refcount_ptr<ConfigNode>	m_parentNode;
+	ConfigNodes			m_childNodes;
 };
 
 

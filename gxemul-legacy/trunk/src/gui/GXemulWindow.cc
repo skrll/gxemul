@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemulWindow.cc,v 1.6 2007-11-16 23:45:08 debug Exp $
+ *  $Id: GXemulWindow.cc,v 1.7 2007-11-24 10:05:22 debug Exp $
  */
 
 #include "misc.h"
@@ -84,7 +84,7 @@ GXemulWindow::GXemulWindow()
 		std::cerr << "building menus failed: " <<  ex.what();
 	}
 #else
-	std::auto_ptr<Glib::Error> ex;
+	auto_ptr<Glib::Error> ex;
 	m_refUIManager->add_ui_from_string(ui_info, ex);
 	if(ex.get()) {
 		std::cerr << "building menus failed: " <<  ex->what();

@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: misc.h,v 1.262 2007-11-16 23:45:08 debug Exp $
+ *  $Id: misc.h,v 1.263 2007-11-24 10:05:22 debug Exp $
  *
  *  Misc. definitions for gxemul.
  */
@@ -55,6 +55,16 @@ typedef Glib::ustring string;
 #include <string>
 typedef std::string string;
 #endif
+
+#include <vector>
+#include <map>
+#include <set>
+using std::vector;
+using std::map;
+using std::set;
+using std::auto_ptr;
+
+#include "refcount_ptr.h"
 #endif
 
 
