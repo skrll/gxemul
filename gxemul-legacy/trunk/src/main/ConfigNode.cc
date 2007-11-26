@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ConfigNode.cc,v 1.2 2007-11-24 10:05:22 debug Exp $
+ *  $Id: ConfigNode.cc,v 1.3 2007-11-26 14:20:31 debug Exp $
  *
  *  A class describing a Configuration Node.
  */
@@ -101,22 +101,21 @@ string ConfigNode::ToString(int indentation) const
 int main(int argc, char *argv[])
 {
 	refcount_ptr<ConfigNode> rootNode = new ConfigNode("emulation");
-	refcount_ptr<ConfigNode> machineB = new ConfigNode("machine B");
+	refcount_ptr<ConfigNode> machineB = new ConfigNode("machine");
 
 	{
-		refcount_ptr<ConfigNode> machineA = new ConfigNode("machine A");
-
+		refcount_ptr<ConfigNode> machineA = new ConfigNode("machine");
 		refcount_ptr<ConfigNode> pcibus(new ConfigNode("pcibus"));
 
 		rootNode->AddChild(machineA);
 		rootNode->AddChild(machineB);
 
 		machineA->AddChild(pcibus);
+
+		std::cout << rootNode->ToString();
+
+		rootNode->RemoveChild(machineA);
 	}
-
-	std::cout << rootNode->ToString();
-
-	machineB = NULL;
 
 	std::cout << rootNode->ToString();
 
