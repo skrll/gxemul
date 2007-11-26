@@ -27,7 +27,7 @@
 #  SUCH DAMAGE.
 #
 #
-#  $Id: configure,v 1.286 2007-11-17 08:52:11 debug Exp $
+#  $Id: configure,v 1.287 2007-11-26 14:20:43 debug Exp $
 #
 #  This is a minimal configure script, hardcoded for GXemul. This script
 #  figures out which compiler flags will work, and creates Makefiles in
@@ -137,7 +137,10 @@ fi
 
 if [ z"$UNSTABLE" = zYES ]; then
 	printf "#define UNSTABLE_DEVEL\n" >> config.h
-else
+fi
+
+
+if [ ! z"$DEBUG" = zYES ]; then
 	CFLAGS="-DNDEBUG $CFLAGS"
 fi
 
@@ -841,30 +844,27 @@ if [ ! z"$DEBUG" = zYES ]; then
 fi
 
 
-#  -g, for development builds
-if [ z"$UNSTABLE" = zYES ]; then
-	printf "checking whether -g can be used... "
-	if [ z"$COMPAQCC" = zYES ]; then
-		$CC $CFLAGS -g3 _testprog.c -o _testprog > _testprog.stdout 2>&1
-		cat _testprog.stdout >> _testprog.error
-		if [ -x _testprog ]; then
-			CFLAGS="-g3 $CFLAGS"
-			printf "yes (-g3)\n"
-		else
-			printf "no\n"
-		fi
+printf "checking whether -g can be used... "
+if [ z"$COMPAQCC" = zYES ]; then
+	$CC $CFLAGS -g3 _testprog.c -o _testprog > _testprog.stdout 2>&1
+	cat _testprog.stdout >> _testprog.error
+	if [ -x _testprog ]; then
+		CFLAGS="-g3 $CFLAGS"
+		printf "yes (-g3)\n"
 	else
-		$CC $CFLAGS -g _testprog.c -o _testprog > _testprog.stdout 2>&1
-		cat _testprog.stdout >> _testprog.error
-		if [ -x _testprog ]; then
-			CFLAGS="-g $CFLAGS"
-			printf "yes\n"
-		else
-			printf "no\n"
-		fi
+		printf "no\n"
 	fi
-	rm -f _testprog _testprog.error _testprog.stdout
+else
+	$CC $CFLAGS -g _testprog.c -o _testprog > _testprog.stdout 2>&1
+	cat _testprog.stdout >> _testprog.error
+	if [ -x _testprog ]; then
+		CFLAGS="-g $CFLAGS"
+		printf "yes\n"
+	else
+		printf "no\n"
+	fi
 fi
+rm -f _testprog _testprog.error _testprog.stdout
 
 
 #  -lrt for nanosleep?
@@ -1256,7 +1256,7 @@ else
 		echo found
 		CFLAGS="$CFLAGS `pkg-config --cflags gtkmm-2.4`"
 		OTHERLIBS="$OTHERLIBS `pkg-config --libs gtkmm-2.4`"
-		printf "#define WITH_GUI\n" >> config.h
+		CFLAGS="$CFLAGS -DWITH_GUI"
 	else
 		echo not found
 		if [ z$WITHGUI = zYES ]; then
