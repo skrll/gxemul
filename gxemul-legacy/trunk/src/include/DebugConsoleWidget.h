@@ -27,10 +27,8 @@
  *  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *  SUCH DAMAGE.
  *
- *  $Id: DebugConsoleWidget.h,v 1.1 2007-11-16 23:45:08 debug Exp $
+ *  $Id: DebugConsoleWidget.h,v 1.2 2007-11-26 14:21:12 debug Exp $
  */
-
-#include "misc.h"
 
 #include <gtkmm.h>
 

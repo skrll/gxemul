@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: misc.h,v 1.263 2007-11-24 10:05:22 debug Exp $
+ *  $Id: misc.h,v 1.264 2007-11-26 14:21:12 debug Exp $
  *
  *  Misc. definitions for gxemul.
  */
@@ -64,13 +64,20 @@ using std::map;
 using std::set;
 using std::auto_ptr;
 
-#include "refcount_ptr.h"
 #endif
 
 
 #ifdef __cplusplus
+
+#ifndef NDEBUG
+#include "debug_new.h"
+#endif
+
+#include "refcount_ptr.h"
+
 extern "C"
 {
+
 #endif /* __cplusplus */
 
 

@@ -25,12 +25,8 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: EmulationDesignArea.cc,v 1.1 2007-11-16 23:45:08 debug Exp $
+ *  $Id: EmulationDesignArea.cc,v 1.2 2007-11-26 14:21:12 debug Exp $
  */
-
-#include "misc.h"
-
-#ifdef WITH_GUI
 
 #include "EmulationDesignArea.h"
 
@@ -84,4 +80,3 @@ bool EmulationDesignArea::on_expose_event(GdkEventExpose* event)
   return true;
 }
 
-#endif	// WITH_GUI

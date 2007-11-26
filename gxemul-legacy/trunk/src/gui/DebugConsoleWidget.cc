@@ -25,12 +25,8 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: DebugConsoleWidget.cc,v 1.1 2007-11-16 23:45:08 debug Exp $
+ *  $Id: DebugConsoleWidget.cc,v 1.2 2007-11-26 14:21:12 debug Exp $
  */
-
-#include "misc.h"
-
-#ifdef WITH_GUI
 
 #include "DebugConsoleWidget.h"
 
@@ -44,4 +40,3 @@ DebugConsoleWidget::~DebugConsoleWidget()
 {
 }
 
-#endif	// WITH_GUI

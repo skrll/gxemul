@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemul.cc,v 1.2 2007-11-16 23:45:08 debug Exp $
+ *  $Id: GXemul.cc,v 1.3 2007-11-26 14:21:13 debug Exp $
  */
 
 #include <stdio.h>
@@ -33,8 +33,6 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
-
-#include "misc.h"
 
 #ifdef WITH_GUI
 #include <gtkmm.h>
@@ -49,6 +47,7 @@
 #include "emul.h"
 #include "GXemul.h"
 #include "machine.h"
+#include "misc.h"
 #include "settings.h"
 #include "timer.h"
 #include "useremul.h"

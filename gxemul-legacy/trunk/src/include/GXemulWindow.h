@@ -28,10 +28,8 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemulWindow.h,v 1.3 2007-11-16 23:45:08 debug Exp $
+ *  $Id: GXemulWindow.h,v 1.4 2007-11-26 14:21:12 debug Exp $
  */
-
-#include "misc.h"
 
 #include <gtkmm.h>
 
