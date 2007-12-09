@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: debugger_cmds.c,v 1.15 2007-11-17 08:52:11 debug Exp $
+ *  $Id: debugger_cmds.cc,v 1.1 2007-12-09 15:16:09 debug Exp $
  *
  *  Debugger commands. Included from debugger.c.
  */
@@ -34,7 +34,7 @@
 /*
  *  debugger_cmd_allsettings():
  */
-static void debugger_cmd_allsettings(struct machine *m, char *cmd_line)
+static void debugger_cmd_allsettings(struct machine *m, const char *cmd_line)
 {
 	settings_debugdump(global_settings, GLOBAL_SETTINGS_NAME, 1);
 }
@@ -45,7 +45,7 @@ static void debugger_cmd_allsettings(struct machine *m, char *cmd_line)
  *
  *  TODO: automagic "expansion" for the subcommand names (s => show).
  */
-static void debugger_cmd_breakpoint(struct machine *m, char *cmd_line)
+static void debugger_cmd_breakpoint(struct machine *m, const char *cmd_line)
 {
 	int i, res;
 
@@ -109,16 +109,16 @@ static void debugger_cmd_breakpoint(struct machine *m, char *cmd_line)
 			return;
 		}
 
-		CHECK_ALLOCATION(m->breakpoints.string = realloc(
+		CHECK_ALLOCATION(m->breakpoints.string = (char **) realloc(
 		    m->breakpoints.string, sizeof(char *) *
 		    (m->breakpoints.n + 1)));
-		CHECK_ALLOCATION(m->breakpoints.addr = realloc(
+		CHECK_ALLOCATION(m->breakpoints.addr = (uint64_t *) realloc(
 		    m->breakpoints.addr, sizeof(uint64_t) *
 		   (m->breakpoints.n + 1)));
 
 		breakpoint_buf_len = strlen(cmd_line+4) + 1;
 
-		CHECK_ALLOCATION(m->breakpoints.string[i] =
+		CHECK_ALLOCATION(m->breakpoints.string[i] = (char *)
 		    malloc(breakpoint_buf_len));
 		strlcpy(m->breakpoints.string[i], cmd_line+4,
 		    breakpoint_buf_len);
@@ -141,7 +141,7 @@ static void debugger_cmd_breakpoint(struct machine *m, char *cmd_line)
 /*
  *  debugger_cmd_continue():
  */
-static void debugger_cmd_continue(struct machine *m, char *cmd_line)
+static void debugger_cmd_continue(struct machine *m, const char *cmd_line)
 {
 	if (*cmd_line) {
 		printf("syntax: continue\n");
@@ -155,7 +155,7 @@ static void debugger_cmd_continue(struct machine *m, char *cmd_line)
 /*
  *  debugger_cmd_device():
  */
-static void debugger_cmd_device(struct machine *m, char *cmd_line)
+static void debugger_cmd_device(struct machine *m, const char *cmd_line)
 {
 	int i;
 	struct memory *mem;
@@ -244,7 +244,7 @@ return_help:
  *
  *  syntax: dump [addr [endaddr]]
  */
-static void debugger_cmd_dump(struct machine *m, char *cmd_line)
+static void debugger_cmd_dump(struct machine *m, const char *cmd_line)
 {
 	uint64_t addr, addr_start, addr_end;
 	struct cpu *c;
@@ -359,7 +359,7 @@ static void debugger_cmd_dump(struct machine *m, char *cmd_line)
  *
  *  Dump info about the current emulation.
  */
-static void debugger_cmd_emul(struct machine *m, char *cmd_line)
+static void debugger_cmd_emul(struct machine *m, const char *cmd_line)
 {
 	int iadd = DEBUG_INDENTATION;
 
@@ -383,7 +383,7 @@ static void debugger_cmd_emul(struct machine *m, char *cmd_line)
  *  Changes focus to specific cpu, in a specific machine (in a specific
  *  emulation).
  */
-static void debugger_cmd_focus(struct machine *m, char *cmd_line)
+static void debugger_cmd_focus(struct machine *m, const char *cmd_line)
 {
 	int x = -1, y = -1;
 	char *p, *p2;
@@ -442,13 +442,13 @@ print_current_focus_and_return:
 
 
 /*  This is defined below.  */
-static void debugger_cmd_help(struct machine *m, char *cmd_line);
+static void debugger_cmd_help(struct machine *m, const char *cmd_line);
 
 
 /*
  *  debugger_cmd_itrace():
  */
-static void debugger_cmd_itrace(struct machine *m, char *cmd_line)
+static void debugger_cmd_itrace(struct machine *m, const char *cmd_line)
 {
 	if (*cmd_line) {
 		printf("syntax: itrace\n");
@@ -466,7 +466,7 @@ static void debugger_cmd_itrace(struct machine *m, char *cmd_line)
 /*
  *  debugger_cmd_lookup():
  */
-static void debugger_cmd_lookup(struct machine *m, char *cmd_line)
+static void debugger_cmd_lookup(struct machine *m, const char *cmd_line)
 {
 	uint64_t addr;
 	int res;
@@ -517,7 +517,7 @@ static void debugger_cmd_lookup(struct machine *m, char *cmd_line)
  *
  *  Dump info about the currently focused machine.
  */
-static void debugger_cmd_machine(struct machine *m, char *cmd_line)
+static void debugger_cmd_machine(struct machine *m, const char *cmd_line)
 {
 	int iadd = 0;
 
@@ -540,7 +540,7 @@ static void debugger_cmd_machine(struct machine *m, char *cmd_line)
 /*
  *  debugger_cmd_ninstrs():
  */
-static void debugger_cmd_ninstrs(struct machine *m, char *cmd_line)
+static void debugger_cmd_ninstrs(struct machine *m, const char *cmd_line)
 {
 	int toggle = 1;
 	int previous_mode = m->show_nr_of_instructions;
@@ -589,7 +589,7 @@ static void debugger_cmd_ninstrs(struct machine *m, char *cmd_line)
 /*
  *  debugger_cmd_pause():
  */
-static void debugger_cmd_pause(struct machine *m, char *cmd_line)
+static void debugger_cmd_pause(struct machine *m, const char *cmd_line)
 {
 	int cpuid = -1;
 
@@ -616,7 +616,7 @@ static void debugger_cmd_pause(struct machine *m, char *cmd_line)
 /*
  *  debugger_cmd_print():
  */
-static void debugger_cmd_print(struct machine *m, char *cmd_line)
+static void debugger_cmd_print(struct machine *m, const char *cmd_line)
 {
 	int res;
 	uint64_t tmp;
@@ -656,7 +656,7 @@ static void debugger_cmd_print(struct machine *m, char *cmd_line)
 /*
  *  debugger_cmd_put():
  */
-static void debugger_cmd_put(struct machine *m, char *cmd_line)
+static void debugger_cmd_put(struct machine *m, const char *cmd_line)
 {
 	static char put_type = ' ';  /*  Remembered across multiple calls.  */
 	char copy[200];
@@ -834,7 +834,7 @@ static void debugger_cmd_put(struct machine *m, char *cmd_line)
 /*
  *  debugger_cmd_quiet():
  */
-static void debugger_cmd_quiet(struct machine *m, char *cmd_line)
+static void debugger_cmd_quiet(struct machine *m, const char *cmd_line)
 {
 	int toggle = 1;
 	int previous_mode = old_quiet_mode;
@@ -882,7 +882,7 @@ static void debugger_cmd_quiet(struct machine *m, char *cmd_line)
 /*
  *  debugger_cmd_quit():
  */
-static void debugger_cmd_quit(struct machine *m, char *cmd_line)
+static void debugger_cmd_quit(struct machine *m, const char *cmd_line)
 {
 	int j, k;
 
@@ -911,7 +911,7 @@ static void debugger_cmd_quit(struct machine *m, char *cmd_line)
 /*
  *  debugger_cmd_reg():
  */
-static void debugger_cmd_reg(struct machine *m, char *cmd_line)
+static void debugger_cmd_reg(struct machine *m, const char *cmd_line)
 {
 	int cpuid = debugger_cur_cpu, coprocnr = -1;
 	int gprs, coprocs;
@@ -946,7 +946,7 @@ static void debugger_cmd_reg(struct machine *m, char *cmd_line)
 /*
  *  debugger_cmd_step():
  */
-static void debugger_cmd_step(struct machine *m, char *cmd_line)
+static void debugger_cmd_step(struct machine *m, const char *cmd_line)
 {
 	int n = 1;
 
@@ -972,7 +972,7 @@ static void debugger_cmd_step(struct machine *m, char *cmd_line)
  *
  *  Dump each CPU's TLB contents.
  */
-static void debugger_cmd_tlbdump(struct machine *m, char *cmd_line)
+static void debugger_cmd_tlbdump(struct machine *m, const char *cmd_line)
 {
 	int x = -1;
 	int rawflag = 0;
@@ -1008,7 +1008,7 @@ static void debugger_cmd_tlbdump(struct machine *m, char *cmd_line)
 /*
  *  debugger_cmd_trace():
  */
-static void debugger_cmd_trace(struct machine *m, char *cmd_line)
+static void debugger_cmd_trace(struct machine *m, const char *cmd_line)
 {
 	int toggle = 1;
 	int previous_mode = old_show_trace_tree;
@@ -1060,7 +1060,7 @@ static void debugger_cmd_trace(struct machine *m, char *cmd_line)
  *
  *  syntax: unassemble [addr [endaddr]]
  */
-static void debugger_cmd_unassemble(struct machine *m, char *cmd_line)
+static void debugger_cmd_unassemble(struct machine *m, const char *cmd_line)
 {
 	uint64_t addr, addr_start, addr_end;
 	struct cpu *c;
@@ -1168,7 +1168,7 @@ static void debugger_cmd_unassemble(struct machine *m, char *cmd_line)
 /*
  *  debugger_cmd_version():
  */
-static void debugger_cmd_version(struct machine *m, char *cmd_line)
+static void debugger_cmd_version(struct machine *m, const char *cmd_line)
 {
 	if (*cmd_line) {
 		printf("syntax: version\n");
@@ -1183,11 +1183,11 @@ static void debugger_cmd_version(struct machine *m, char *cmd_line)
 
 
 struct cmd {
-	char	*name;
-	char	*args;
-	int	tmp_flag;
-	void	(*f)(struct machine *, char *cmd_line);
-	char	*description;
+	const char	*name;
+	const char	*args;
+	int		tmp_flag;
+	void		(*f)(struct machine *, const char *cmd_line);
+	const char	*description;
 };
 
 static struct cmd cmds[] = {
@@ -1286,7 +1286,7 @@ static struct cmd cmds[] = {
  *
  *  TODO: Command completion (ie just type "help s" for "help step").
  */
-static void debugger_cmd_help(struct machine *m, char *cmd_line)
+static void debugger_cmd_help(struct machine *m, const char *cmd_line)
 {
 	int only_one = 0, only_one_match = 0;
 	char *nlines_env = getenv("LINES");

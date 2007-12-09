@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile.skel,v 1.5 2007-03-26 02:01:36 debug Exp $
+#  $Id: Makefile.skel,v 1.6 2007-12-09 15:16:09 debug Exp $
 #
 #  Makefile for GXemul src/debugger
 #
@@ -12,10 +12,10 @@ all: $(OBJS)
 
 $(OBJS): Makefile
 
-debugger.c: debugger_cmds.c
+debugger.cc: debugger_cmds.cc
 
 clean:
-	rm -f $(OBJS) *core tmp_*.c
+	rm -f $(OBJS) *core
 
 clean_all: clean
 	rm -f Makefile

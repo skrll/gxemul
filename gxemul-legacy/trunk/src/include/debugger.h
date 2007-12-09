@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: debugger.h,v 1.11 2007-11-21 12:54:12 debug Exp $
+ *  $Id: debugger.h,v 1.12 2007-12-09 15:16:09 debug Exp $
  *
  *  See src/debugger/debugger.c.
  */
@@ -63,8 +63,8 @@ void debugger_init(struct emul *emul);
 #define	PARSE_NUMBER		3
 #define	PARSE_SYMBOL		4
 
-int debugger_parse_expression(struct machine *m, char *expr, int writeflag,
-	uint64_t *valuep);
+int debugger_parse_expression(struct machine *m, const char *expr,
+	int writeflag, uint64_t *valuep);
 
 #ifdef __cplusplus
 }

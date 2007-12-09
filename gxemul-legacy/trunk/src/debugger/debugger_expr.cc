@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: debugger_expr.c,v 1.12 2007-06-28 14:58:38 debug Exp $
+ *  $Id: debugger_expr.cc,v 1.1 2007-12-09 15:16:09 debug Exp $
  *
  *  Expression evaluator.
  *
@@ -92,8 +92,8 @@ extern int debugger_cur_machine;
  *	PARSE_NUMBER		a hex number
  *	PARSE_SYMBOL		a symbol
  */
-int debugger_parse_name(struct machine *m, char *name, int writeflag,
-	uint64_t *valuep)
+int debugger_parse_name(struct machine *m, const char *name,
+	int writeflag, uint64_t *valuep)
 {
 	int match_settings = 0, match_symbol = 0, match_numeric = 0;
 	int skip_settings, skip_numeric, skip_symbol;
@@ -243,8 +243,8 @@ int debugger_parse_name(struct machine *m, char *name, int writeflag,
  *        be:   left  = a
  *              right = (b+c*d)/e
  */
-int debugger_parse_expression(struct machine *m, char *expr, int writeflag,
-	uint64_t *valuep)
+int debugger_parse_expression(struct machine *m, const char *expr,
+	int writeflag, uint64_t *valuep)
 {
 	int prec, res, i, nest;
 	char *copy;

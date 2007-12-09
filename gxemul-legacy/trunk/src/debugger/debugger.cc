@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: debugger.c,v 1.27 2007-06-28 14:58:38 debug Exp $
+ *  $Id: debugger.cc,v 1.1 2007-12-09 15:16:09 debug Exp $
  *
  *  Single-step debugger.
  *
@@ -84,8 +84,6 @@ int old_show_trace_tree = 0;
  */
 
 static volatile int ctrl_c;
-
-static struct emul *debugger_emul;
 
 /*  Currently focused CPU, machine, and emulation:  */
 int debugger_cur_cpu;
@@ -180,7 +178,7 @@ static void show_breakpoint(struct machine *m, int i)
 /****************************************************************************/
 
 
-#include "debugger_cmds.c"
+#include "debugger_cmds.cc"
 
 
 /****************************************************************************/
@@ -198,7 +196,7 @@ void debugger_assignment(struct machine *m, char *cmd)
 	uint64_t tmp;
 	uint64_t old_pc = m->cpus[0]->pc;	/*  TODO: multiple cpus?  */
 
-	CHECK_ALLOCATION(left = malloc(MAX_CMD_BUFLEN));
+	CHECK_ALLOCATION(left = (char *) malloc(MAX_CMD_BUFLEN));
 	strlcpy(left, cmd, MAX_CMD_BUFLEN);
 	right = strchr(left, '=');
 	if (right == NULL) {
@@ -728,7 +726,7 @@ void debugger_init(struct emul *emul)
 	debugger_cur_machine = 0;
 
 	for (i=0; i<N_PREVIOUS_CMDS; i++) {
-		CHECK_ALLOCATION(last_cmd[i] = malloc(MAX_CMD_BUFLEN));
+		CHECK_ALLOCATION(last_cmd[i] = (char *) malloc(MAX_CMD_BUFLEN));
 		last_cmd[i][0] = '\0';
 	}
 

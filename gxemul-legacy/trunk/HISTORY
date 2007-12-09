@@ -1,4 +1,4 @@
-$Id: HISTORY,v 1.1659 2007-12-09 14:37:28 debug Exp $
+$Id: HISTORY,v 1.1660 2007-12-09 15:16:08 debug Exp $
 
 Changelog for GXemul:
 ---------------------
@@ -3725,3 +3725,4 @@ Changelog for GXemul:
 		Incorporating Wu Yongwei's debug_new, for memory leak
 		detection.
 20071209	Converting the remaining src/machine/*.c to *.cc.
+		Converting src/debugger/*.c to *.cc.
