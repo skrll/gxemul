@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: cpu.c,v 1.6 2007-06-28 13:36:45 debug Exp $
+ *  $Id: cpu.cc,v 1.1 2007-12-09 15:16:29 debug Exp $
  *
  *  Common routines for CPU emulation. (Not specific to any CPU type.)
  */
@@ -72,9 +72,10 @@ struct cpu *cpu_new(struct memory *mem, struct machine *machine,
 
 	CHECK_ALLOCATION(cpu_type_name = strdup(name));
 
-	cpu = zeroed_alloc(sizeof(struct cpu));
+	cpu = (struct cpu *) zeroed_alloc(sizeof(struct cpu));
 
-	CHECK_ALLOCATION(cpu->path = malloc(strlen(machine->path) + 15));
+	CHECK_ALLOCATION(cpu->path = (char *)
+	    malloc(strlen(machine->path) + 15));
 	snprintf(cpu->path, strlen(machine->path) + 15,
 	    "%s.cpu[%i]", machine->path, cpu_id);
 
@@ -293,7 +294,7 @@ void cpu_create_or_reset_tc(struct cpu *cpu)
 	size_t s = dyntrans_cache_size + DYNTRANS_CACHE_MARGIN;
 
 	if (cpu->translation_cache == NULL)
-		cpu->translation_cache = zeroed_alloc(s);
+		cpu->translation_cache = (unsigned char *) zeroed_alloc(s);
 
 	/*  Create an empty table at the beginning of the translation cache:  */
 	memset(cpu->translation_cache, 0, sizeof(uint32_t)
@@ -501,7 +502,8 @@ static void add_cpu_family(int (*family_init)(struct cpu_family *), int arch)
 	struct cpu_family *fp, *tmp;
 	int res;
 
-	CHECK_ALLOCATION(fp = malloc(sizeof(struct cpu_family)));
+	CHECK_ALLOCATION(fp = (struct cpu_family *)
+	    malloc(sizeof(struct cpu_family)));
 	memset(fp, 0, sizeof(struct cpu_family));
 
 	/*
