@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: machine.cc,v 1.1 2007-11-22 16:53:10 debug Exp $
+ *  $Id: machine.cc,v 1.2 2007-12-09 14:37:29 debug Exp $
  */
 
 #include <stdio.h>
@@ -56,7 +56,7 @@ struct machine_entry *first_machine_entry = NULL;
  *
  *  Returns a reasonably initialized struct machine.
  */
-struct machine *machine_new(char *name, struct emul *emul, int id)
+struct machine *machine_new(const char *name, struct emul *emul, int id)
 {
 	struct machine *m;
 
@@ -70,8 +70,10 @@ struct machine *machine_new(char *name, struct emul *emul, int id)
 		CHECK_ALLOCATION(m->name = strdup(name));
 
 	/*  Full path, e.g. "machine[0]":  */
-	CHECK_ALLOCATION(m->path = (char *) malloc(20));
-	snprintf(m->path, 20, "machine[%i]", id);
+	char *path;
+	CHECK_ALLOCATION(path = (char *) malloc(20));
+	snprintf(path, 20, "machine[%i]", id);
+	m->path = path;
 
 	/*  Sane default values:  */
 	m->serial_nr = 1;
@@ -130,10 +132,10 @@ void machine_destroy(struct machine *machine)
 		cpu_destroy(machine->cpus[i]);
 
 	if (machine->name != NULL)
-		free(machine->name);
+		free((void*)machine->name);
 
 	if (machine->path != NULL)
-		free(machine->path);
+		free((void*)machine->path);
 
 	/*  Remove any remaining level-1 settings:  */
 	settings_remove_all(machine->settings);

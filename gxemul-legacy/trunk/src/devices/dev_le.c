@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *   
  *
- *  $Id: dev_le.c,v 1.56 2007-06-15 19:11:15 debug Exp $
+ *  $Id: dev_le.c,v 1.57 2007-12-09 14:37:29 debug Exp $
  *  
  *  COMMENT: LANCE ethernet, as used in DECstations
  *
@@ -759,7 +759,7 @@ do_return:
  *  dev_le_init():
  */
 void dev_le_init(struct machine *machine, struct memory *mem, uint64_t baseaddr,
-	uint64_t buf_start, uint64_t buf_end, char *irq_path, int len)
+	uint64_t buf_start, uint64_t buf_end, const char *irq_path, int len)
 {
 	char *name2;
 	size_t nlen = 55;

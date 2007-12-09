@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: useremul.h,v 1.2 2007-11-12 13:50:06 debug Exp $
+ *  $Id: useremul.h,v 1.3 2007-12-09 14:37:29 debug Exp $
  */
 
 #include "misc.h"
@@ -43,7 +43,7 @@ extern "C"
 void useremul_setup(struct cpu *, int, char **);
 void useremul_syscall(struct cpu *cpu, uint32_t code);
 void useremul_name_to_useremul(struct cpu *, char *name,
-        int *arch, char **machine_name, char **cpu_name);
+        int *arch, const char **machine_name, char **cpu_name);
 void useremul_list_emuls(void);
 void useremul_init(void);
 

@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *   
  *
- *  $Id: machine_hpcarm.c,v 1.6 2007-06-15 18:08:10 debug Exp $
+ *  $Id: machine_hpcarm.cc,v 1.1 2007-12-09 14:37:29 debug Exp $
  *
  *  COMMENT: Handheld ARM-based machines
  */

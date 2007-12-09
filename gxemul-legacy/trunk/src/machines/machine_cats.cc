@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *   
  *
- *  $Id: machine_cats.c,v 1.15 2007-06-15 18:08:10 debug Exp $
+ *  $Id: machine_cats.cc,v 1.1 2007-12-09 14:37:29 debug Exp $
  *
  *  COMMENT: Simtec Electronics' CATS board
  */
@@ -64,7 +64,7 @@ MACHINE_SETUP(cats)
 
 	snprintf(tmpstr, sizeof(tmpstr), "footbridge irq=%s.cpu[%i].irq"
 	    " addr=0x42000000", machine->path, machine->bootstrap_cpu);
-	pci_bus = device_add(machine, tmpstr);
+	pci_bus = (struct pci_data *) device_add(machine, tmpstr);
 
 	/*  DC21285_ROM_BASE (256 KB at 0x41000000)  */
 	dev_ram_init(machine, 0x41000000, 256 * 1024, DEV_RAM_RAM, 0);

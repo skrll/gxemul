@@ -1,4 +1,4 @@
-$Id: HISTORY,v 1.1658 2007-11-26 14:21:12 debug Exp $
+$Id: HISTORY,v 1.1659 2007-12-09 14:37:28 debug Exp $
 
 Changelog for GXemul:
 ---------------------
@@ -3724,3 +3724,4 @@ Changelog for GXemul:
 20071127	configure now uses -g also for non-development builds.
 		Incorporating Wu Yongwei's debug_new, for memory leak
 		detection.
+20071209	Converting the remaining src/machine/*.c to *.cc.

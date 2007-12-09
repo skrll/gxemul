@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: dev_asc.c,v 1.86 2007-06-15 18:44:19 debug Exp $
+ *  $Id: dev_asc.c,v 1.87 2007-12-09 14:37:28 debug Exp $
  *
  *  COMMENT: NCR53C9X "ASC" SCSI controller
  *
@@ -1225,7 +1225,7 @@ break;
  *  Register an 'asc' device.
  */
 void dev_asc_init(struct machine *machine, struct memory *mem,
-	uint64_t baseaddr, char *irq_path, void *turbochannel, int mode,
+	uint64_t baseaddr, const char *irq_path, void *turbochannel, int mode,
 	size_t (*dma_controller)(void *dma_controller_data,
 		unsigned char *data, size_t len, int writeflag),
 	void *dma_controller_data)

@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *   
  *
- *  $Id: dev_px.c,v 1.38 2007-06-15 19:57:33 debug Exp $
+ *  $Id: dev_px.c,v 1.39 2007-12-09 14:37:29 debug Exp $
  *  
  *  COMMENT: TURBOchannel Pixelstamp graphics card
  *
@@ -752,7 +752,7 @@ odata = random();
 
 
 void dev_px_init(struct machine *machine, struct memory *mem,
-	uint64_t baseaddr, int px_type, char *irq_path)
+	uint64_t baseaddr, int px_type, const char *irq_path)
 {
 	struct px_data *d;
 

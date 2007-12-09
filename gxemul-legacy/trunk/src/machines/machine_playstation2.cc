@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *   
  *
- *  $Id: machine_playstation2.c,v 1.12 2007-06-15 18:08:10 debug Exp $
+ *  $Id: machine_playstation2.cc,v 1.1 2007-12-09 14:37:30 debug Exp $
  *
  *  COMMENT: Sony PlayStation 2
  */
@@ -113,7 +113,7 @@ MACHINE_SETUP(playstation2)
 
 
 	tmplen = 1000;
-	CHECK_ALLOCATION(tmp = malloc(tmplen));
+	CHECK_ALLOCATION(tmp = (char *) malloc(tmplen));
 
 	add_symbol_name(&machine->symbol_context,
 	    PLAYSTATION2_SIFBIOS, 0x10000, "[SIFBIOS entry]", 0, 0);

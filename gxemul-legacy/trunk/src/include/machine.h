@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: machine.h,v 1.185 2007-11-22 16:53:10 debug Exp $
+ *  $Id: machine.h,v 1.186 2007-12-09 14:37:29 debug Exp $
  */
 
 #include <sys/types.h>
@@ -111,17 +111,17 @@ struct machine {
 	struct settings *settings;
 
 	/*  Name as choosen by the user:  */
-	char	*name;
+	const char	*name;
 
 	/*  Full "path" to the machine, e.g. "machine[0]":  */
-	char	*path;
+	const char	*path;
 
 	int	arch;			/*  ARCH_MIPS, ARCH_PPC, ..  */
 	int	machine_type;		/*  MACHINE_PMAX, ..  */
 	int	machine_subtype;	/*  MACHINE_DEC_3MAX_5000, ..  */
 
 	/*  Name set by code in src/machines/machine_*.c:  */
-	char	*machine_name;
+	const char	*machine_name;
 
 	/*  The serial number is mostly used when emulating multiple machines
 	    in a network. nr_of_nics is the current nr of network cards, which
@@ -391,7 +391,7 @@ struct machine_entry {
 
 
 /*  machine.c:  */
-struct machine *machine_new(char *name, struct emul *emul, int id);
+struct machine *machine_new(const char *name, struct emul *emul, int id);
 void machine_destroy(struct machine *machine);
 int machine_name_to_type(char *stype, char *ssubtype,
 	int *type, int *subtype, int *arch);

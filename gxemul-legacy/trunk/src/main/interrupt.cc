@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: interrupt.cc,v 1.1 2007-11-21 12:54:12 debug Exp $
+ *  $Id: interrupt.cc,v 1.2 2007-12-09 14:37:30 debug Exp $
  *
  *  The interrupt subsystem.
  *
@@ -121,7 +121,7 @@ void interrupt_handler_register(struct interrupt *template_interrupt)
  *  still connected users of this interrupt, then an error message is printed
  *  and the emulator aborts.
  */
-void interrupt_handler_remove(char *name)
+void interrupt_handler_remove(const char *name)
 {
 	int i;
 
@@ -169,7 +169,7 @@ void interrupt_handler_remove(char *name)
  *  name is found, the template is filled with valid data, and 1 is returned.
  *  If the name is not found, 0 is returned.
  */
-int interrupt_handler_lookup(char *name, struct interrupt *template_interrupt)
+int interrupt_handler_lookup(const char *name, struct interrupt *template_interrupt)
 {
 	int i;
 

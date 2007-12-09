@@ -27,7 +27,7 @@
 #  SUCH DAMAGE.
 #
 #
-#  $Id: makeautomachine.sh,v 1.6 2007-11-22 16:53:10 debug Exp $
+#  $Id: makeautomachine.sh,v 1.7 2007-12-09 14:37:30 debug Exp $
 
 
 printf "Generating automachine.cc... "
@@ -40,7 +40,7 @@ cat automachine_head.cc >> automachine.cc
 
 printf "3"
 rm -f .index
-for a in *.c *.cc; do
+for a in *.cc; do
 	B=`grep COMMENT $a`
 	if [ z"$B" != z ]; then
 		printf "$a " >> .index
@@ -50,17 +50,6 @@ done
 
 printf "2"
 
-printf "extern \"C\" {\n" >> automachine.cc
-for a in machine_*.c; do
-	B=`grep MACHINE_REGISTER $a`
-	if [ z"$B" != z ]; then
-		C=`grep MACHINE_REGISTER $a | cut -d \( -f 2|cut -d \) -f 1`
-		for B in $C; do
-			printf "void machine_register_$B(void);\n" >> automachine.cc
-		done
-	fi
-done
-printf "}\n" >> automachine.cc
 for a in machine_*.cc; do
 	B=`grep MACHINE_REGISTER $a`
 	if [ z"$B" != z ]; then
@@ -74,7 +63,7 @@ done
 cat automachine_middle.cc >> automachine.cc
 
 printf "1"
-for a in machine_*.c machine_*.cc; do
+for a in machine_*.cc; do
 	B=`grep MACHINE_REGISTER $a`
 	if [ z"$B" != z ]; then
 		C=`grep MACHINE_REGISTER $a | cut -d \( -f 2|cut -d \) -f 1`

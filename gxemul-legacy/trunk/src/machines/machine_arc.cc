@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *   
  *
- *  $Id: machine_arc.c,v 1.20 2007-06-15 18:08:10 debug Exp $
+ *  $Id: machine_arc.cc,v 1.1 2007-12-09 14:37:29 debug Exp $
  *
  *  COMMENT: ARC (Advanced RISC Computing) machines
  */
@@ -52,13 +52,14 @@ MACHINE_SETUP(arc)
 	char tmpstr[1000];
 	char tmpstr2[1000];
 	int i, j;
-	char *eaddr_string = "eaddr=10:20:30:40:50:60";		/*  bogus  */
+	const char *eaddr_string = "eaddr=10:20:30:40:50:60";		/*  bogus  */
 	unsigned char macaddr[6];
+	char *machine_name;
 
-	CHECK_ALLOCATION(machine->machine_name = malloc(MACHINE_NAME_MAXBUF));
+	CHECK_ALLOCATION(machine_name = (char *) malloc(MACHINE_NAME_MAXBUF));
 
 	cpu->byte_order = EMUL_LITTLE_ENDIAN;
-	snprintf(machine->machine_name, MACHINE_NAME_MAXBUF, "ARC");
+	snprintf(machine_name, MACHINE_NAME_MAXBUF, "ARC");
 
 	switch (machine->machine_subtype) {
 
@@ -112,12 +113,12 @@ MACHINE_SETUP(arc)
 
 		switch (machine->machine_subtype) {
 		case MACHINE_ARC_JAZZ_PICA:
-			strlcat(machine->machine_name,
+			strlcat(machine_name,
 			    " (Microsoft Jazz, Acer PICA-61)",
 			    MACHINE_NAME_MAXBUF);
 			break;
 		case MACHINE_ARC_JAZZ_MAGNUM:
-			strlcat(machine->machine_name,
+			strlcat(machine_name,
 			    " (Microsoft Jazz, MIPS Magnum)",
 			    MACHINE_NAME_MAXBUF);
 			break;
@@ -160,7 +161,7 @@ MACHINE_SETUP(arc)
 		case MACHINE_ARC_JAZZ_PICA:
 			if (machine->x11_md.in_use) {
 				dev_vga_init(machine, mem, 0x400a0000ULL,
-				    0x600003c0ULL, machine->machine_name);
+				    0x600003c0ULL, machine_name);
 				arcbios_console_init(machine,
 				    0x400b8000ULL, 0x600003c0ULL);
 			}
@@ -214,6 +215,8 @@ Not yet.
 		    machine->machine_subtype);
 		exit(1);
 	}
+
+	machine->machine_name = machine_name;
 
 	/*
 	 *  NOTE: ARCBIOS shouldn't be used before this point. (The only

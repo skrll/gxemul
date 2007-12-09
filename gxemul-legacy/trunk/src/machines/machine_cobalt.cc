@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *   
  *
- *  $Id: machine_cobalt.c,v 1.12 2007-06-15 18:08:10 debug Exp $
+ *  $Id: machine_cobalt.cc,v 1.1 2007-12-09 14:37:29 debug Exp $
  *
  *  COMMENT: Cobalt (MIPS-based)
  */
@@ -120,7 +120,7 @@ MACHINE_SETUP(cobalt)
 	 */
 	cpu->cd.mips.gpr[MIPS_GPR_A0] =
 	    machine->physical_ram_in_mb * 1048576 + 0xffffffff80000000ULL;
-	machine->bootstr = "root=/dev/hda1 ro";
+	machine->bootstr = strdup("root=/dev/hda1 ro");
 	/*  bootstr = "nfsroot=/usr/cobalt/";  */
 	/*  TODO: bootarg, and/or automagic boot device detection  */
 	store_string(cpu, cpu->cd.mips.gpr[MIPS_GPR_A0] - 512,

@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *   
  *
- *  $Id: dev_turbochannel.c,v 1.50 2007-06-15 19:57:34 debug Exp $
+ *  $Id: dev_turbochannel.c,v 1.51 2007-12-09 14:37:29 debug Exp $
  *  
  *  COMMENT: TURBOchannel bus framework, used in DECstation machines
  */
@@ -174,7 +174,7 @@ DEVICE_ACCESS(turbochannel)
  */
 void dev_turbochannel_init(struct machine *machine, struct memory *mem,
 	int slot_nr, uint64_t baseaddr, uint64_t endaddr,
-	char *device_name, char *irq_path)
+	const char *device_name, const char *irq_path)
 {
 	struct vfb_data *fb;
 	struct turbochannel_data *d;

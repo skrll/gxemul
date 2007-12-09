@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: useremul.cc,v 1.1 2007-11-21 12:22:29 debug Exp $
+ *  $Id: useremul.cc,v 1.2 2007-12-09 14:37:30 debug Exp $
  *
  *  COMMENT: Userland (syscall) emulation framework
  */
@@ -108,7 +108,7 @@ void useremul_syscall(struct cpu *cpu, uint32_t code)
  *             and *cpu_name = "R3000".
  */
 void useremul_name_to_useremul(struct cpu *cpu, char *name, int *arch,
-	char **machine_name, char **cpu_name)
+	const char **machine_name, char **cpu_name)
 {
 	struct syscall_emul *sep;
 

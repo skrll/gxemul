@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *   
  *
- *  $Id: dev_ssc.c,v 1.31 2007-06-15 19:57:34 debug Exp $
+ *  $Id: dev_ssc.c,v 1.32 2007-12-09 14:37:29 debug Exp $
  *
  *  COMMENT: System Support Chip serial controller
  *
@@ -225,7 +225,7 @@ DEVICE_ACCESS(ssc)
 
 
 void dev_ssc_init(struct machine *machine, struct memory *mem,
-	uint64_t baseaddr, char *irq_path, int use_fb)
+	uint64_t baseaddr, const char *irq_path, int use_fb)
 {
 	struct ssc_data *d;
 

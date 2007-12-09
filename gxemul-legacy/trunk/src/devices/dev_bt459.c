@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *   
  *
- *  $Id: dev_bt459.c,v 1.70 2007-06-15 18:44:19 debug Exp $
+ *  $Id: dev_bt459.c,v 1.71 2007-12-09 14:37:28 debug Exp $
  *  
  *  COMMENT: Brooktree BT459, used by TURBOchannel graphics cards
  */
@@ -523,7 +523,7 @@ DEVICE_ACCESS(bt459)
  */
 void dev_bt459_init(struct machine *machine, struct memory *mem,
 	uint64_t baseaddr, uint64_t baseaddr_irq, struct vfb_data *vfb_data,
-	int planes, char *irq_path, int type)
+	int planes, const char *irq_path, int type)
 {
 	struct bt459_data *d;
 

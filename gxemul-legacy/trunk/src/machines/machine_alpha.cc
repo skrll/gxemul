@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *   
  *
- *  $Id: machine_alpha.c,v 1.14 2007-06-15 18:08:10 debug Exp $
+ *  $Id: machine_alpha.cc,v 1.1 2007-12-09 14:37:29 debug Exp $
  *
  *  COMMENT: DEC Alpha machines
  */
@@ -51,7 +51,8 @@ MACHINE_SETUP(alpha)
 	struct crb crb;
 	struct ctb ctb;
 	struct mddt mddt;
-	struct pcs *pcs = malloc(sizeof(struct pcs) * machine->ncpus);
+	struct pcs *pcs = (struct pcs *)
+	    malloc(sizeof(struct pcs) * machine->ncpus);
 	int i;
 
 	switch (machine->machine_subtype) {

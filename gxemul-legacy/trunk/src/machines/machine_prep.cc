@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *   
  *
- *  $Id: machine_prep.c,v 1.20 2007-06-15 18:08:10 debug Exp $
+ *  $Id: machine_prep.cc,v 1.1 2007-12-09 14:37:30 debug Exp $
  *
  *  COMMENT: Machines conforming to the PowerPC Reference Platform specs
  */
@@ -50,7 +50,7 @@ MACHINE_SETUP(prep)
 	char tmpstr[300];
 
 	struct pci_data *pci_data;
-	char *model_name = "";
+	const char *model_name = "";
 
 	switch (machine->machine_subtype) {
 
@@ -68,7 +68,7 @@ MACHINE_SETUP(prep)
 
 		snprintf(tmpstr, sizeof(tmpstr), "eagle irq=%s.cpu[%i]",
 		    machine->path, machine->bootstrap_cpu);
-		pci_data = device_add(machine, tmpstr);
+		pci_data = (struct pci_data *) device_add(machine, tmpstr);
 
 		bus_pci_add(machine, pci_data, machine->memory,
 		    0, 13, 0, "dec21143");
@@ -91,7 +91,7 @@ MACHINE_SETUP(prep)
 
 		snprintf(tmpstr, sizeof(tmpstr), "eagle irq=%s.cpu[%i]",
 		    machine->path, machine->bootstrap_cpu);
-		pci_data = device_add(machine, tmpstr);
+		pci_data = (struct pci_data *) device_add(machine, tmpstr);
 
 		break;
 

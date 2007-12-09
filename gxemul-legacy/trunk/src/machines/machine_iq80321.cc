@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *   
  *
- *  $Id: machine_iq80321.c,v 1.26 2007-06-15 18:08:10 debug Exp $
+ *  $Id: machine_iq80321.cc,v 1.1 2007-12-09 14:37:29 debug Exp $
  *
  *  COMMENT: Intel IQ80321 (ARM)
  */
@@ -60,7 +60,7 @@ MACHINE_SETUP(iq80321)
 
 	snprintf(tmpstr, sizeof(tmpstr), "i80321 irq=%s.cpu[%i].irq "
 	    "addr=0xffffe000", machine->path, machine->bootstrap_cpu);
-	pci = device_add(machine, tmpstr);
+	pci = (struct pci_data *) device_add(machine, tmpstr);
 
 	snprintf(tmpstr, sizeof(tmpstr), "ns16550 irq=%s.cpu[%i].irq."
 	    "i80321.%i addr=0xfe800000 name2='serial console'",

@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *   
  *
- *  $Id: dev_vga.c,v 1.104 2007-06-15 19:57:34 debug Exp $
+ *  $Id: dev_vga.c,v 1.105 2007-12-09 14:37:29 debug Exp $
  *
  *  COMMENT: VGA framebuffer device (charcell and graphics modes)
  *
@@ -1187,7 +1187,7 @@ DEVICE_ACCESS(vga_ctrl)
  *  like 80 and 25, respectively.
  */
 void dev_vga_init(struct machine *machine, struct memory *mem,
-	uint64_t videomem_base, uint64_t control_base, char *name)
+	uint64_t videomem_base, uint64_t control_base, const char *name)
 {
 	struct vga_data *d;
 	size_t allocsize, i;

@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: bus_pci.h,v 1.33 2006-12-30 13:31:00 debug Exp $
+ *  $Id: bus_pci.h,v 1.34 2007-12-09 14:37:29 debug Exp $
  */
 
 #include "misc.h"
@@ -142,6 +142,11 @@ struct pci_device {
  *  bus_pci.c:
  */
 
+#ifdef __cplusplus   
+extern "C"
+{
+#endif /* __cplusplus */
+
 /*  Run-time access:  */
 void bus_pci_decompose_1(uint32_t t, int *bus, int *dev, int *func, int *reg);
 void bus_pci_setaddr(struct cpu *cpu, struct pci_data *pci_data,
@@ -150,15 +155,18 @@ void bus_pci_data_access(struct cpu *cpu, struct pci_data *pci_data,
 	uint64_t *data, int len, int writeflag);
 
 /*  Initialization:  */
-struct pci_data *bus_pci_init(struct machine *machine, char *irq_path,
+struct pci_data *bus_pci_init(struct machine *machine, const char *irq_path,
 	uint64_t pci_actual_io_offset, uint64_t pci_actual_mem_offset,
-	uint64_t pci_portbase, uint64_t pci_membase, char *pci_irqbase,
-	uint64_t isa_portbase, uint64_t isa_membase, char *isa_irqbase);
+	uint64_t pci_portbase, uint64_t pci_membase, const char *pci_irqbase,
+	uint64_t isa_portbase, uint64_t isa_membase, const char *isa_irqbase);
 
 /*  Add a PCI device to a PCI bus:  */
 void bus_pci_add(struct machine *machine, struct pci_data *pci_data,
 	struct memory *mem, int bus, int device, int function,
 	const char *name);
 
+#ifdef __cplusplus   
+}
+#endif /* __cplusplus */
 
 #endif	/*  BUS_PCI_H  */

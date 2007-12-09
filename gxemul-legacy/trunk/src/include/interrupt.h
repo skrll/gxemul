@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: interrupt.h,v 1.7 2007-11-17 11:15:33 debug Exp $
+ *  $Id: interrupt.h,v 1.8 2007-12-09 14:37:29 debug Exp $
  *
  *  Definitions related to the Interrupt subsystem.
  */
@@ -101,8 +101,8 @@ extern "C"
  */
 
 void interrupt_handler_register(struct interrupt *templ);
-void interrupt_handler_remove(char *name);
-int interrupt_handler_lookup(char *name, struct interrupt *templ);
+void interrupt_handler_remove(const char *name);
+int interrupt_handler_lookup(const char *name, struct interrupt *templ);
 
 
 /*

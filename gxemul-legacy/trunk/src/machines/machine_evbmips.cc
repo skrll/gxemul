@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *   
  *
- *  $Id: machine_evbmips.c,v 1.30 2007-06-17 02:17:45 debug Exp $
+ *  $Id: machine_evbmips.cc,v 1.1 2007-12-09 14:37:29 debug Exp $
  *
  *  COMMENT: MIPS evaluation boards (e.g. Malta)
  */

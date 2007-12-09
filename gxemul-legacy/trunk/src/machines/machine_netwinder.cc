@@ -25,9 +25,9 @@
  *  SUCH DAMAGE.
  *   
  *
- *  $Id: machine_pmppc.c,v 1.12 2007-06-15 18:08:10 debug Exp $
+ *  $Id: machine_netwinder.cc,v 1.1 2007-12-09 14:37:29 debug Exp $
  *
- *  COMMENT: Artesyn's PM/PPC board
+ *  COMMENT: NetWinder
  */
 
 #include <stdio.h>
@@ -43,48 +43,54 @@
 #include "misc.h"
 
 
-
-MACHINE_SETUP(pmppc)
+MACHINE_SETUP(netwinder)
 {
-	struct pci_data *pci_data;
 	char tmpstr[300];
+	struct pci_data *pci_bus;
 
-	/*
-	 *  NetBSD/pmppc (http://www.netbsd.org/ports/pmppc/)
-	 */
-	machine->machine_name = "Artesyn's PM/PPC board";
+	machine->machine_name = "NetWinder";
 
-	/*  Bogus default speed = 33 MHz  */
-	if (machine->emulated_hz == 0)
-		machine->emulated_hz = 33000000;
+	if (machine->physical_ram_in_mb > 256)
+		fprintf(stderr, "WARNING! Real NetWinders cannot"
+		    " have more than 256 MB RAM. Continuing anyway.\n");
 
-	/*  PM/PPC specific motherboard registers:  */
-	device_add(machine, "pmppc");
+	/*  CPU at 63.75 MHz, according to NetBSD's netwinder_machdep.c.  */
+	machine->emulated_hz = 63750000;
 
-	/*  PCI and Interrupt controller:  */
-	pci_data = device_add(machine, "cpc700");
+	snprintf(tmpstr, sizeof(tmpstr), "footbridge irq=%s.cpu[%i].irq"
+	    " addr=0x42000000", machine->path, machine->bootstrap_cpu);
+	pci_bus = (struct pci_data *) device_add(machine, tmpstr);
 
-	/*  RTC at "ext int 5" = "int 25" in IBM jargon, int
-	    31-25 = 6 for the rest of us.  */
-	snprintf(tmpstr, sizeof(tmpstr), "%s.cpu[%i].cpc700.%i",
-	    machine->path, machine->bootstrap_cpu, 31-25);
-	dev_mc146818_init(machine, machine->memory, 0x7ff00000, tmpstr,
-	    MC146818_PMPPC, 1);
+	if (machine->x11_md.in_use) {
+		bus_pci_add(machine, pci_bus, machine->memory,
+		    0xc0, 8, 0, "igsfb");
+	}
 
-	bus_pci_add(machine, pci_data, machine->memory, 0, 8, 0, "dec21143");
+	if (!machine->prom_emulation)
+		return;
+
+	arm_setup_initial_translation_table(cpu, 0x4000);
 }
 
 
-MACHINE_DEFAULT_CPU(pmppc)
+MACHINE_DEFAULT_CPU(netwinder)
 {
-	machine->cpu_name = strdup("PPC750");
+	machine->cpu_name = strdup("SA110");
 }
 
 
-MACHINE_REGISTER(pmppc)
+MACHINE_DEFAULT_RAM(netwinder)
 {
-	MR_DEFAULT(pmppc, "Artesyn's PM/PPC board", ARCH_PPC, MACHINE_PMPPC);
+	machine->physical_ram_in_mb = 16;
+}
 
-	machine_entry_add_alias(me, "pmppc");
+
+MACHINE_REGISTER(netwinder)
+{
+	MR_DEFAULT(netwinder, "NetWinder", ARCH_ARM, MACHINE_NETWINDER);
+
+	machine_entry_add_alias(me, "netwinder");
+
+	me->set_default_ram = machine_default_ram_netwinder;
 }
 

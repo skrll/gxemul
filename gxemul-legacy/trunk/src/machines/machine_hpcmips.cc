@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *   
  *
- *  $Id: machine_hpcmips.c,v 1.9 2007-06-15 18:08:10 debug Exp $
+ *  $Id: machine_hpcmips.cc,v 1.1 2007-12-09 14:37:29 debug Exp $
  *
  *  COMMENT: Handheld MIPS-based machines
  */
@@ -333,7 +333,7 @@ MACHINE_SETUP(hpcmips)
 	/*  Special case for the Agenda VR3:  */
 	if (machine->machine_subtype == MACHINE_HPCMIPS_AGENDA_VR3) {
 		const int tmplen = 1000;
-		char *tmp = malloc(tmplen);
+		char *tmp = (char *) malloc(tmplen);
 
 		cpu->cd.mips.gpr[MIPS_GPR_A0] = 2;	/*  argc  */
 

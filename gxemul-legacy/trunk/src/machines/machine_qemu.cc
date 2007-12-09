@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *   
  *
- *  $Id: machine_qemu.c,v 1.14 2007-06-20 18:59:16 debug Exp $
+ *  $Id: machine_qemu.cc,v 1.1 2007-12-09 14:37:30 debug Exp $
  *
  *  COMMENT: Machine mimicing QEMU's default MIPS emulation mode
  *

@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: arcbios.cc,v 1.1 2007-11-17 12:13:53 debug Exp $
+ *  $Id: arcbios.cc,v 1.2 2007-12-09 14:37:30 debug Exp $
  *
  *  COMMENT: ARCBIOS emulation
  */
@@ -2171,7 +2171,7 @@ void arcbios_console_init(struct machine *machine,
  *  Initialize the emulated environment variables.
  */
 static void arc_environment_setup(struct machine *machine, int is64bit,
-	char *primary_ether_addr)
+	const char *primary_ether_addr)
 {
 	size_t bootpath_len = 500;
 	char *init_bootpath;
@@ -2400,7 +2400,7 @@ static void arc_environment_setup(struct machine *machine, int is64bit,
  *  TODO: Refactor; this is too long.
  */
 void arcbios_init(struct machine *machine, int is64bit, uint64_t sgi_ram_offset,
-	char *primary_ether_addr, uint8_t *primary_ether_macaddr)
+	const char *primary_ether_addr, uint8_t *primary_ether_macaddr)
 {
 	int i, alloclen = 20;
 	char *name;

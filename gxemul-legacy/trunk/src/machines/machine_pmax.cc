@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *   
  *
- *  $Id: machine_pmax.c,v 1.29 2007-06-15 19:11:15 debug Exp $
+ *  $Id: machine_pmax.cc,v 1.1 2007-12-09 14:37:30 debug Exp $
  *
  *  COMMENT: Digital DECstation ("PMAX") machines
  */
@@ -57,10 +57,10 @@
 
 MACHINE_SETUP(pmax)
 {
-	char *framebuffer_console_name, *serial_console_name, *init_bootpath;
+	const char *framebuffer_console_name, *serial_console_name, *init_bootpath;
 	int color_fb_flag, i;
 	int boot_scsi_boardnumber = 3, boot_net_boardnumber = 3;
-	char *turbochannel_default_gfx_card = "PMAG-BA";
+	const char *turbochannel_default_gfx_card = "PMAG-BA";
 		/*  PMAG-AA, -BA, -CA/DA/EA/FA, -JA, -RO, PMAGB-BA  */
 	struct xx {
 		struct btinfo_magic a;
@@ -808,7 +808,7 @@ abort();
 		init_bootpath = bootpath;
 	}
 
-	CHECK_ALLOCATION(machine->bootarg = malloc(BOOTARG_BUFLEN));
+	CHECK_ALLOCATION(machine->bootarg = (char *) malloc(BOOTARG_BUFLEN));
 	strlcpy(machine->bootarg, init_bootpath, BOOTARG_BUFLEN);
 	if (strlcat(machine->bootarg, machine->boot_kernel_filename,
 	    BOOTARG_BUFLEN) > BOOTARG_BUFLEN) {
@@ -816,7 +816,7 @@ abort();
 		exit(1);
 	}
 
-	machine->bootstr = "boot";
+	machine->bootstr = strdup("boot");
 
 	store_string(cpu, DEC_PROM_INITIAL_ARGV+0x10, machine->bootstr);
 	store_string(cpu, DEC_PROM_INITIAL_ARGV+0x70, machine->bootarg);
@@ -854,12 +854,12 @@ abort();
 	store_buf(cpu, BOOTINFO_ADDR, (char *)&xx, sizeof(xx));
 
 	CHECK_ALLOCATION(machine->md.pmax =
-	    malloc(sizeof(struct machine_pmax)));
+	    (struct machine_pmax *) malloc(sizeof(struct machine_pmax)));
 	memset(machine->md.pmax, 0, sizeof(struct machine_pmax));
 
 	/*  The system's memmap:  */
 	CHECK_ALLOCATION(machine->md.pmax->memmap =
-	    malloc(sizeof(struct dec_memmap)));
+	    (struct dec_memmap *) malloc(sizeof(struct dec_memmap)));
 	store_32bit_word_in_host(cpu,
 	    (unsigned char *)&machine->md.pmax->memmap->pagesize, 4096);
 	{
