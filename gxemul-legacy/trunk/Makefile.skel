@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile.skel,v 1.60 2007-11-24 10:04:29 debug Exp $
+#  $Id: Makefile.skel,v 1.61 2007-12-12 23:09:49 debug Exp $
 #
 #  Makefile for GXemul
 #
@@ -9,7 +9,15 @@ BIN=gxemul
 BINGUI=gxemul-gui
 LIBS=$(XLIB) $(OTHERLIBS)
 
+
 all: build
+
+documentation:
+	@echo "To build doxygen documentation, run"
+	@echo "    doxygen doc/Doxyfile"
+	@echo "_before_ running the configure script!"
+	@echo "Documentation will end up in doc/html/"
+	@echo "To cleanup:  rm -rf doc/html doc/latex"
 
 build:
 	cd src; $(MAKE); cd ..

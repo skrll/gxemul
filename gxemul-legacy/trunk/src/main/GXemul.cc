@@ -25,7 +25,18 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemul.cc,v 1.3 2007-11-26 14:21:13 debug Exp $
+ *  $Id: GXemul.cc,v 1.4 2007-12-12 23:09:09 debug Exp $
+ */
+
+
+/*  For Doxygen:  */
+
+/*! \mainpage Source code documentation
+ *
+ * This is the automatically generated Doxygen documentation, built from
+ * comments throughout the source code.
+ *
+ * GXemul's home page: <a href="http://gavare.se/gxemul/">http://gavare.se/gxemul/</a>
  */
 
 #include <stdio.h>
