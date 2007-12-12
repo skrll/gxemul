@@ -1,4 +1,4 @@
-$Id: TODO,v 1.569 2007-11-24 02:00:04 debug Exp $
+$Id: TODO,v 1.570 2007-12-12 23:09:53 debug Exp $
 
 Some things, in no specific order, that I'd like to fix:
 (Some items in this list are perhaps already fixed.)
@@ -55,7 +55,12 @@ C => C++ rewrite
 		    The design mode should use cairo for drawing.
 
 		    Dockable/undockable windows for machines/devices/
-		    I/O-units?
+		    I/O-units' contents.
+
+		    Tooltips for components.
+
+		    (Tooltips should be a "summary" of the entire
+		    state window.)
 
 		+)  Debug console:
 		    A text area with a text entry field. Simply a way
@@ -106,9 +111,50 @@ C => C++ rewrite
 		x)  Strings should be supported, both for e.g. variable
 		    assignment, and for e.g. placing strings in memory.
 
+	x)  Save and load ALL state of an emulation, i.e. all
+	    components.
+
+	x)  Regular saving of state with time stamps (i.e. cycle numbers),
+	    so that running "backwards" is possible!
+	    NOTE:
+		1) This must include network packages and disk image
+		   contents! Tricky. But perhaps doable.
+		2) Must be possible to use both from the UI (a "step
+		   backwards" button?) and the debugger.
+
+	x)  Actual machines being emulated 1 per process? Or all in the
+	    same process?
+
+	x)  Tutorials on how to implement new Components!
+
 	x)  There can now be links directly into the documentation,
 	    assuming it is installed. ($PREFIX/share/doc/gxemul/*.html)
 
+     o)  Possibly restart from scratch with the documentation. :-)
+
+Component
+	SerializableComponent
+
+If an emulation has only serializable components, and no non-serializable,
+it is possible to save the entire state. Otherwise just the "setup" can
+be saved, and not the state.
+
+
+Components:
+	Functions:
+		Save/Load state. (Serialization/deserialization.)
+		Give tooltip.
+		Show full state for the debug window.
+		Get/set individual state variabes.
+
+	Variables:
+		Name.		(e.g. "LanceEthernet")
+		Instance name.	("le0")
+
+		Full persistent state.
+		(Temporary state.)
+
+		Connections to other components.
 
 -------------------------------------------------------------------------------
 
