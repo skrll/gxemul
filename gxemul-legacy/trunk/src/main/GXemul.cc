@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemul.cc,v 1.5 2007-12-13 12:30:09 debug Exp $
+ *  $Id: GXemul.cc,v 1.6 2007-12-13 12:37:45 debug Exp $
  */
 
 
@@ -50,15 +50,57 @@
 #include "misc.h"
 
 
-char *progname;
+/**
+ * Creates a GXemul object.
+ */
+GXemul::GXemul(bool bWithGUI, int argc, char *argv[])
+	: m_bWithGUI(bWithGUI)
+{
+	/*  Print startup message:  */
+	if (!m_bWithGUI) {
+		std::cout << "GXemul "VERSION"    Copyright (C) 2003-2007  Anders"
+		    " Gavare\nRead the source code and/or documentation for"
+		    " other Copyright messages.\n\n";
+	}
+}
+
+
+GXemul::~GXemul()
+{
+}
+
+
+/**
+ * Run GXemul's main loop.
+ *
+ * @return Zero on success, non-zero on error.
+ */
+int GXemul::Run()
+{
+	if (m_bWithGUI) {
+#ifdef WITH_GUI
+		GXemulWindow window;
+		Gtk::Main::run(window);
+#else
+		std::cerr << "Sorry, this installation of GXemul was "
+		    "compiled without GUI support.\n";
+#endif
+		return 0;
+	}
+
+	return 0;
+}
+
+
+/*****************************************************************************/
 
 
 /**
  * Checks whether GXemul was launched using the command "gxemul-gui" or not.
  *
- * @returns true if GXemul was launched using the command name "gxemul-gui", otherwise false.
+ * @return True if GXemul was launched using the command name "gxemul-gui", otherwise false.
  */
-static bool WithGui(const char *progname)
+static bool WithGUI(const char *progname)
 {
 	const char *p = strrchr(progname, '/');
 	if (p == NULL)
@@ -73,56 +115,18 @@ static bool WithGui(const char *progname)
 }
 
 
-GXemul::GXemul(int argc, char *argv[])
-{
-	/*  Print startup message:  */
-	if (!WithGui(progname)) {
-		std::cout << "GXemul "VERSION"    Copyright (C) 2003-2007  Anders"
-		    " Gavare\nRead the source code and/or documentation for"
-		    " other Copyright messages.\n\n";
-	}
-}
-
-
-GXemul::~GXemul()
-{
-}
-
-
-/**
- * @return Zero on success, non-zero on error.
- */
-int GXemul::Run()
-{
-	if (WithGui(progname)) {
-#ifdef WITH_GUI
-		GXemulWindow window;
-		Gtk::Main::run(window);
-#else
-		fprintf(stderr, "Sorry, this installation of GXemul was "
-		    "compiled without GUI support.\n");
-#endif
-		return 0;
-	}
-
-	return 0;
-}
-
-
-/*****************************************************************************/
-
 /**
  * Program entry point.
  */
 int main(int argc, char *argv[])
 {
-	progname = argv[0];
+	const char *progname = argv[0];
 
 #ifdef WITH_GUI
 	Gtk::Main main(argc, argv);
 #endif
 
-	GXemul gxemul(argc, argv);
+	GXemul gxemul(WithGUI(progname), argc, argv);
 	return gxemul.Run();
 }
 

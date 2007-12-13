@@ -27,16 +27,19 @@
  *  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *  SUCH DAMAGE.
  *
- *  $Id: GXemul.h,v 1.2 2007-12-13 12:30:09 debug Exp $
+ *  $Id: GXemul.h,v 1.3 2007-12-13 12:37:45 debug Exp $
  */
 
 class GXemul
 {
 public:
-	GXemul(int argc, char *argv[]);
+	GXemul(bool bWithGUI, int argc, char *argv[]);
 	~GXemul();
 
 	int Run();
+
+private:
+	bool	m_bWithGUI;
 };
 
 #endif	// GXEMUL_H
