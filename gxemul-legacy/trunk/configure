@@ -27,7 +27,7 @@
 #  SUCH DAMAGE.
 #
 #
-#  $Id: configure,v 1.288 2007-12-13 12:00:54 debug Exp $
+#  $Id: configure,v 1.289 2007-12-13 21:41:30 debug Exp $
 #
 #  This is a minimal configure script, hardcoded for GXemul. This script
 #  figures out which compiler flags will work, and creates Makefiles in
@@ -1184,6 +1184,19 @@ rm -f _test_end*
 
 ###############################################################################
 
+printf "checking for Doxygen... "
+
+if (doxygen --version > /dev/null); then
+	echo found
+	DOXYGEN=doxygen
+else
+	# Not found is already printed, if doxygen is not found.
+	DOXYGEN="\#"
+fi
+
+
+###############################################################################
+
 GTKMM_VER="2.12.1"
 printf "checking for gtkmm-2.4 >= $GTKMM_VER... "
 
@@ -1232,8 +1245,7 @@ echo "PREFIX=$PREFIX" >> _Makefile.header
 echo "CC=$CC" >> _Makefile.header
 echo "CXX=$CXX" >> _Makefile.header
 echo "OTHERLIBS=$OTHERLIBS" >> _Makefile.header
-echo "CPU_ARCHS=$CPU_ARCHS" >> _Makefile.header
-echo "CPU_TOOLS=$CPU_TOOLS" >> _Makefile.header
+echo "DOXYGEN=$DOXYGEN" >> _Makefile.header
 echo "" >> _Makefile.header
 
 

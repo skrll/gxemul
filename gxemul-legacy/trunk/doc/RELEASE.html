@@ -8,7 +8,7 @@
 <b>GXemul:</b></font>&nbsp;&nbsp;<font color="#000000" size="6"><b>Release notes</b>
 </font></td></tr></table></td></tr></table><p>
 
-<!--  $Id: RELEASE.html,v 1.6 2007-12-13 11:43:19 debug Exp $  -->
+<!--  $Id: RELEASE.html,v 1.7 2007-12-13 21:41:30 debug Exp $  -->
 
 
 <h2>Release notes for GXemul 0.5.0</h2>
@@ -31,6 +31,15 @@
   <li>There are now finally <tt>install</tt> and <tt>uninstall</tt>
 	makefile targets, which should simplify installation.
 </ul>
+
+<p>To build GXemul, you may need the following:
+<ul>
+	<li>The gtkmm libraries and header files (gtkmm-2.4 >= 2.12.1),
+		for the GUI.
+	<li>Doxygen, for building C++ class documentation.
+</ul>
+
+Both gtkmm and Doxygen are optional, GXemul will build without them.
 
 
 <p><br>Super-short mini FAQ:
@@ -56,96 +65,9 @@ or use of this software" must display acknowledgements. Even though I do
 fact that these people have made their files available for re-use, as Free 
 software, so regardless of legal requirements, I guess thanking them like 
 this is in order:<pre>
-    This product includes software developed by the University of
-    California, Berkeley and its contributors.
+	debug_cpp.{h,cc}, fast_mutex.h, and static_assert.h are
+	Copyright (C) 2004-2005 by Wu Yongwei.
 
-    This product includes software developed for the
-    NetBSD Project.  See <a href="http://www.netbsd.org/">http://www.netbsd.org/</a> for
-    information about NetBSD.
-
-    This product includes software developed by Jonathan Stone for
-    the NetBSD Project.
-
-    This product includes software developed for the NetBSD Project
-    by Matthias Drochner.
-
-    This product includes software developed by the NetBSD
-    Foundation, Inc. and its contributors.
-
-    This product includes software developed by Christopher G. Demetriou.
-    [for the NetBSD Project.]
-
-    This product includes software developed by Adam Glass.
-
-    This product includes software developed by the PocketBSD project
-    and its contributors.
-
-    This product includes software developed by Peter Galbavy.
-
-    Carnegie Mellon University   (multiple header files,
-    no specific advertisement text required)
-
-    This product includes software developed by Charles M. Hannum.
-
-    This product includes software developed under <a href="http://www.openbsd.org/">OpenBSD</a> by Per Fogelström.
-
-    This product includes software developed by Per Fogelström.
-
-    This product includes software developed at Ludd, University of
-    Luleå, Sweden and its contributors.
-
-    This product includes software developed by Hellmuth Michaelis
-    and Joerg Wunsch
-
-    The font(s) in devices/fonts are Copyright (c) 1992, 1993, 1994
-    by Hellmuth Michaelis and Joerg Wunsch.  ("This product includes software
-    developed by Hellmuth Michaelis and Joerg Wunsch", well, the font
-    is maybe not software, but still...)
-
-    impactsr-bsd.h is Copyright (C) 2004 by Stanislaw Skowronek.
-
-    This product includes software developed for the NetBSD Project by
-    Wasabi Systems, Inc.  [by Simon Burge]
-
-    arcbios_other.h is Copyright (c) 1996 M. Warner Losh.
-
-    This product includes software developed by Marc Horowitz.
-
-    This product includes software developed by Brini.
-
-    This product includes software developed by Mark Brinicombe
-    for the NetBSD Project.
-
-    This product includes software developed by TooLs GmbH.
-
-    This product includes software developed by Manuel Bouyer.
-
-    This product includes software developed by the Alice Group.
-
-    This product includes software developed by Ichiro FUKUHARA.
-
-    This product includes software developed by Marcus Comstedt.
-
-    This product includes software developed by Bill Paul.
-
-    This product includes software developed by Nivas Madhur.
-
-    debug_cpp.{h,cc}, fast_mutex.h, and static_assert.h are
-    Copyright (C) 2004-2005 by Wu Yongwei.
-
-</pre>
-
-<p>Also, <tt>src/include/alpha_rpb.h</tt> requires the following:<pre>
-    Copyright (c) 1994, 1995, 1996 Carnegie-Mellon University.
-    All rights reserved.
-
-    Author: Keith Bostic, Chris G. Demetriou
-
-    Permission to use, copy, modify and distribute this software and
-    its documentation is hereby granted, provided that both the copyright
-    notice and this permission notice appear in all copies of the
-    software, derivative works or modified versions, and any portions
-    thereof, and that both notices appear in supporting documentation.
 </pre>
 
 <p>See individual files for license details, if you plan to redistribute 

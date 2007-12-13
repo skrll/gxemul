@@ -34,6 +34,11 @@ Quick start
 To compile, type './configure' and then 'make'. This should work on most
 Unix-like systems. If it does not, then please mail me a bug report.
 
+Dependencies (optional):
+
+	gtkmm-2.4 >= 2.12.1	for the GUI
+	doxygen			for building C++ class documentation
+
 You might want to experiment with various CC, CXX, and CFLAGS environment
 variable settings, to get optimum performance.
 

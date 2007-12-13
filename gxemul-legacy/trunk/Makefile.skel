@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile.skel,v 1.62 2007-12-13 12:30:09 debug Exp $
+#  $Id: Makefile.skel,v 1.63 2007-12-13 21:41:30 debug Exp $
 #
 #  Makefile for GXemul
 #
@@ -12,13 +12,6 @@ LIBS=$(XLIB) $(OTHERLIBS)
 
 all: build
 
-documentation:
-	@echo "To build doxygen documentation, run"
-	@echo "    doxygen doc/Doxyfile"
-	@echo "_before_ running the configure script!"
-	@echo "Documentation will end up in doc/html/"
-	@echo "To cleanup:  rm -rf doc/html doc/latex"
-
 build:
 	cd src; $(MAKE); cd ..
 	$(CXX) $(COPTIM) src/main/*.o src/gui/*.o $(LIBS) -o $(BIN)
@@ -27,7 +20,10 @@ build:
 test:
 	@echo TODO: Test
 
-install: build test
+documentation:
+	$(DOXYGEN) doc/Doxyfile
+
+install: build test documentation
 	@echo
 	@echo Installing binaries...
 	mkdir -p $(PREFIX)/bin
@@ -56,6 +52,7 @@ uninstall:
 
 clean:
 	rm -f $(BIN) $(BINGUI) *core core.* *.gmon _* *.exe ktrace.out
+	rm -rf doc/html doc/latex
 	cd src; $(MAKE) clean; cd ..
 
 #  experiments and demos are not cleaned on a normal clean, only on a clean_all.
