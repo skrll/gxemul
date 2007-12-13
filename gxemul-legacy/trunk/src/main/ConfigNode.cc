@@ -25,13 +25,14 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ConfigNode.cc,v 1.3 2007-11-26 14:20:31 debug Exp $
+ *  $Id: ConfigNode.cc,v 1.4 2007-12-13 12:30:09 debug Exp $
  *
  *  A class describing a Configuration Node.
  */
 
-#include "ConfigNode.h"
 #include <iostream>
+
+#include "ConfigNode.h"
 
 
 ConfigNode::ConfigNode(const string& strName)
@@ -94,34 +95,4 @@ string ConfigNode::ToString(int indentation) const
 
 	return str;
 }
-
-
-#ifdef TEST
-
-int main(int argc, char *argv[])
-{
-	refcount_ptr<ConfigNode> rootNode = new ConfigNode("emulation");
-	refcount_ptr<ConfigNode> machineB = new ConfigNode("machine");
-
-	{
-		refcount_ptr<ConfigNode> machineA = new ConfigNode("machine");
-		refcount_ptr<ConfigNode> pcibus(new ConfigNode("pcibus"));
-
-		rootNode->AddChild(machineA);
-		rootNode->AddChild(machineB);
-
-		machineA->AddChild(pcibus);
-
-		std::cout << rootNode->ToString();
-
-		rootNode->RemoveChild(machineA);
-	}
-
-	std::cout << rootNode->ToString();
-
-	std::cout << "TEST OK: ConfigNode\n";
-	return 0;
-}
-
-#endif
 

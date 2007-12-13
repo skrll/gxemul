@@ -27,10 +27,8 @@
  *  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *  SUCH DAMAGE.
  *
- *  $Id: GXemul.h,v 1.1 2007-11-14 12:00:58 debug Exp $
+ *  $Id: GXemul.h,v 1.2 2007-12-13 12:30:09 debug Exp $
  */
-
-#include "emul.h"
 
 class GXemul
 {
@@ -39,9 +37,6 @@ public:
 	~GXemul();
 
 	int Run();
-
-private:
-	struct emul *emul;
 };
 
 #endif	// GXEMUL_H
