@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile.skel,v 1.5 2007-11-19 11:12:43 debug Exp $
+#  $Id: Makefile.skel,v 1.6 2007-12-13 11:49:37 debug Exp $
 #
 #  Makefile for GXemul src/file
 #
@@ -9,7 +9,6 @@ CFLAGS=$(CWARNINGS) $(COPTIM) $(XINCLUDE) $(DINCLUDE)
 OBJS=file.o
 
 all: $(OBJS)
-	../../experiments/make_index.sh
 
 $(OBJS): Makefile
 

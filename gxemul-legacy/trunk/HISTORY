@@ -1,4 +1,4 @@
-$Id: HISTORY,v 1.1661 2007-12-12 23:09:08 debug Exp $
+$Id: HISTORY,v 1.1662 2007-12-13 11:49:37 debug Exp $
 
 Changelog for GXemul:
 ---------------------
@@ -3728,3 +3728,8 @@ Changelog for GXemul:
 		Converting src/debugger/*.c to *.cc.
 20071212	Including a Doxyfile, for doxygen generation (source code
 		comments to HTML).
+20071213	Performing a VERY bold move: Removing pretty much everything of
+		the old code. All CPUs, devices, documentation, PROM emulation
+		modes, disk and file handling, console handling, the old
+		debugger, etc.
+		Planning the new Component framework.

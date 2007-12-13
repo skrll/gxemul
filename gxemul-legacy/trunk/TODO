@@ -1,4 +1,4 @@
-$Id: TODO,v 1.570 2007-12-12 23:09:53 debug Exp $
+$Id: TODO,v 1.571 2007-12-13 11:49:37 debug Exp $
 
 Some things, in no specific order, that I'd like to fix:
 (Some items in this list are perhaps already fixed.)
@@ -13,6 +13,75 @@ C => C++ rewrite
 
 	And there is definitely no concrete plan for how long it will
 	take, or in which order things will need to be done.
+
+
+TODO:
+
+1. a) Rip out all the old documentation!
+   b) Rip out the current debugger completely!
+   c) Rip out all devices!
+   d) Rip out all CPUs!
+   e) Rip out all PROM emulation modules!
+
+2. Implement header files for Components, etc:
+
+	Component
+		constructor:
+			Component = 0 virtual	State should be same as after a Reset.
+		functions:
+			Reset			(e.g. if after loading a saved state, the user
+						wishes to restart as if the components were Clean)
+			SetParent(Component)
+			GetChildren
+			GetTooltip		Default is something like description + "\n" + instance name
+			Get/Set state variables!
+			SaveState		(save/load the state variables)
+			LoadState		(default behaviour is to save/load raw "state variables")
+		vars:
+			class name	(e.g. "pcibus")
+			description	(e.g. "PCI bus")
+			instance name	(e.g. "pcibus0")	May not contain "."
+			children	(pointers to other Components)
+			state variables... (How?)
+					Perhaps:  name = value, where value can only be one of a
+								few predetermined types.
+
+3. New component source code tree:
+
+	src/components/
+		dummy/			Contains dummy test components, for testing
+					the components framework (e.g. serialization...)
+		cpus/
+			CPU		class CPU : public Component, etc
+			arm/
+			alpha/
+			mips/		etc. One for each CPU architecture
+		displays/
+			rgbmonitor	RGB monitor, for e.g. VGA output.
+			lcd		LCD display
+			led		A single led :)
+		network/		Ethernet and others end up here
+		busses/			TurboChannel, ISA, PCI, ...
+		devices/		MISC stuff ends up here, including
+					e.g. VGA graphics cards!
+
+4. New debugger with basic functionality:
+	* Built-in:
+		quit
+		help
+		version
+
+	* Configuration-related:
+		Look at current configuration tree of components.
+		Set focus to somewhere in the tree (given a "path").
+		Add a component somewhere in the tree.
+		Remove a component (including recursively removing all its children)
+		Save configuration.
+		Load configuration.
+		Reset configuration (i.e. reset all components).
+
+5. Unit tests!!!
+
 
 	x)  GTKMM GUI:
 		+)  Menu bar:
@@ -129,32 +198,6 @@ C => C++ rewrite
 
 	x)  There can now be links directly into the documentation,
 	    assuming it is installed. ($PREFIX/share/doc/gxemul/*.html)
-
-     o)  Possibly restart from scratch with the documentation. :-)
-
-Component
-	SerializableComponent
-
-If an emulation has only serializable components, and no non-serializable,
-it is possible to save the entire state. Otherwise just the "setup" can
-be saved, and not the state.
-
-
-Components:
-	Functions:
-		Save/Load state. (Serialization/deserialization.)
-		Give tooltip.
-		Show full state for the debug window.
-		Get/set individual state variabes.
-
-	Variables:
-		Name.		(e.g. "LanceEthernet")
-		Instance name.	("le0")
-
-		Full persistent state.
-		(Temporary state.)
-
-		Connections to other components.
 
 -------------------------------------------------------------------------------
 
