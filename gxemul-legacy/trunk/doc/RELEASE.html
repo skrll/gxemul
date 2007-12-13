@@ -8,7 +8,7 @@
 <b>GXemul:</b></font>&nbsp;&nbsp;<font color="#000000" size="6"><b>Release notes</b>
 </font></td></tr></table></td></tr></table><p>
 
-<!--  $Id: RELEASE.html,v 1.5 2007-11-26 14:21:12 debug Exp $  -->
+<!--  $Id: RELEASE.html,v 1.6 2007-12-13 11:43:19 debug Exp $  -->
 
 
 <h2>Release notes for GXemul 0.5.0</h2>
@@ -17,37 +17,16 @@
 
 
 <p><br>GXemul is a framework for full-system computer architecture emulation. 
-Several processor architectures and machine types have been implemented. 
-It is working well enough to allow <a href="guestoses.html">unmodified
-"guest" operating systems to run inside the emulator</a>,
-as if they were running on real hardware.
-
-<p>The emulator emulates (networks of) real machines. The machines may 
-consist of ARM, MIPS, PowerPC, and SuperH processors, and various 
-surrounding hardware components such as framebuffers, busses, interrupt 
-controllers, ethernet controllers, disk controllers, and serial port 
-controllers.
-
-<p>The <a href="index.html">documentation</a> lists the machines and
-guest operating systems that 
-can be regarded as "working" in GXemul. The best working guest operating 
-systems are <a href="guestoses.html#netbsdpmaxinstall">NetBSD/pmax</a>
-and <a href="guestoses.html#netbsdcatsinstall">NetBSD/cats</a>.
 
 
 <p><br>The changes between release 0.4.6.1 and 0.5.0 are:
 
 <ul>
 
-  <li>I have begun to rewrite some parts of the framework in C++,
-	and also started on a GUI. What this means in practice:
-	<ul>
-		<li>The emulator now depends on gtkmm-2.4 >= 2.12.1, if
-			the GUI is to be included. (It is optional, though.)
-		<li>Many things that worked in previous releases may
-			be broken.
-	</ul>
-
+  <li>GXemul 0.5.0 is a complete rewrite of the emulator, in C++.
+	(Previous versions were written in C.)
+  <p>
+  <li>A preliminary GTK+ GUI is now built-in.
   <p>
   <li>There are now finally <tt>install</tt> and <tt>uninstall</tt>
 	makefile targets, which should simplify installation.
@@ -178,9 +157,6 @@ GXemul or reuse code.
 <p>If you have found GXemul useful in some way, or feel like sending me 
 comments or feedback in general, then mail me at
 <tt>anders(<i>@At</i>)gavare.se</tt>.
-
-
-
 
 
 </body>
