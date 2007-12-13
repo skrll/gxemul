@@ -1,10 +1,10 @@
 #
-#  $Id: Makefile.skel,v 1.2 2007-11-16 23:45:08 debug Exp $
+#  $Id: Makefile.skel,v 1.3 2007-12-13 23:22:05 debug Exp $
 #
 #  Makefile for GXemul src/gui
 #
 
-CFLAGS=$(CWARNINGS) $(COPTIM) $(XINCLUDE) $(DINCLUDE)
+CFLAGS=$(CWARNINGS) $(COPTIM) $(XINCLUDE) $(INCLUDE)
 
 OBJS=DebugConsoleWidget.o EmulationDesignArea.o GXemulWindow.o
 

@@ -28,26 +28,30 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: refcount_ptr.h,v 1.1 2007-11-24 10:05:22 debug Exp $
- *
- *  Reference counting wrapper template.
- *
- *  Usage:
- *		refcount_ptr<MyClass> myPtr;
- *
- *  where MyClass should have increase_refcount and
- *  decrease_refcount, e.g.
- *
- *		class MyClass : public ReferenceCountable
- *		{
- *			...
- *		}
+ *  $Id: refcount_ptr.h,v 1.2 2007-12-13 23:22:05 debug Exp $
  */
 
-
+/**
+ * Reference counting wrapper template.
+ *
+ * Usage:
+ *	refcount_ptr<MyClass> myPtr = new MyClass(...);
+ *
+ * where MyClass should have increase_refcount and
+ * decrease_refcount, e.g.
+ *
+ * class MyClass : public ReferenceCountable
+ * {
+ *	...
+ * }
+ */
 class ReferenceCountable
 {
 public:
+	/**
+	 * Default constructor, which initializes the reference
+	 * count to zero.
+ 	 */
 	ReferenceCountable()
 		: m_refCount(0)
 	{
@@ -57,11 +61,20 @@ public:
 	{
 	}
 
+	/**
+	 * Increases the reference count of the object.
+	 * @return The reference count after increasing it.
+	 */
 	int increase_refcount()
 	{
 		return (++ m_refCount);
 	}
 
+	/**
+	 * Decreases the reference count of the object.
+	 * @return The reference count after decreasing it. If the
+	 *	value is zero, the caller should delete the object.
+	 */
 	int decrease_refcount()
 	{
 		return (-- m_refCount);
@@ -72,10 +85,23 @@ private:
 };
 
 
+/**
+ * A template class representing a reference counted pointer.
+ * Basically, when a pointer assigned to the reference counted pointer,
+ * it increases the reference count of the pointed-to object.
+ * When the reference counted pointer is destroyed (or NULL is
+ * assigned to it), it decreases the reference count of the pointed-to
+ * object. If the reference count reaches zero, the object is deleted.
+ */
 template <class T>
 class refcount_ptr
 {
 public:
+	/**
+	 * Constructor for a reference counted pointer.
+	 *
+	 * @param p Pointer to an object; default is NULL.
+	 */
 	refcount_ptr(T* p = NULL)
 		: m_p(p)
 	{
@@ -83,11 +109,22 @@ public:
 			m_p->increase_refcount();
 	}
 
+	/**
+	 * The destructor causes the reference count to be decreased
+	 * by one. If the reference count of the object reaches zero,
+	 * it is deleted (freed).
+	 */
 	~refcount_ptr()
 	{
 		release();
 	}
 
+	/**
+	 * Copy constructor, which causes the reference count of the
+	 * pointed-to object to be increased.
+	 *
+	 * @param other The reference counted pointer to copy from.
+	 */
 	refcount_ptr(const refcount_ptr& other)
 		: m_p(other.m_p)
 	{
@@ -95,6 +132,15 @@ public:
 			m_p->increase_refcount();
 	}
 
+	/**
+	 * Assignment operator. If an object is already referenced,
+	 * it is released (i.e. its reference is decreased, and if it
+	 * is zero, it is freed). The object referenced to by the
+	 * other reference counted pointer then gets its reference
+	 * count increased.
+	 *
+	 * @param other The reference counted pointer to assign from.
+	 */
 	refcount_ptr& operator = (const refcount_ptr& other)
 	{
 		if (this != &other) {
@@ -105,6 +151,12 @@ public:
 		return *this;
 	}
 
+	/**
+	 * Releases the currently references object, if any, by
+	 * decreasing its reference count. If the count reaches zero,
+	 * that means that no others have pointers to the object,
+	 * and it is freed.
+	 */
 	void release()
 	{
 		if (m_p != NULL) {
@@ -112,11 +164,6 @@ public:
 				delete m_p;
 			m_p = NULL;
 		}
-	}
-
-	operator T* ()
-	{
-		return m_p;
 	}
 
 	T& operator *()
@@ -139,11 +186,26 @@ public:
 		return m_p;
 	}
 
+	/**
+	 * Checks whether or not an object is referenced by the
+	 * reference counted pointer.
+	 *
+	 * @return true if the reference counted pointer is not
+	 *	referencing any object, false otherwise.
+	 */
 	bool IsNULL() const
 	{
 		return m_p == NULL;
 	}
 
+	/**
+	 * Less-than operator, e.g. for sorting.
+	 *
+	 * @param other The reference counted pointer to
+	 *	compare this object to.
+	 * @return true if the plain pointer of this object is
+	 *	less than the plain pointer of the other object.
+	 */
 	bool operator < (const refcount_ptr& other) const
 	{
 		return (size_t)m_p < (size_t)other.m_p;

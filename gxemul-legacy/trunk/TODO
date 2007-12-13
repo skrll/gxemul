@@ -1,9 +1,13 @@
-$Id: TODO,v 1.573 2007-12-13 21:41:30 debug Exp $
+$Id: TODO,v 1.574 2007-12-13 23:22:05 debug Exp $
 
 Some things, in no specific order, that I'd like to fix:
 (Some items in this list are perhaps already fixed.)
 
 -------------------------------------------------------------------------------
+
+1. Who will Own the components?
+   The main GXemul object.
+   Unless they are deleted. Then the undo stack will own them.
 
 2. Implement header files for Components, etc:
 
@@ -52,15 +56,17 @@ Some things, in no specific order, that I'd like to fix:
 		quit
 		help
 		version
-
-	* Configuration-related:
-		Look at current configuration tree of components.
-		Set focus to somewhere in the tree (given a "path").
-		Add a component somewhere in the tree.
-		Remove a component (including recursively removing all its children)
-		Save configuration.
-		Load configuration.
-		Reset configuration (i.e. reset all components).
+		undo
+		redo
+		tree    	Look at current configuration tree of components.
+		focus   	Set focus to somewhere in the tree (given a "path").
+		add     	Add a component somewhere in the tree.
+		remove  	Remove a component (including recursively removing all its children)
+		save    	Save configuration.
+		load    	Load configuration.
+		reset   	Reset configuration (i.e. reset all components).
+		print expr  	Prints expression (gets a state variable)
+		expr = value	Sets a state variable
 
 5. Unit tests!!!
 
@@ -121,27 +127,6 @@ Some things, in no specific order, that I'd like to fix:
 		    execute the command "continue" in the debugger.
 
 	x)  New debugger.
-		x)  Extremely few commands "built-in":
-			help
-			focus		(*1)
-			print		(more or less a "nop" (*))
-			quit
-			version
-		    The rest added during runtime from various modules.
-		    (*1) e.g. setting focus to "machine0.pci1" means
-		    that other commands will try to be based on that
-		    path first.
-		x)  Assignment etc are "arguments" to objects, so that
-			cpu0.pc = 0x1234
-		    actually sends the = argument to the pc object.
-		    If it cannot handle the = argument/operator, then
-		    it should throw an exception.
-		    (This will allow more kinds of operators, such as
-		    +=.)
-		    The default operator for most objects is to print
-		    its value. This makes the command "print" rather
-		    meaningless, since it just calls the arguments
-		    following it.
 		x)  "Object oriented" hierarchy, so that e.g.
 			print machine.pci0.dc0.register_this_and_that
 		    would work.
@@ -157,13 +142,9 @@ Some things, in no specific order, that I'd like to fix:
 			machine1.pci0
 			machine1.pci1
 			machine2.pci0
-		x)  The debugger MUST work the same way from the command
-		    line as from within the GUI.
 		x)  Strings should be supported, both for e.g. variable
 		    assignment, and for e.g. placing strings in memory.
-
-	x)  Save and load ALL state of an emulation, i.e. all
-	    components.
+		x)  Arrays?
 
 	x)  Regular saving of state with time stamps (i.e. cycle numbers),
 	    so that running "backwards" is possible!
@@ -175,8 +156,6 @@ Some things, in no specific order, that I'd like to fix:
 
 	x)  Actual machines being emulated 1 per process? Or all in the
 	    same process?
-
-	x)  Tutorials on how to implement new Components!
 
 	x)  There can now be links directly into the documentation,
 	    assuming it is installed. ($PREFIX/share/doc/gxemul/*.html)

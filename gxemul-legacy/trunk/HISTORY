@@ -1,4 +1,4 @@
-$Id: HISTORY,v 1.1662 2007-12-13 11:49:37 debug Exp $
+$Id: HISTORY,v 1.1663 2007-12-13 23:22:04 debug Exp $
 
 Changelog for GXemul:
 ---------------------
@@ -3732,4 +3732,6 @@ Changelog for GXemul:
 		the old code. All CPUs, devices, documentation, PROM emulation
 		modes, disk and file handling, console handling, the old
 		debugger, etc.
-		Planning the new Component framework.
+		Thinking about the new Component framework.
+20071214	Updating the TODO (basically removing all 0.4.x stuff).
+		Beginning on some Doxygen documentation for simple classes.

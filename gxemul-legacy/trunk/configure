@@ -27,7 +27,7 @@
 #  SUCH DAMAGE.
 #
 #
-#  $Id: configure,v 1.289 2007-12-13 21:41:30 debug Exp $
+#  $Id: configure,v 1.290 2007-12-13 23:22:05 debug Exp $
 #
 #  This is a minimal configure script, hardcoded for GXemul. This script
 #  figures out which compiler flags will work, and creates Makefiles in
@@ -1229,8 +1229,7 @@ echo "checking for 'make install' prefix: $PREFIX"
 
 ###############################################################################
 
-INCLUDE=-Iinclude/
-DINCLUDE=-I../include/
+INCLUDE="-Iinclude/ -I../include/ -I../../include"
 
 rm -f _testprog.c
 
@@ -1240,7 +1239,6 @@ rm -f _testprog.c
 echo "CWARNINGS=$CWARNINGS" >> _Makefile.header
 echo "COPTIM=$CFLAGS" >> _Makefile.header
 echo "INCLUDE=$INCLUDE" >> _Makefile.header
-echo "DINCLUDE=$DINCLUDE" >> _Makefile.header
 echo "PREFIX=$PREFIX" >> _Makefile.header
 echo "CC=$CC" >> _Makefile.header
 echo "CXX=$CXX" >> _Makefile.header
@@ -1250,7 +1248,7 @@ echo "" >> _Makefile.header
 
 
 #  Create the Makefiles:
-D=". src src/gui src/main"
+D=". src src/components src/components/dummy src/gui src/main"
 for a in $D; do
 	echo "creating $a/Makefile"
 	touch $a/Makefile

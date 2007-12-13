@@ -1,12 +1,15 @@
 #
-#  $Id: Makefile.skel,v 1.112 2007-12-13 12:30:09 debug Exp $
+#  $Id: Makefile.skel,v 1.113 2007-12-13 23:22:05 debug Exp $
 #
 #  Makefile for GXemul src
 #
 
 CFLAGS=$(CWARNINGS) $(COPTIM) $(XINCLUDE) $(INCLUDE)
 
-all: do_gui do_main
+all: do_components do_gui do_main
+
+do_components:
+	cd components; $(MAKE); cd ..
 
 do_gui:
 	cd gui; $(MAKE); cd ..
@@ -15,10 +18,12 @@ do_main:
 	cd main; $(MAKE); cd ..
 
 clean:
+	cd components; $(MAKE) clean; cd ..
 	cd gui; $(MAKE) clean; cd ..
 	cd main; $(MAKE) clean; cd ..
 
 clean_all: clean
+	cd components; $(MAKE) clean_all; cd ..
 	cd gui; $(MAKE) clean_all; cd ..
 	cd main; $(MAKE) clean_all; cd ..
 	rm -f Makefile
