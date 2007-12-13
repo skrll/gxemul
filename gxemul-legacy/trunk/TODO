@@ -1,4 +1,4 @@
-$Id: TODO,v 1.571 2007-12-13 11:49:37 debug Exp $
+$Id: TODO,v 1.572 2007-12-13 11:57:09 debug Exp $
 
 Some things, in no specific order, that I'd like to fix:
 (Some items in this list are perhaps already fixed.)
@@ -16,12 +16,6 @@ C => C++ rewrite
 
 
 TODO:
-
-1. a) Rip out all the old documentation!
-   b) Rip out the current debugger completely!
-   c) Rip out all devices!
-   d) Rip out all CPUs!
-   e) Rip out all PROM emulation modules!
 
 2. Implement header files for Components, etc:
 
