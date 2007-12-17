@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemul.cc,v 1.8 2007-12-17 13:53:32 debug Exp $
+ *  $Id: GXemul.cc,v 1.9 2007-12-17 14:07:08 debug Exp $
  *
  *  This file contains three things:
  *
@@ -48,6 +48,9 @@
  * This is the automatically generated Doxygen documentation, built from
  * comments throughout the source code.
  *
+ * See the <a href="../../index.html">main documentation</a> for more
+ * information about this version of %GXemul.
+ *
  * See GXemul's home page for more information about %GXemul in general:
  * <a href="http://gavare.se/gxemul/">http://gavare.se/gxemul/</a>
  *
@@ -67,7 +70,8 @@
  *
  * Reference counting: All components are owned by the GXemul instance, either
  * as part of the normal tree of components, or owned by an action in the
- * undo stack.
+ * undo stack. (Reference counting is implemented for an object by
+ * using the ReferenceCountable helper class.)
  *
  * \subsection undostack_subsec Undo stack
  *
@@ -91,6 +95,7 @@
  *	<li>Avoid using non-portable code constructs. Any external library
  *		dependencies should be optional!
  *	<li>Write Doxygen documentation for everything.
+ *	<li>Write unit tests for everything (if it makes sense).
  *	<li>Keep to 80 columns width.
  *	<li>Use <tt>string</tt> for strings. This is typedeffed to
  *		<tt>Glib::ustring</tt> if it is available (for unicode
