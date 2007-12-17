@@ -1,4 +1,4 @@
-$Id: HISTORY,v 1.1663 2007-12-13 23:22:04 debug Exp $
+$Id: HISTORY,v 1.1664 2007-12-17 13:43:00 debug Exp $
 
 Changelog for GXemul:
 ---------------------
@@ -3735,3 +3735,7 @@ Changelog for GXemul:
 		Thinking about the new Component framework.
 20071214	Updating the TODO (basically removing all 0.4.x stuff).
 		Beginning on some Doxygen documentation for simple classes.
+20071217	Moving Doxygen documentation to doc/doxygen/html....
+		src/main/GXemul.cc is used for the "main page" of the
+		generated Doxygen HTML documentation, so that is where all the
+		general code concepts should be documented.

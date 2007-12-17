@@ -25,19 +25,66 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemul.cc,v 1.6 2007-12-13 12:37:45 debug Exp $
+ *  $Id: GXemul.cc,v 1.7 2007-12-17 13:43:01 debug Exp $
+ *
+ *  This file contains three things:
+ *
+ *	1. Doxygen documentation for the general design concepts of the
+ *	   emulator. The mainpage documentation written here ends up on
+ *	   the "main page" in the generated HTML documentation.
+ *
+ *	2. The GXemul class implementation. This is the main emulator
+ *	   object, which either runs the GUI main loop, or a text console
+ *	   main loop.
+ *
+ *	3. The main() entry point.
  */
 
 
-/*  For Doxygen:  */
-
 /*! \mainpage Source code documentation
+ *
+ * \section intro_sec Introduction
  *
  * This is the automatically generated Doxygen documentation, built from
  * comments throughout the source code.
  *
- * GXemul's home page: <a href="http://gavare.se/gxemul/">http://gavare.se/gxemul/</a>
+ * See GXemul's home page for more information about %GXemul in general:
+ * <a href="http://gavare.se/gxemul/">http://gavare.se/gxemul/</a>
+ *
+ *
+ * \section concepts_sec Core concepts
+ *
+ * \subsection components_subsec Components
+ *
+ * The most important core concept in %GXemul is the Component. Examples of
+ * components are processors, networks, video displays, RAM memory, busses,
+ * interrupt controllers, and all other kinds of devices.
+ *
+ * Each component has a parent, so the full set of components in an emulation
+ * are in fact a tree. The state of each component is stored within
+ * that component. (The root component is a dummy container, which contains
+ * zero or more sub-components, but it doesn't actually do anything else.)
+ *
+ * Reference counting: All components are owned by the GXemul instance, either
+ * as part of the normal tree of components, or owned by an action in the
+ * undo stack.
+ *
+ * \subsection undostack_subsec Undo stack
+ *
+ * Most actions that the user performs in %GXemul can be seen as reversible.
+ * For example, adding a new Component to the configuration tree is a reversible
+ * action. In this case, the reverse action is to simply remove that component.
+ *
+ * By pushing each action onto an undo stack, it is possible to implement
+ * undo/redo functionality. This is available both via the GUI, and
+ * when running via a text-only terminal. If an action is incapable of providing
+ * undo information, then the undo stack is cleared when the action is
+ * performed.
  */
+
+
+/*****************************************************************************/
+
 
 #include <iostream>
 
@@ -51,14 +98,19 @@
 
 
 /**
- * Creates a GXemul object.
+ * Creates a GXemul instance.
+ *
+ * @param bWithGUI	true if the GUI is to be used, false otherwise
+ * @param argc		for parsing command line options
+ * @param argv		for parsing command line options
  */
 GXemul::GXemul(bool bWithGUI, int argc, char *argv[])
 	: m_bWithGUI(bWithGUI)
 {
 	/*  Print startup message:  */
 	if (!m_bWithGUI) {
-		std::cout << "GXemul "VERSION"    Copyright (C) 2003-2007  Anders"
+		std::cout << "GXemul "VERSION
+		    "   --   Copyright (C) 2003-2007  Anders"
 		    " Gavare\nRead the source code and/or documentation for"
 		    " other Copyright messages.\n\n";
 	}
@@ -98,7 +150,9 @@ int GXemul::Run()
 /**
  * Checks whether GXemul was launched using the command "gxemul-gui" or not.
  *
- * @return True if GXemul was launched using the command name "gxemul-gui", otherwise false.
+ * @param progname argv[0] as seen from main()
+ * @return true if GXemul was launched using the command name "gxemul-gui",
+ *	   otherwise false
  */
 static bool WithGUI(const char *progname)
 {

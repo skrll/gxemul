@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile.skel,v 1.64 2007-12-13 23:22:05 debug Exp $
+#  $Id: Makefile.skel,v 1.65 2007-12-17 13:43:01 debug Exp $
 #
 #  Makefile for GXemul
 #
@@ -52,7 +52,7 @@ uninstall:
 
 clean:
 	rm -f $(BIN) $(BINGUI) *core core.* *.gmon _* *.exe ktrace.out
-	rm -rf doc/html doc/latex
+	rm -rf doc/doxygen
 	cd src; $(MAKE) clean; cd ..
 
 #  experiments and demos are not cleaned on a normal clean, only on a clean_all.

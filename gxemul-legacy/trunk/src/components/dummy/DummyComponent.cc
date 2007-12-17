@@ -25,14 +25,14 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: DummyComponent.cc,v 1.1 2007-12-13 23:22:05 debug Exp $
+ *  $Id: DummyComponent.cc,v 1.2 2007-12-17 13:43:01 debug Exp $
  */
 
 #include "components/DummyComponent.h"
 
 
 DummyComponent::DummyComponent()
-	: Component("dummy")
+	: Component("dummy", "Dummy component")
 {
 }
 

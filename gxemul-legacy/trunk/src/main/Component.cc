@@ -25,14 +25,16 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Component.cc,v 1.1 2007-12-13 23:22:20 debug Exp $
+ *  $Id: Component.cc,v 1.2 2007-12-17 13:43:01 debug Exp $
  */
 
 #include "Component.h"
 
 
-Component::Component(const string& strClassName)
+Component::Component(const string& strClassName,
+		const string& strDescription)
 	: m_strClassName(strClassName)
+	, m_strDescription(strDescription)
 {
 }
 

@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Component.h,v 1.1 2007-12-13 23:22:20 debug Exp $
+ *  $Id: Component.h,v 1.2 2007-12-17 13:43:01 debug Exp $
  */
 
 #include "misc.h"
@@ -45,11 +45,22 @@ public:
 	/**
 	 * Base constructor for a Component.
 	 *
-	 * @param strClassName	The name of the component class.
-	 *			It should be a short, descriptive name.
-	 *			For a PCI bus class, it can be "pcibus".
+	 * @param strClassName		The name of the component class.
+	 *				It should be a short, descriptive name.
+	 *				For e.g. a PCI bus class, it can be "pcibus".
+	 * @param strDescription	A short description describing the
+	 *				component class. For e.g. a PCI bus class,
+	 *				it can be "PCI bus".
 	 */
-	Component(const string& strClassName);
+	Component(const string& strClassName,
+		  const string& strDescription);
+
+	/**
+	 * Calling Reset on a Component should reset its state
+	 * to the same state that a newly created Component of that
+	 * type has.
+	 */
+	virtual void Reset() = 0;
 
 private:
 	/**
@@ -59,6 +70,7 @@ private:
 
 private:
 	string		m_strClassName;
+	string		m_strDescription;
 };
 
 

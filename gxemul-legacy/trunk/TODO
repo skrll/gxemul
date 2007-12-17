@@ -1,14 +1,14 @@
-$Id: TODO,v 1.574 2007-12-13 23:22:05 debug Exp $
+$Id: TODO,v 1.575 2007-12-17 13:43:01 debug Exp $
 
 Some things, in no specific order, that I'd like to fix:
 (Some items in this list are perhaps already fixed.)
 
 -------------------------------------------------------------------------------
 
-1. Who will Own the components?
-   The main GXemul object.
-   Unless they are deleted. Then the undo stack will own them.
-
+1. The main GXemul class:
+	Tree of components
+	Undo/redo stack of Actions
+	
 2. Implement header files for Components, etc:
 
 	Component
@@ -24,9 +24,9 @@ Some things, in no specific order, that I'd like to fix:
 			SaveState		(save/load the state variables)
 			LoadState		(default behaviour is to save/load raw "state variables")
 		vars:
-			class name	(e.g. "pcibus")
+			class name	(e.g. "pcibus")		May not contain "."
 			description	(e.g. "PCI bus")
-			instance name	(e.g. "pcibus0")	May not contain "."
+			instance name	(e.g. "pcibus0")	class name + unique number
 			children	(pointers to other Components)
 			state variables... (How?)
 					Perhaps:  name = value, where value can only be one of a
@@ -52,7 +52,13 @@ Some things, in no specific order, that I'd like to fix:
 					e.g. VGA graphics cards!
 
 4. New debugger with basic functionality:
-	* Built-in:
+	* Same command interface when running from the command line, and
+	  inside a window in the GUI.
+	* Tab completion for everything:
+		command names
+		component names
+		components' state variables
+	* Built-in commands:
 		quit
 		help
 		version
@@ -68,7 +74,7 @@ Some things, in no specific order, that I'd like to fix:
 		print expr  	Prints expression (gets a state variable)
 		expr = value	Sets a state variable
 
-5. Unit tests!!!
+
 
 
 	x)  GTKMM GUI:
@@ -80,6 +86,9 @@ Some things, in no specific order, that I'd like to fix:
 					-----------------------
 					GXemul instance
 				Open
+					(Open can show a list of "thumbnails"
+					of the workspace plus e.g. one main
+					window (such as a VGA display).)
 				Save
 				Save as...
 				-----------
@@ -160,4 +169,21 @@ Some things, in no specific order, that I'd like to fix:
 	x)  There can now be links directly into the documentation,
 	    assuming it is installed. ($PREFIX/share/doc/gxemul/*.html)
 
+
+TODO:
+	Userland emulation! (Only from the command line.)
+
+	Hot-swap of devices during runtime, depends on Bus support.
+	e.g.:
+		PCMCIA
+		USB
+		Serial devices
+		Parallel devices
+		VGA monitors
+		...
+
+Architectures to concentrate on, from the beginning:
+	MIPS (since that's what works best in GXemul < 0.5.)
+	amd64 (since there's more software to test that way)
+	some simple AVR microcontroller? for demos
 
