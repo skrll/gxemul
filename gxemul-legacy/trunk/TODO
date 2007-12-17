@@ -1,14 +1,13 @@
-$Id: TODO,v 1.575 2007-12-17 13:43:01 debug Exp $
+$Id: TODO,v 1.576 2007-12-17 23:19:03 debug Exp $
 
-Some things, in no specific order, that I'd like to fix:
-(Some items in this list are perhaps already fixed.)
+Some things, in no specific order, that I'd like to implement or fix.
+Some items in this list are perhaps already fixed. This is just a place
+for me to do brain-storming.
 
 -------------------------------------------------------------------------------
 
-1. The main GXemul class:
-	Tree of components
-	Undo/redo stack of Actions
-	
+1. Unit tests.
+
 2. Implement header files for Components, etc:
 
 	Component

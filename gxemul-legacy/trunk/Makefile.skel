@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile.skel,v 1.65 2007-12-17 13:43:01 debug Exp $
+#  $Id: Makefile.skel,v 1.66 2007-12-17 23:19:03 debug Exp $
 #
 #  Makefile for GXemul
 #
@@ -17,8 +17,8 @@ build:
 	$(CXX) $(COPTIM) src/components/*/*.o src/main/*.o src/gui/*.o $(LIBS) -o $(BIN)
 	ln -f $(BIN) $(BINGUI)
 
-test:
-	@echo TODO: Test
+test: build
+	./$(BIN) -W unittest > /dev/null
 
 documentation:
 	$(DOXYGEN) doc/Doxyfile

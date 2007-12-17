@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemul.cc,v 1.9 2007-12-17 14:07:08 debug Exp $
+ *  $Id: GXemul.cc,v 1.10 2007-12-17 23:19:04 debug Exp $
  *
  *  This file contains three things:
  *
@@ -73,34 +73,45 @@
  * undo stack. (Reference counting is implemented for an object by
  * using the ReferenceCountable helper class.)
  *
- * \subsection undostack_subsec Undo stack
+ * \subsection undostack_subsec Undo stack of Actions
  *
  * Most actions that the user performs in %GXemul can be seen as reversible.
  * For example, adding a new Component to the configuration tree is a reversible
  * action. In this case, the reverse action is to simply remove that component.
  *
- * By pushing each action onto an undo stack, it is possible to implement
+ * By pushing each such Action onto an undo stack, it is possible to implement
  * undo/redo functionality. This is available both via the GUI, and
- * when running via a text-only terminal. If an action is incapable of providing
- * undo information, then the undo stack is cleared when the action is
- * performed.
+ * when running via a text-only terminal. If an action is incapable of
+ * providing undo information, then the undo stack is cleared when the action
+ * is performed.
+ *
+ * The stack is implemented by the ActionStack class. Each GXemul instance
+ * has one such stack.
  *
  *
  * \section codestyle_sec Coding style
  *
- * No specific coding/indentation style is enforced, but there are a few simple
- * guidelines:
+ * The most important guideline is:
  *
+ * <ul>
+ *	<li>Newly written code should be similar to existing code.
+ * </ul>
+ *
+ * But also:
  * <ul>
  *	<li>Avoid using non-portable code constructs. Any external library
  *		dependencies should be optional!
- *	<li>Write Doxygen documentation for everything.
- *	<li>Write unit tests for everything (if it makes sense).
+ *	<li>Write <a href="http://en.wikipedia.org/wiki/Doxygen">
+ *		Doxygen</a> documentation for everything.
+ *	<li>Write unit tests for everything. For now, the UnitTest class
+ *		is a simple helper for writing unit tests.
+ *	<li>Use <a href="http://en.wikipedia.org/wiki/Hungarian_notation">
+ *		Hungarian notation</a> for symbol/variable names.
  *	<li>Keep to 80 columns width.
  *	<li>Use <tt>string</tt> for strings. This is typedeffed to
- *		<tt>Glib::ustring</tt> if it is available (for unicode
+ *		<tt>Glib::ustring</tt> if it is available (for
+ *		<a href="http://en.wikipedia.org/wiki/Unicode">unicode</a>
  *		support), otherwise it is typedeffed to <tt>std::string</tt>.
- *	<li>Style, when writing new code, should be similar to existing code.
  * </ul>
  */
 
@@ -115,42 +126,87 @@
 #include "GXemulWindow.h"
 #endif
 
-#include "GXemul.h"
 #include "misc.h"
 
+#include "GXemul.h"
+#include "UnitTest.h"
 
-/**
- * Creates a GXemul instance.
- *
- * @param bWithGUI	true if the GUI is to be used, false otherwise
- * @param argc		for parsing command line options
- * @param argv		for parsing command line options
- */
-GXemul::GXemul(bool bWithGUI, int argc, char *argv[])
+#include <unistd.h>
+extern char *optarg;
+
+
+GXemul::GXemul(bool bWithGUI)
 	: m_bWithGUI(bWithGUI)
+	, m_bRunUnitTests(false)
 {
-	/*  Print startup message:  */
-	if (!m_bWithGUI) {
-		std::cout << "GXemul "VERSION
-		    "   --   Copyright (C) 2003-2007  Anders"
-		    " Gavare\nRead the source code and/or documentation for"
-		    " other Copyright messages.\n\n";
+}
+
+
+bool GXemul::ParseOptions(int argc, char *argv[])
+{
+	int ch;
+	const char *opts = "W:";
+
+	while ((ch = getopt(argc, argv, opts)) != -1) {
+		switch (ch) {
+		case 'W':
+			if (string(optarg) == "unittest")
+				m_bRunUnitTests = true;
+			else {
+				PrintUsage(false);
+				return false;
+			}
+			break;
+		case 'h':
+			PrintUsage(true);
+			return false;
+		default:
+			PrintUsage(false);
+			return false;
+		}
 	}
+
+	return true;
 }
 
 
-GXemul::~GXemul()
+static void PrintBanner()
 {
+	std::cout << "GXemul "VERSION
+	    "      Copyright (C) 2003-2007  Anders"
+	    " Gavare\nRead the source code and/or documentation for"
+	    " other Copyright messages.\n\n";
 }
 
 
-/**
- * Run GXemul's main loop.
- *
- * @return Zero on success, non-zero on error.
- */
+void GXemul::PrintUsage(bool bLong) const
+{
+	PrintBanner();
+
+	std::cout << "Usage: gxemul [options]\n"
+		     "   or  gxemul-gui [options]\n\n"
+		     "where options may be:\n\n";
+
+	std::cout <<
+		"  -h             display help message\n"
+#ifndef WITHOUTUNITTESTS
+		"  -W unittest    run unit tests\n"
+#endif
+	    ;
+}
+
+
 int GXemul::Run()
 {
+	/*  Print startup message:  */
+	if (!m_bWithGUI)
+		PrintBanner();
+
+	/*  Run unit tests? Then only run those, and then exit.  */
+	if (m_bRunUnitTests)
+		return UnitTest::RunTests();
+
+	/*  Run the main loop:  */
 	if (m_bWithGUI) {
 #ifdef WITH_GUI
 		GXemulWindow window;
@@ -202,7 +258,11 @@ int main(int argc, char *argv[])
 	Gtk::Main main(argc, argv);
 #endif
 
-	GXemul gxemul(WithGUI(progname), argc, argv);
+	GXemul gxemul(WithGUI(progname));
+
+	if (!gxemul.ParseOptions(argc, argv))
+		return 1;
+
 	return gxemul.Run();
 }
 

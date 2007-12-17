@@ -1,5 +1,5 @@
-#ifndef GXEMUL_H
-#define	GXEMUL_H
+#ifndef UNITTEST_H
+#define	UNITTEST_H
 
 /*
  *  Copyright (C) 2007  Anders Gavare.  All rights reserved.
@@ -27,67 +27,31 @@
  *  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *  SUCH DAMAGE.
  *
- *  $Id: GXemul.h,v 1.5 2007-12-17 23:19:04 debug Exp $
+ *
+ *  $Id: UnitTest.h,v 1.1 2007-12-17 23:19:04 debug Exp $
  */
 
 #include "misc.h"
 
-#include "ActionStack.h"
-#include "Component.h"
-
 
 /**
- * The GXemul class is the main emulator class. Its main purpose is to
- * run the GUI main loop, or the text terminal main loop.
- *
- * A GXemul instance has a tree of components, which make up the full
- * state of the current emulation setup.
- *
- * Also, a stack of undo/redo actions is also kept.
+ * The UnitTest class is a collection of helper functions,
+ * for writing simple unit tests.
  */
-class GXemul
+class UnitTest
 {
 public:
 	/**
-	 * Creates a GXemul instance.
+	 * If WITHOUTUNITTESTS was defined in config.h, nothing is tested,
+	 * and zero is returned.
 	 *
-	 * @param bWithGUI      true if the GUI is to be used, false otherwise
-	 */
-	GXemul(bool bWithGUI);
-
-	/**
-	 * Parses command line arguments.
+	 * Otherwise, unit tests for all classes listed in
+	 * src/main/UnitTest.cc are executed.
 	 *
-	 * @param argc for parsing command line options
-	 * @param argv for parsing command line options
-	 * @return true if options were parsable, false if there was
-	 *		some error.
+	 * @return zero if no unit tests failed, 1 otherwise.
 	 */
-	bool ParseOptions(int argc, char *argv[]);
-
-	/**
-	 * Runs GXemul's main loop. This can be either a GUI main loop, or
-	 * a text terminal based main loop.
-	 *
-	 * @return Zero on success, non-zero on error.
-	 */
-	int Run();
-
-private:
-	/**
-	 * Prints help message to std::cout.
-	 *
-	 * @param bLong true if the long help message should be printed,
-	 *		false to only print a short message.
-	 */
-	void PrintUsage(bool bLong) const;
-
-private:
-	bool			m_bWithGUI;
-	bool			m_bRunUnitTests;
-
-	refcount_ptr<Component>	m_rootComponent;
-	ActionStack		m_actionStack;
+	static int RunTests();
 };
 
-#endif	// GXEMUL_H
+
+#endif	// UNITTEST_H

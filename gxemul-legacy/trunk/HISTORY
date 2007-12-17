@@ -1,4 +1,4 @@
-$Id: HISTORY,v 1.1664 2007-12-17 13:43:00 debug Exp $
+$Id: HISTORY,v 1.1665 2007-12-17 23:19:03 debug Exp $
 
 Changelog for GXemul:
 ---------------------
@@ -3739,3 +3739,4 @@ Changelog for GXemul:
 		src/main/GXemul.cc is used for the "main page" of the
 		generated Doxygen HTML documentation, so that is where all the
 		general code concepts should be documented.
+20071218	Adding skeleton Action, ActionStack, and UnitTest frameworks.

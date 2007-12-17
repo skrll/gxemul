@@ -1,5 +1,5 @@
-#ifndef GXEMUL_H
-#define	GXEMUL_H
+#ifndef ACTIONSTACK_H
+#define	ACTIONSTACK_H
 
 /*
  *  Copyright (C) 2007  Anders Gavare.  All rights reserved.
@@ -27,67 +27,60 @@
  *  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *  SUCH DAMAGE.
  *
- *  $Id: GXemul.h,v 1.5 2007-12-17 23:19:04 debug Exp $
+ *
+ *  $Id: ActionStack.h,v 1.1 2007-12-17 23:19:04 debug Exp $
  */
 
 #include "misc.h"
 
-#include "ActionStack.h"
-#include "Component.h"
+#include "Action.h"
 
 
 /**
- * The GXemul class is the main emulator class. Its main purpose is to
- * run the GUI main loop, or the text terminal main loop.
+ * The ActionStack contains zero or more reference counted pointers 
+ * to Action objects.
  *
- * A GXemul instance has a tree of components, which make up the full
- * state of the current emulation setup.
- *
- * Also, a stack of undo/redo actions is also kept.
+ * The main purpose of this class, together with the Action class, is to 
+ * enable undo/redo functionality for the end user via the GUI, but the
+ * functionality is also available from the text-only interface.
  */
-class GXemul
+class ActionStack
 {
 public:
 	/**
-	 * Creates a GXemul instance.
-	 *
-	 * @param bWithGUI      true if the GUI is to be used, false otherwise
+	 * Clears the stack.
 	 */
-	GXemul(bool bWithGUI);
+	void Clear();
 
 	/**
-	 * Parses command line arguments.
+	 * Checks whether the stack is empty. The main purpose of
+	 * this is for indication in the GUI. If the stack is empty, the
+	 * undo button (or undo menu entry) can be greyed out.
 	 *
-	 * @param argc for parsing command line options
-	 * @param argv for parsing command line options
-	 * @return true if options were parsable, false if there was
-	 *		some error.
+	 * @return true if the stack is empty, false otherwise.
 	 */
-	bool ParseOptions(int argc, char *argv[]);
+	bool IsEmpty() const;
 
 	/**
-	 * Runs GXemul's main loop. This can be either a GUI main loop, or
-	 * a text terminal based main loop.
+	 * Pushes an Action onto the stack. This increases the reference
+	 * count of the action, so the caller can release its reference.
 	 *
-	 * @return Zero on success, non-zero on error.
+	 * @param pAction a pointer to the Action to push
 	 */
-	int Run();
+	void PushAction(Action* pAction);
+
+	/**
+	 * Pops an Action from the stack, if there is any left. The
+	 * return value is a reference counted pointer; ownership of the
+	 * Action is transfered to the caller.
+	 *
+	 * @return a reference counter pointer to an Action
+	 */
+	refcount_ptr<Action> PopAction();
 
 private:
-	/**
-	 * Prints help message to std::cout.
-	 *
-	 * @param bLong true if the long help message should be printed,
-	 *		false to only print a short message.
-	 */
-	void PrintUsage(bool bLong) const;
-
-private:
-	bool			m_bWithGUI;
-	bool			m_bRunUnitTests;
-
-	refcount_ptr<Component>	m_rootComponent;
-	ActionStack		m_actionStack;
+	vector< refcount_ptr<Action> >	m_vecActions;
 };
 
-#endif	// GXEMUL_H
+
+#endif	// ACTIONSTACK_H

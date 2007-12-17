@@ -1,5 +1,5 @@
-#ifndef GXEMUL_H
-#define	GXEMUL_H
+#ifndef ACTION_H
+#define	ACTION_H
 
 /*
  *  Copyright (C) 2007  Anders Gavare.  All rights reserved.
@@ -27,67 +27,49 @@
  *  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *  SUCH DAMAGE.
  *
- *  $Id: GXemul.h,v 1.5 2007-12-17 23:19:04 debug Exp $
+ *
+ *  $Id: Action.h,v 1.1 2007-12-17 23:19:04 debug Exp $
  */
 
 #include "misc.h"
 
-#include "ActionStack.h"
-#include "Component.h"
-
 
 /**
- * The GXemul class is the main emulator class. Its main purpose is to
- * run the GUI main loop, or the text terminal main loop.
+ * Actions that are replayable and/or undoable are implemented using the
+ * Action class.
  *
- * A GXemul instance has a tree of components, which make up the full
- * state of the current emulation setup.
- *
- * Also, a stack of undo/redo actions is also kept.
+ * The main purpose of this class, together with the ActionStack class, is 
+ * to enable undo/redo functionality for the end user via the GUI, but the 
+ * functionality is also available from the text-only interface.
  */
-class GXemul
+class Action
+	: public ReferenceCountable
 {
 public:
 	/**
-	 * Creates a GXemul instance.
+	 * Base constructor for an Action.
 	 *
-	 * @param bWithGUI      true if the GUI is to be used, false otherwise
+	 * @param strClassName		The name of the action class.
+	 *				It should be a short, descriptive name,
+	 *				e.g. "add component".
+	 * @param strDescription	A short description describing the
+	 *				action. For e.g. the "add component"
+	 *				action, it can be "Adds a component to
+	 *				the current configuration tree."
 	 */
-	GXemul(bool bWithGUI);
+	Action(const string& strClassName,
+		const string& strDescription);
 
-	/**
-	 * Parses command line arguments.
-	 *
-	 * @param argc for parsing command line options
-	 * @param argv for parsing command line options
-	 * @return true if options were parsable, false if there was
-	 *		some error.
-	 */
-	bool ParseOptions(int argc, char *argv[]);
+	virtual void Execute() = 0;
 
-	/**
-	 * Runs GXemul's main loop. This can be either a GUI main loop, or
-	 * a text terminal based main loop.
-	 *
-	 * @return Zero on success, non-zero on error.
-	 */
-	int Run();
+	virtual void Redo() = 0;
+
+	virtual void Undo() = 0;
 
 private:
-	/**
-	 * Prints help message to std::cout.
-	 *
-	 * @param bLong true if the long help message should be printed,
-	 *		false to only print a short message.
-	 */
-	void PrintUsage(bool bLong) const;
-
-private:
-	bool			m_bWithGUI;
-	bool			m_bRunUnitTests;
-
-	refcount_ptr<Component>	m_rootComponent;
-	ActionStack		m_actionStack;
+	string	m_strClassName;
+	string	m_strDescription;
 };
 
-#endif	// GXEMUL_H
+
+#endif	// ACTION_H

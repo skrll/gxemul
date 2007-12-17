@@ -27,7 +27,7 @@
 #  SUCH DAMAGE.
 #
 #
-#  $Id: configure,v 1.290 2007-12-13 23:22:05 debug Exp $
+#  $Id: configure,v 1.291 2007-12-17 23:19:04 debug Exp $
 #
 #  This is a minimal configure script, hardcoded for GXemul. This script
 #  figures out which compiler flags will work, and creates Makefiles in
@@ -82,16 +82,20 @@ if [ z"$*" != z ]; then
 			WITHX11=YES
 		else if [ z$a = z--without-x11 ]; then
 			WITHOUTX11=YES
+		else if [ z$a = z--without-unit-tests ]; then
+			WITHOUTUNITTESTS=YES
 		else if [ z$a = z--help ]; then
 			printf "usage: $0 [options]\n\n"
 			if [ z"$UNSTABLE" = zYES ]; then
-				echo "  --debug             configure" \
+				echo "  --debug               configure" \
 					"for a debug build"
 			fi
-			echo "  --with-gui          build with the gtkmm GUI"
-			echo "  --without-gui       build without the gtkmm GUI"
-			echo "  --with-x11          build with X11 framebuffer support"
-			echo "  --without-x11       build without X11 framebuffer support"
+			echo "  --without-unit-tests  build without unit tests"
+			echo
+			echo "  --with-gui            build with the gtkmm GUI"
+			echo "  --without-gui         build without the gtkmm GUI"
+			echo "  --with-x11            build with X11 framebuffer support"
+			echo "  --without-x11         build without X11 framebuffer support"
 			echo
 			echo "(default is to detect gtkmm and X11 automatically)"
 			echo
@@ -105,7 +109,7 @@ if [ z"$*" != z ]; then
 			echo "Run  $0 --help  to get a list of" \
 			    "available options."
 			exit
-		fi; fi; fi; fi; fi; fi
+		fi; fi; fi; fi; fi; fi; fi
 	done
 fi
 
@@ -139,6 +143,9 @@ if [ z"$UNSTABLE" = zYES ]; then
 	printf "#define UNSTABLE_DEVEL\n" >> config.h
 fi
 
+if [ z"$WITHOUTUNITTESTS" = zYES ]; then
+	printf "#define WITHOUTUNITTESTS\n" >> config.h
+fi
 
 if [ ! z"$DEBUG" = zYES ]; then
 	CFLAGS="-DNDEBUG $CFLAGS"
@@ -1248,7 +1255,9 @@ echo "" >> _Makefile.header
 
 
 #  Create the Makefiles:
-D=". src src/components src/components/dummy src/gui src/main"
+D=". src src/components"
+D="$D src/components/dummy"
+D="$D src/gui src/main"
 for a in $D; do
 	echo "creating $a/Makefile"
 	touch $a/Makefile
