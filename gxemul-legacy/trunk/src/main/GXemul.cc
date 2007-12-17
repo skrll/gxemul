@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemul.cc,v 1.7 2007-12-17 13:43:01 debug Exp $
+ *  $Id: GXemul.cc,v 1.8 2007-12-17 13:53:32 debug Exp $
  *
  *  This file contains three things:
  *
@@ -80,6 +80,23 @@
  * when running via a text-only terminal. If an action is incapable of providing
  * undo information, then the undo stack is cleared when the action is
  * performed.
+ *
+ *
+ * \section codestyle_sec Coding style
+ *
+ * No specific coding/indentation style is enforced, but there are a few simple
+ * guidelines:
+ *
+ * <ul>
+ *	<li>Avoid using non-portable code constructs. Any external library
+ *		dependencies should be optional!
+ *	<li>Write Doxygen documentation for everything.
+ *	<li>Keep to 80 columns width.
+ *	<li>Use <tt>string</tt> for strings. This is typedeffed to
+ *		<tt>Glib::ustring</tt> if it is available (for unicode
+ *		support), otherwise it is typedeffed to <tt>std::string</tt>.
+ *	<li>Style, when writing new code, should be similar to existing code.
+ * </ul>
  */
 
 
