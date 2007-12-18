@@ -8,7 +8,7 @@
 <b>GXemul:</b></font>&nbsp;&nbsp;<font color="#000000" size="6"><b>Introduction</b>
 </font></td></tr></table></td></tr></table><p>
 
-<!--  $Id: intro.html,v 1.132 2007-12-18 12:16:44 debug Exp $  -->
+<!--  $Id: intro.html,v 1.133 2007-12-18 21:18:24 debug Exp $  -->
 
 <h2>Introduction</h2>
 
@@ -21,10 +21,44 @@ surrounding devices and peripherals are also emulated.
 <a href="http://en.wikipedia.org/wiki/C%2B%2B">C++</a>. Previous versions
 were written in plain
 <a href="http://en.wikipedia.org/wiki/C_%28programming_language%29">C</a>.
+The main two reasons for rewriting in C++ was 1) that I wanted to learn C++
+a bit more, and 2) that GXemul had stagnated feature-wise, and I needed
+a fresh start to build a better base platform.
 
-<p>To build GXemul, simply run <tt>configure</tt> followed by
-<tt>make</tt>. This should work on most Unix-like platforms. If it does 
-not work for you, then please mail me a detailed bug report.
+<p>Thanks to (in no specific order) Joachim Buss, Olivier Houchard, Juli 
+Mallett, Juan Romero Pardines, Carl van Schaik, Miod Vallat, Alec Voropay,
+Göran Weinholt, Alexander Yurchenko, and everyone else who has provided me
+with feedback on previous versions of GXemul.
+
+<p>GXemul's homepage is
+<a href="http://gavare.se/gxemul/">http://gavare.se/gxemul/</a>.
+
+<p>If you have found GXemul useful in some way, or feel like sending me 
+comments or feedback in general, then mail me at&nbsp;&nbsp;<tt>anders <i>(at)</i> gavare.se</tt>.
+
+
+<p><br><h3><a name="build">How to build GXemul</a></h3>
+
+<p>If you are lucky, your OS vendor has already packaged GXemul for your
+particular platform. If so, then please refer to your OS on how to
+download/install GXemul. E.g. on FreeBSD, you would usually execute<pre>
+	pkg_add -r gxemul
+</pre>
+as root. That will install [some version of] GXemul from the FreeBSD
+Ports collection.
+
+<p>In case GXemul is not available as a pre-built package for your OS,
+or it is available but only an older version, or if you feel like
+compiling from source code directly, simply download the GXemul
+distribution and run:<pre>
+	configure
+	make
+</pre>
+
+<p>This should work on most Unix-like platforms. (If it does 
+not work for you, then please mail me a detailed bug report, including
+the output of <tt>uname -a</tt>, the <tt>configure</tt> and <tt>make</tt>
+output, and any other useful information.)
 
 <p>(Using <a href="http://en.wikipedia.org/wiki/Cygwin">Cygwin</a>
  might work as well, but this is not really supported.)

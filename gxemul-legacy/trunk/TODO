@@ -1,8 +1,12 @@
-$Id: TODO,v 1.577 2007-12-18 12:16:43 debug Exp $
+$Id: TODO,v 1.578 2007-12-18 21:18:23 debug Exp $
 
 Some things, in no specific order, that I'd like to implement or fix.
 Some items in this list are perhaps already fixed. This is just a place
 for me to do brain-storming.
+
+Please note that GXemul 0.5.0 is a rewrite of GXemul from scratch.
+This file has nothing to do with the TODO files from previous versions
+of GXemul.
 
 -------------------------------------------------------------------------------
 
@@ -17,6 +21,7 @@ for me to do brain-storming.
 		Push and pop actions.
 	The component tree.
 		Perform Actions.
+		save/load
 
 2. Implement header files for Components, etc:
 
@@ -193,6 +198,7 @@ TODO:
 
 Architectures to concentrate on, from the beginning:
 	MIPS (since that's what works best in GXemul < 0.5.)
+	M88K (so that the work so far isn't lost)
 	amd64 (since there's more software to test that way)
 	some simple AVR microcontroller? for demos
 
