@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ActionStack.cc,v 1.3 2007-12-18 21:35:13 debug Exp $
+ *  $Id: ActionStack.cc,v 1.4 2007-12-18 22:12:45 debug Exp $
  */
 
 #include "ActionStack.h"
@@ -59,7 +59,7 @@ int ActionStack::GetNrOfRedoableActions() const
 void ActionStack::PushActionAndExecute(refcount_ptr<Action>& pAction)
 {
 	m_vecUndoActions.push_back(pAction);
-	m_vecRedoActions.clear();
+	ClearRedo();
 
 	pAction->Execute();
 }

@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ActionStack.h,v 1.5 2007-12-18 21:35:13 debug Exp $
+ *  $Id: ActionStack.h,v 1.6 2007-12-18 22:12:45 debug Exp $
  */
 
 #include "misc.h"
@@ -85,10 +85,11 @@ public:
 	/**
 	 * \brief Pushes an Action onto the undo stack, and executes it.
 	 *
-	 * This increases the reference count of the action, so the caller
-	 * can release its reference.
-	 *
-	 * The redo stack is cleared.
+	 * Note: The redo stack is cleared when this function is used.
+	 * In practice, this means that as long as the user does not issue
+	 * <i>new</i> actions, it is possible to move back and forward in
+	 * time by using undo/redo. As soon as the user issues a new action,
+	 * this breaks the possibility to go forward in the old redo history.
 	 *
 	 * @param pAction a pointer to the Action to push
 	 */
@@ -108,7 +109,7 @@ public:
 	/**
 	 * \brief Redoes an Action from the redo stack, if any is available.
 	 *
-	 * The Action's Redo function is executed, and the Action is moved
+	 * The Action's Execute function is executed, and the Action is moved
 	 * to the undo stack from the redo stack.
 	 *
 	 * @return true if an action was redone, false if the redo stack

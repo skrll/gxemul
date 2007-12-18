@@ -1,53 +1,41 @@
-$Id: TODO,v 1.578 2007-12-18 21:18:23 debug Exp $
+$Id: TODO,v 1.579 2007-12-18 22:12:45 debug Exp $
 
 Some things, in no specific order, that I'd like to implement or fix.
 Some items in this list are perhaps already fixed. This is just a place
 for me to do brain-storming.
 
-Please note that GXemul 0.5.0 is a rewrite of GXemul from scratch.
+Please note that GXemul 0.5.0 is a complete rewrite of GXemul, from scratch.
 This file has nothing to do with the TODO files from previous versions
 of GXemul.
 
 -------------------------------------------------------------------------------
 
-0. ActionStack BOTH undo and redo stack!
-	undo vector size
-	redo vector size
-	adding a new action causes the redo vector to be cleared!
-	undo/redo moves between vectors!
+Components
+----------
 
-1. Unit tests.
-	The ActionStack.
-		Push and pop actions.
-	The component tree.
-		Perform Actions.
-		save/load
+Actions for adding components, removing them...
 
-2. Implement header files for Components, etc:
+	constructor:
+		Component = 0 virtual	State should be same as after a Reset.
+	functions:
+		Reset			(e.g. if after loading a saved state, the user
+					wishes to restart as if the components were Clean)
+		SetParent(Component)
+		GetChildren
+		GetTooltip		Default is something like description + "\n" + instance name
+		Get/Set state variables!
+		SaveState		(save/load the state variables)
+		LoadState		(default behaviour is to save/load raw "state variables")
+	vars:
+		class name	(e.g. "pcibus")		May not contain "."
+		description	(e.g. "PCI bus")
+		instance name	(e.g. "pcibus0")	class name + unique number
+		children	(pointers to other Components)
+		state variables... (How?)
+				Perhaps:  name = value, where value can only be one of a
+							few predetermined types.
 
-	Component
-		constructor:
-			Component = 0 virtual	State should be same as after a Reset.
-		functions:
-			Reset			(e.g. if after loading a saved state, the user
-						wishes to restart as if the components were Clean)
-			SetParent(Component)
-			GetChildren
-			GetTooltip		Default is something like description + "\n" + instance name
-			Get/Set state variables!
-			SaveState		(save/load the state variables)
-			LoadState		(default behaviour is to save/load raw "state variables")
-		vars:
-			class name	(e.g. "pcibus")		May not contain "."
-			description	(e.g. "PCI bus")
-			instance name	(e.g. "pcibus0")	class name + unique number
-			children	(pointers to other Components)
-			state variables... (How?)
-					Perhaps:  name = value, where value can only be one of a
-								few predetermined types.
-
-3. New component source code tree:
-
+New component source code tree:
 	src/components/
 		dummy/			Contains dummy test components, for testing
 					the components framework (e.g. serialization...)
@@ -65,7 +53,12 @@ of GXemul.
 		devices/		MISC stuff ends up here, including
 					e.g. VGA graphics cards!
 
-4. New debugger with basic functionality:
+
+Debugger / command interpreter
+------------------------------
+
+New debugger with basic functionality:
+
 	* Same command interface when running from the command line, and
 	  inside a window in the GUI.
 	* Tab completion for everything:
@@ -87,87 +80,89 @@ of GXemul.
 		reset   	Reset configuration (i.e. reset all components).
 		print expr  	Prints expression (gets a state variable)
 		expr = value	Sets a state variable
+	x)  "Object oriented" hierarchy, so that e.g.
+		print machine.pci0.dc0.register_this_and_that
+	    would work.
+	x)  Tab completion, for all commands, including the
+	    object oriented extensions / variable names / etc.
+	    INCLUDING tab completion inside sub components.
+	    This might feel odd, but that would allow one to
+	    type pci<TAB> to expand to machine.pci0  (if there
+	    only is one pci bus), or if there are, say, three
+	    machines with pci busses, that would give a
+	    tab completion list, similar to this:
+		machine0.pci0
+		machine1.pci0
+		machine1.pci1
+		machine2.pci0
+	x)  Strings should be supported, both for e.g. variable
+	    assignment, and for e.g. placing strings in memory.
+	x)  Arrays?
 
 
+GTKMM GUI
+---------
+
+	+)  Menu bar:
+		File
+			New ->
+				Emulation
+				Emulation from template
+				-----------------------
+				GXemul instance
+			Open
+				(Open can show a list of "thumbnails"
+				of the workspace plus e.g. one main
+				window (such as a VGA display).)
+			Save
+			Save as...
+			-----------
+			Quit
+		View
+			[ ]  Show toolbar
+			[ ]  Show workspace
+			[ ]  Show debug console
+		Emulation
+			Start
+			Pause/unpause
+			Reset
+			-------------
+			Edit annotation
+		Help
+			About
+
+	+)  Toolbar button area:
+		Play (start emulation)
+		Pause (pause emulation, button kept down until unpaused)
+		Reset (with a dialog asking for confirmation)
+		Undo/Redo!
+	    (Optional plug-in-ability/extensibility. Buttons should
+	    be bound to debugger commands.)
+
+	+)  "Workspace", where emulations can be created
+	    by drag-n-drop of components from a palette, and/or
+	    from other emulations.
+
+	    The design mode should use cairo for drawing.
+
+	    Dockable/undockable windows for machines/devices/
+	    I/O-units' contents.
+
+	    Tooltips for components.
+
+	    (Tooltips should be a "summary" of the entire
+	    state window.)
+
+	+)  Debug console:
+	    A text area with a text entry field. Simply a way
+	    to get the same kind of interaction that will be
+	    available via the console-mode debugger.
+	    Click e.g. the "play" button would automatically
+	    execute the command "continue" in the debugger.
 
 
-	x)  GTKMM GUI:
-		+)  Menu bar:
-			File
-				New ->
-					Emulation
-					Emulation from template
-					-----------------------
-					GXemul instance
-				Open
-					(Open can show a list of "thumbnails"
-					of the workspace plus e.g. one main
-					window (such as a VGA display).)
-				Save
-				Save as...
-				-----------
-				Quit
-			View
-				[ ]  Show toolbar
-				[ ]  Show workspace
-				[ ]  Show debug console
-			Emulation
-				Start
-				Pause/unpause
-				Reset
-				-------------
-				Edit annotation
-			Help
-				About
-
-		+)  Toolbar button area:
-			Play (start emulation)
-			Pause (pause emulation, button kept down until
-					unpaused)
-			Reset (with a dialog asking for confirmation)
-		    (Optional plug-in-ability/extensibility. Buttons should
-		    be bound to debugger commands.)
-
-		+)  "Workspace", where emulations can be created
-		    by drag-n-drop of components from a palette, and/or
-		    from other emulations.
-
-		    The design mode should use cairo for drawing.
-
-		    Dockable/undockable windows for machines/devices/
-		    I/O-units' contents.
-
-		    Tooltips for components.
-
-		    (Tooltips should be a "summary" of the entire
-		    state window.)
-
-		+)  Debug console:
-		    A text area with a text entry field. Simply a way
-		    to get the same kind of interaction that will be
-		    available via the console-mode debugger.
-		    Click e.g. the "play" button would automatically
-		    execute the command "continue" in the debugger.
-
-	x)  New debugger.
-		x)  "Object oriented" hierarchy, so that e.g.
-			print machine.pci0.dc0.register_this_and_that
-		    would work.
-		x)  Tab completion, for all commands, including the
-		    object oriented extensions / variable names / etc.
-		    INCLUDING tab completion inside sub components.
-		    This might feel odd, but that would allow one to
-		    type pci<TAB> to expand to machine.pci0  (if there
-		    only is one pci bus), or if there are, say, three
-		    machines with pci busses, that would give a
-		    tab completion list, similar to this:
-			machine0.pci0
-			machine1.pci0
-			machine1.pci1
-			machine2.pci0
-		x)  Strings should be supported, both for e.g. variable
-		    assignment, and for e.g. placing strings in memory.
-		x)  Arrays?
+Think about
+-----------
 
 	x)  Regular saving of state with time stamps (i.e. cycle numbers),
 	    so that running "backwards" is possible!
@@ -183,12 +178,9 @@ of GXemul.
 	x)  There can now be links directly into the documentation,
 	    assuming it is installed. ($PREFIX/share/doc/gxemul/*.html)
 
+	x)  Userland emulation! (Only from the command line.)
 
-TODO:
-	Userland emulation! (Only from the command line.)
-
-	Hot-swap of devices during runtime, depends on Bus support.
-	e.g.:
+	x)  Hot-swap of devices during runtime, depends on Bus support. e.g.:
 		PCMCIA
 		USB
 		Serial devices
@@ -196,9 +188,9 @@ TODO:
 		VGA monitors
 		...
 
-Architectures to concentrate on, from the beginning:
-	MIPS (since that's what works best in GXemul < 0.5.)
-	M88K (so that the work so far isn't lost)
-	amd64 (since there's more software to test that way)
-	some simple AVR microcontroller? for demos
+	x)  Architectures to concentrate on, from the beginning:
+		MIPS (since that's what works best in GXemul < 0.5.)
+		M88K (so that the work so far isn't lost)
+		amd64 (since there's more software to test that way)
+		some simple AVR microcontroller? for demos
 
