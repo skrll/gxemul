@@ -28,11 +28,11 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: refcount_ptr.h,v 1.2 2007-12-13 23:22:05 debug Exp $
+ *  $Id: refcount_ptr.h,v 1.3 2007-12-18 14:39:30 debug Exp $
  */
 
 /**
- * Reference counting wrapper template.
+ * \brief Base class for reference countable objects.
  *
  * Usage:
  *	refcount_ptr<MyClass> myPtr = new MyClass(...);
@@ -86,7 +86,8 @@ private:
 
 
 /**
- * A template class representing a reference counted pointer.
+ * \brief A template class representing a reference counted pointer.
+ *
  * Basically, when a pointer assigned to the reference counted pointer,
  * it increases the reference count of the pointed-to object.
  * When the reference counted pointer is destroyed (or NULL is

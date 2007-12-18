@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ActionStack.h,v 1.3 2007-12-18 13:57:13 debug Exp $
+ *  $Id: ActionStack.h,v 1.4 2007-12-18 14:39:30 debug Exp $
  */
 
 #include "misc.h"
@@ -38,6 +38,8 @@
 
 
 /**
+ * \brief A stack of Action objects, for implementing undo/redo functionality.
+ *
  * The ActionStack contains zero or more reference counted pointers 
  * to Action objects.
  *

@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: UnitTest.h,v 1.3 2007-12-18 14:07:52 debug Exp $
+ *  $Id: UnitTest.h,v 1.4 2007-12-18 14:39:30 debug Exp $
  */
 
 #include "misc.h"
@@ -37,7 +37,7 @@
 
 
 /**
- * An exception thrown by unit test cases that fail.
+ * \brief An exception thrown by unit test cases that fail.
  */
 class UnitTestFailedException : public std::exception
 {
@@ -67,6 +67,8 @@ private:
 
 
 /**
+ * \brief Base class for unit testable classes.
+ *
  * A class which inherits from the UnitTestable class exposes a function,
  * RunUnitTests, which runs unit tests, and returns the number of failed
  * test cases.
@@ -84,8 +86,7 @@ public:
 
 
 /**
- * The UnitTest class is a collection of helper functions,
- * for writing simple unit tests.
+ * \brief A collection of helper functions, for writing simple unit tests.
  */
 class UnitTest
 {
@@ -113,6 +114,9 @@ public:
 	/**
 	 * Checks that a condition is true. If it is false, Fail is
 	 * called with the failure message.
+	 *
+	 * The failure message can be something like "expected xyz",
+	 * or "the list should be empty at this point".
 	 *
 	 * @param strFailMessage failure message to print to std::cerr
 	 * @param bCondition condition to check

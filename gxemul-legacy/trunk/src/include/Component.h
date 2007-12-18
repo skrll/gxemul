@@ -28,13 +28,16 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Component.h,v 1.3 2007-12-18 14:07:31 debug Exp $
+ *  $Id: Component.h,v 1.4 2007-12-18 14:39:30 debug Exp $
  */
 
 #include "misc.h"
 
 
 /**
+ * \brief A Component is a node in the configuration tree that
+ *	makes up an emulation setup.
+ *
  * The Component is the core concept in %GXemul. All devices,
  * CPUs, networks, and so on are components.
  */

@@ -27,7 +27,7 @@
  *  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *  SUCH DAMAGE.
  *
- *  $Id: GXemul.h,v 1.5 2007-12-17 23:19:04 debug Exp $
+ *  $Id: GXemul.h,v 1.6 2007-12-18 14:39:30 debug Exp $
  */
 
 #include "misc.h"
@@ -37,8 +37,10 @@
 
 
 /**
- * The GXemul class is the main emulator class. Its main purpose is to
- * run the GUI main loop, or the text terminal main loop.
+ * \brief The main emulator class.
+ *
+ * Its main purpose is to run the GUI main loop, or the text terminal
+ * main loop.
  *
  * A GXemul instance has a tree of components, which make up the full
  * state of the current emulation setup.

@@ -28,13 +28,15 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Action.h,v 1.2 2007-12-18 14:07:31 debug Exp $
+ *  $Id: Action.h,v 1.3 2007-12-18 14:39:29 debug Exp $
  */
 
 #include "misc.h"
 
 
 /**
+ * \brief Actions are undoable/redoable wrappers around function calls.
+ *
  * Actions that are replayable and/or undoable are implemented using the
  * Action class.
  *

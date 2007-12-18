@@ -28,14 +28,14 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: DummyComponent.h,v 1.1 2007-12-13 23:22:05 debug Exp $
+ *  $Id: DummyComponent.h,v 1.2 2007-12-18 14:39:30 debug Exp $
  */
 
 #include "Component.h"
 
 
 /**
- * A dummy Component, for unit testing purposes.
+ * \brief A dummy Component, for unit testing purposes.
  */
 class DummyComponent : public Component
 {

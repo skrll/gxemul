@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemulWindow.h,v 1.4 2007-11-26 14:21:12 debug Exp $
+ *  $Id: GXemulWindow.h,v 1.5 2007-12-18 14:39:30 debug Exp $
  */
 
 #include <gtkmm.h>
@@ -36,6 +36,9 @@
 #include "DebugConsoleWidget.h"
 #include "EmulationDesignArea.h"
 
+/**
+ * \brief The main GUI window.
+ */
 class GXemulWindow : public Gtk::Window
 {
 public:
