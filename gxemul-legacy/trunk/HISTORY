@@ -1,4 +1,4 @@
-$Id: HISTORY,v 1.1666 2007-12-18 12:16:43 debug Exp $
+$Id: HISTORY,v 1.1667 2007-12-18 13:57:01 debug Exp $
 
 Changelog for GXemul:
 ---------------------
@@ -3740,3 +3740,5 @@ Changelog for GXemul:
 		generated Doxygen HTML documentation, so that is where all the
 		general code concepts should be documented.
 		Adding skeleton Action, ActionStack, and UnitTest frameworks.
+20071218	Continuing on the UnitTest framework.
+		Adding a small intro.html documentation page.
