@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Action.h,v 1.1 2007-12-17 23:19:04 debug Exp $
+ *  $Id: Action.h,v 1.2 2007-12-18 14:07:31 debug Exp $
  */
 
 #include "misc.h"
@@ -59,6 +59,8 @@ public:
 	 */
 	Action(const string& strClassName,
 		const string& strDescription);
+
+	virtual ~Action();
 
 	virtual void Execute() = 0;
 

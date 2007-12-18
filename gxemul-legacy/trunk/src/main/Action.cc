@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Action.cc,v 1.1 2007-12-17 23:19:04 debug Exp $
+ *  $Id: Action.cc,v 1.2 2007-12-18 14:07:31 debug Exp $
  */
 
 #include "Action.h"
@@ -35,6 +35,11 @@ Action::Action(const string& strClassName,
 		const string& strDescription)
 	: m_strClassName(strClassName)
 	, m_strDescription(strDescription)
+{
+}
+
+
+Action::~Action()
 {
 }
 

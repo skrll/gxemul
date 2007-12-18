@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: UnitTest.h,v 1.2 2007-12-18 13:57:13 debug Exp $
+ *  $Id: UnitTest.h,v 1.3 2007-12-18 14:07:52 debug Exp $
  */
 
 #include "misc.h"
@@ -133,11 +133,12 @@ public:
 /*  Helper for unit test case execution:  */
 #include <iostream>
 #define UNITTEST(nrOfFailures,functionname)	try {			\
+		std::cout << "### " #functionname "\n";			\
 		(functionname)();					\
 	} catch (UnitTestFailedException& ex) {				\
-		std::cerr << "### " #functionname " (" __FILE__ " line "\
+		std::cerr << "\n### " #functionname " (" __FILE__ " line "\
 			<< __LINE__ << ") failed!\n"			\
-			"    > " << ex.GetMessage() << "\n\n";		\
+			"    > " << ex.GetMessage() << "\n";		\
 		++ (nrOfFailures);   					\
 	}
 #endif

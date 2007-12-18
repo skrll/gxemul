@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: UnitTest.cc,v 1.2 2007-12-18 13:57:13 debug Exp $
+ *  $Id: UnitTest.cc,v 1.3 2007-12-18 14:07:52 debug Exp $
  */
 
 #include <iostream>
@@ -72,9 +72,9 @@ int UnitTest::RunTests()
 	nrOfErrors += ActionStack::RunUnitTests();
 
 	if (nrOfErrors == 0)
-		std::cerr << "All tests passed.\n";
+		std::cerr << "\nAll tests passed.\n";
 	else
-		std::cerr << nrOfErrors << " TESTS FAILED!\n";
+		std::cerr << "\n" << nrOfErrors << " TESTS FAILED!\n";
 
 	// Returns 0 if there were no errors.
 	return nrOfErrors > 0;
