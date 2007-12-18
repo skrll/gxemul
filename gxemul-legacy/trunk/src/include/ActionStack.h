@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ActionStack.h,v 1.1 2007-12-17 23:19:04 debug Exp $
+ *  $Id: ActionStack.h,v 1.2 2007-12-18 12:16:44 debug Exp $
  */
 
 #include "misc.h"
@@ -53,7 +53,7 @@ public:
 	void Clear();
 
 	/**
-	 * Checks whether the stack is empty. The main purpose of
+	 * Checks whether the undo stack is empty. The main purpose of
 	 * this is for indication in the GUI. If the stack is empty, the
 	 * undo button (or undo menu entry) can be greyed out.
 	 *

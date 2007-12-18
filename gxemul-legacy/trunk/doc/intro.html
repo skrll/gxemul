@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>Gavare's eXperimental Emulator:&nbsp;&nbsp;&nbsp;Introduction</title>
+<meta name="robots" content="noarchive,nofollow,noindex"></head>
+<body bgcolor="#f8f8f8" text="#000000" link="#4040f0" vlink="#404040" alink="#ff0000">
+<table border=0 width=100% bgcolor="#d0d0d0"><tr>
+<td width=100% align=center valign=center><table border=0 width=100%><tr>
+<td align="left" valign=center bgcolor="#d0efff"><font color="#6060e0" size="6">
+<b>GXemul:</b></font>&nbsp;&nbsp;<font color="#000000" size="6"><b>Introduction</b>
+</font></td></tr></table></td></tr></table><p>
+
+<!--  $Id: intro.html,v 1.132 2007-12-18 12:16:44 debug Exp $  -->
+
+<h2>Introduction</h2>
+
+<p>GXemul is an experimental framework for
+<a href="http://en.wikipedia.org/wiki/Full_virtualization">full-system</a>
+emulation. This means that, in addition to emulating processors, 
+surrounding devices and peripherals are also emulated.
+
+<p>GXemul 0.5.0 is a complete rewrite of GXemul in
+<a href="http://en.wikipedia.org/wiki/C%2B%2B">C++</a>. Previous versions
+were written in plain
+<a href="http://en.wikipedia.org/wiki/C_%28programming_language%29">C</a>.
+
+<p>To build GXemul, simply run <tt>configure</tt> followed by
+<tt>make</tt>. This should work on most Unix-like platforms. If it does 
+not work for you, then please mail me a detailed bug report.
+
+<p>(Using <a href="http://en.wikipedia.org/wiki/Cygwin">Cygwin</a>
+ might work as well, but this is not really supported.)
+
+<p>GXemul depends on the following external libraries and tools:
+<ul>
+        <li>The <a href="http://en.wikipedia.org/wiki/Gtkmm">gtkmm</a>
+		libraries and header files (gtkmm-2.4 >= 2.12.1),
+                for the GUI.
+        <li><a href="http://en.wikipedia.org/wiki/Doxygen">Doxygen</a>, 
+		for building C++ class documentation.
+</ul>
+
+<p>Note, however, that both gtkmm and Doxygen are <i>optional</i>
+dependencies. GXemul will build without them. If gtkmm is missing, the
+<tt>gxemul-gui</tt> binary will not work, but you can still use the 
+text-only variant, <tt>gxemul</tt>. If Doxygen is missing, the
+installed documentation will not include the
+<a href="doxygen/html/index.html">source code reference</a>.
+
+<p>To install, type <tt>make install</tt>. This installs binaries,
+man pages, and documentation under <tt>/usr/local</tt>, unless the
+<tt>PREFIX</tt> environment variable was set prior to running
+<tt>configure</tt>.
+
+
+<hr>
+</body>
+</html>

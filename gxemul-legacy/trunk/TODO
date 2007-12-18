@@ -1,4 +1,4 @@
-$Id: TODO,v 1.576 2007-12-17 23:19:03 debug Exp $
+$Id: TODO,v 1.577 2007-12-18 12:16:43 debug Exp $
 
 Some things, in no specific order, that I'd like to implement or fix.
 Some items in this list are perhaps already fixed. This is just a place
@@ -6,7 +6,17 @@ for me to do brain-storming.
 
 -------------------------------------------------------------------------------
 
+0. ActionStack BOTH undo and redo stack!
+	undo vector size
+	redo vector size
+	adding a new action causes the redo vector to be cleared!
+	undo/redo moves between vectors!
+
 1. Unit tests.
+	The ActionStack.
+		Push and pop actions.
+	The component tree.
+		Perform Actions.
 
 2. Implement header files for Components, etc:
 
