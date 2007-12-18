@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ActionStack.h,v 1.4 2007-12-18 14:39:30 debug Exp $
+ *  $Id: ActionStack.h,v 1.5 2007-12-18 21:35:13 debug Exp $
  */
 
 #include "misc.h"
@@ -40,8 +40,8 @@
 /**
  * \brief A stack of Action objects, for implementing undo/redo functionality.
  *
- * The ActionStack contains zero or more reference counted pointers 
- * to Action objects.
+ * Technically, the ActionStack consists of two stacks, one undo stack and
+ * one redo stack.
  *
  * The main purpose of this class, together with the Action class, is to 
  * enable undo/redo functionality for the end user via the GUI, but the
@@ -52,41 +52,78 @@ class ActionStack
 {
 public:
 	/**
-	 * Clears the stack.
+	 * \brief Clears both the Undo and the Redo stacks.
 	 */
 	void Clear();
 
 	/**
-	 * Checks whether the undo stack is empty. The main purpose of
-	 * this is for indication in the GUI. If the stack is empty, the
-	 * undo button (or undo menu entry) can be greyed out.
-	 *
-	 * @return true if the stack is empty, false otherwise.
+	 * \brief Clears the Redo stack.
 	 */
-	bool IsEmpty() const;
+	void ClearRedo();
 
 	/**
-	 * Pushes an Action onto the stack. This increases the reference
-	 * count of the action, so the caller can release its reference.
+	 * \brief Checks how many actions are in the undo stack.
+	 *
+	 * The main purpose of this is for indication in the GUI. If the 
+	 * stack is empty, the undo button (or undo menu entry) can be 
+	 * greyed out.
+	 *
+	 * @return the number of undoable actions
+	 */
+	int GetNrOfUndoableActions() const;
+
+	/**
+	 * \brief Checks how many actions are in the redo stack.
+	 *
+	 * The main purpose of this is for indication in the GUI. If the stack
+	 * is empty, the redo button (or redo menu entry) can be greyed out.
+	 *
+	 * @return the number of redoable actions
+	 */
+	int GetNrOfRedoableActions() const;
+
+	/**
+	 * \brief Pushes an Action onto the undo stack, and executes it.
+	 *
+	 * This increases the reference count of the action, so the caller
+	 * can release its reference.
+	 *
+	 * The redo stack is cleared.
 	 *
 	 * @param pAction a pointer to the Action to push
 	 */
-	void PushAction(Action* pAction);
+	void PushActionAndExecute(refcount_ptr<Action>& pAction);
 
 	/**
-	 * Pops an Action from the stack, if there is any left. The
-	 * return value is a reference counted pointer; ownership of the
-	 * Action is transfered to the caller.
+	 * \brief Undoes the last pushed Action, if any.
 	 *
-	 * @return a reference counter pointer to an Action
+	 * The Action's Undo function is executed, and the Action is moved
+	 * to the redo stack from the undo stack.
+	 *
+	 * @return true if an action was undone, false if the undo stack
+	 *	was empty
 	 */
-	refcount_ptr<Action> PopAction();
+	bool Undo();
 
+	/**
+	 * \brief Redoes an Action from the redo stack, if any is available.
+	 *
+	 * The Action's Redo function is executed, and the Action is moved
+	 * to the undo stack from the redo stack.
+	 *
+	 * @return true if an action was redone, false if the redo stack
+	 *	was empty
+	 */
+	bool Redo();
+
+
+	/********************************************************************/
 
 	static int RunUnitTests();
 
 private:
-	vector< refcount_ptr<Action> >	m_vecActions;
+	vector< refcount_ptr<Action> >	m_vecUndoActions;
+	vector< refcount_ptr<Action> >	m_vecRedoActions;
 };
 
 

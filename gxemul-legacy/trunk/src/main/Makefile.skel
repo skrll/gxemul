@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile.skel,v 1.8 2007-12-18 14:07:52 debug Exp $
+#  $Id: Makefile.skel,v 1.9 2007-12-18 21:35:13 debug Exp $
 #
 #  Makefile for GXemul src/main
 #
@@ -7,8 +7,8 @@
 CFLAGS=$(CWARNINGS) $(COPTIM) $(XINCLUDE) $(INCLUDE1)
 LIBS=$(XLIB) $(OTHERLIBS)
 
-OBJS=Action.o ActionStack.o Component.o ConfigNode.o \
-	debug_new.o GXemul.o TTYDebugConsole.o UnitTest.o
+OBJS=Action.o ActionStack.o Component.o \
+	debug_new.o GXemul.o UnitTest.o
 
 all: $(OBJS)
 

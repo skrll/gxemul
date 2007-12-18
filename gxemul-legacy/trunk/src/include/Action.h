@@ -28,17 +28,14 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Action.h,v 1.3 2007-12-18 14:39:29 debug Exp $
+ *  $Id: Action.h,v 1.4 2007-12-18 21:35:13 debug Exp $
  */
 
 #include "misc.h"
 
 
 /**
- * \brief Actions are undoable/redoable wrappers around function calls.
- *
- * Actions that are replayable and/or undoable are implemented using the
- * Action class.
+ * \brief Actions are wrappers around undoable/redoable function calls.
  *
  * The main purpose of this class, together with the ActionStack class, is 
  * to enable undo/redo functionality for the end user via the GUI, but the 
@@ -49,7 +46,7 @@ class Action
 {
 public:
 	/**
-	 * Base constructor for an Action.
+	 * \brief Base constructor for an Action.
 	 *
 	 * @param strClassName		The name of the action class.
 	 *				It should be a short, descriptive name,
@@ -64,10 +61,14 @@ public:
 
 	virtual ~Action();
 
+	/**
+	 * \brief Called to execute the Action.
+	 */
 	virtual void Execute() = 0;
 
-	virtual void Redo() = 0;
-
+	/**
+	 * \brief Called to execute the Action in reverse, i.e. undo it.
+	 */
 	virtual void Undo() = 0;
 
 private:

@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: UnitTest.h,v 1.4 2007-12-18 14:39:30 debug Exp $
+ *  $Id: UnitTest.h,v 1.5 2007-12-18 21:35:13 debug Exp $
  */
 
 #include "misc.h"
@@ -52,7 +52,7 @@ public:
 	}
 
 	/**
-	 * Retrieves the error message associated with the exception.
+	 * \brief Retrieves the error message associated with the exception.
 	 *
 	 * @return a const reference to the error message string
 	 */
@@ -77,7 +77,7 @@ class UnitTestable
 {
 public:
 	/**
-	 * Runs unit test cases.
+	 * \brief Runs unit test cases.
 	 *
 	 * @return the number of failed test cases
 	 */
@@ -92,15 +92,17 @@ class UnitTest
 {
 public:
 	/**
+	 * \brief Runs all unit tests in %GXemul.
+	 *
 	 * If WITHOUTUNITTESTS was defined in config.h, nothing is tested,
 	 * and zero is returned.
 	 *
 	 * Otherwise, unit tests for all classes listed in
 	 * src/main/UnitTest.cc are executed.
 	 *
-	 * Debug output is allowed to std::cout. If a test fails, a single
-	 * line identifying that test is written to std::cerr, using
-	 * the Fail function.
+	 * Debug output is allowed to std::cout, but not to std::cerr.
+	 * If a test fails, the UNITTEST macro in the unit testing framework
+	 * takes care of outputting a line identifying that test to std::cerr.
 	 *
 	 * @return zero if no unit tests failed, 1 otherwise.
 	 */
@@ -112,8 +114,9 @@ public:
 	/*******************************************************************/
 
 	/**
-	 * Checks that a condition is true. If it is false, Fail is
-	 * called with the failure message.
+	 * \brief Asserts that a boolean condition is true.
+	 *
+	 * If the condition is false, Fail is called with the failure message.
 	 *
 	 * The failure message can be something like "expected xyz",
 	 * or "the list should be empty at this point".
@@ -124,7 +127,7 @@ public:
 	static void Assert(const string& strFailMessage, bool bCondition);
 
 	/**
-	 * Fails a unit test unconditionally, by throwing a
+	 * \brief Fails a unit test unconditionally, by throwing a
 	 * UnitTestFailedException.
 	 *
 	 * @param strMessage failure message
