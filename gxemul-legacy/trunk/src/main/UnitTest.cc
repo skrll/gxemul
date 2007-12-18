@@ -25,15 +25,32 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: UnitTest.cc,v 1.1 2007-12-17 23:19:04 debug Exp $
+ *  $Id: UnitTest.cc,v 1.2 2007-12-18 13:57:13 debug Exp $
  */
 
 #include <iostream>
 
+#include "misc.h"
 #include "UnitTest.h"
+
+#include "ActionStack.h"
+
+
+void UnitTest::Assert(const string& strFailMessage, bool bCondition)
+{
+	if (!bCondition)
+		Fail(strFailMessage);
+}
+
+
+void UnitTest::Fail(const string& strMessage)
+{
+	throw UnitTestFailedException(strMessage);
+}
 
 
 #ifdef WITHOUTUNITTESTS
+
 
 int UnitTest::RunTests()
 {
@@ -43,24 +60,25 @@ int UnitTest::RunTests()
 	return 0;
 }
 
-#else
+
+#else	// !WITHOUTUNITTESTS
+
 
 int UnitTest::RunTests()
 {
 	int nrOfErrors = 0;
 
-	/*
-	 * TODO: Something like this?
-	 *
-	 *	nrOfErrors += Action::RunUnitTests();
- 	 */
+	// Run tests in all specified classes:
+	nrOfErrors += ActionStack::RunUnitTests();
 
 	if (nrOfErrors == 0)
 		std::cerr << "All tests passed.\n";
 	else
 		std::cerr << nrOfErrors << " TESTS FAILED!\n";
 
+	// Returns 0 if there were no errors.
 	return nrOfErrors > 0;
 }
 
-#endif
+
+#endif	// !WITHOUTUNITTESTS

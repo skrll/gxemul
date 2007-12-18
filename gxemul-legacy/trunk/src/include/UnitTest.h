@@ -28,10 +28,59 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: UnitTest.h,v 1.1 2007-12-17 23:19:04 debug Exp $
+ *  $Id: UnitTest.h,v 1.2 2007-12-18 13:57:13 debug Exp $
  */
 
 #include "misc.h"
+
+#include <exception>
+
+
+/**
+ * An exception thrown by unit test cases that fail.
+ */
+class UnitTestFailedException : public std::exception
+{
+public:
+	UnitTestFailedException(const string& strMessage)
+		: m_strMessage(strMessage)
+	{
+	}
+
+	virtual ~UnitTestFailedException() throw ()
+	{
+	}
+
+	/**
+	 * Retrieves the error message associated with the exception.
+	 *
+	 * @return a const reference to the error message string
+	 */
+	const string& GetMessage() const
+	{
+		return m_strMessage;
+	}
+
+private:
+	string	m_strMessage;
+};
+
+
+/**
+ * A class which inherits from the UnitTestable class exposes a function,
+ * RunUnitTests, which runs unit tests, and returns the number of failed
+ * test cases.
+ */
+class UnitTestable
+{
+public:
+	/**
+	 * Runs unit test cases.
+	 *
+	 * @return the number of failed test cases
+	 */
+	static int RunUnitTests();
+};
 
 
 /**
@@ -48,10 +97,50 @@ public:
 	 * Otherwise, unit tests for all classes listed in
 	 * src/main/UnitTest.cc are executed.
 	 *
+	 * Debug output is allowed to std::cout. If a test fails, a single
+	 * line identifying that test is written to std::cerr, using
+	 * the Fail function.
+	 *
 	 * @return zero if no unit tests failed, 1 otherwise.
 	 */
 	static int RunTests();
+
+
+	/*******************************************************************/
+	/*            Helper functions, used by unit test cases            */
+	/*******************************************************************/
+
+	/**
+	 * Checks that a condition is true. If it is false, Fail is
+	 * called with the failure message.
+	 *
+	 * @param strFailMessage failure message to print to std::cerr
+	 * @param bCondition condition to check
+	 */
+	static void Assert(const string& strFailMessage, bool bCondition);
+
+	/**
+	 * Fails a unit test unconditionally, by throwing a
+	 * UnitTestFailedException.
+	 *
+	 * @param strMessage failure message
+	 */
+	static void Fail(const string& strMessage);
 };
+
+
+#ifndef WITHOUTUNITTESTS
+/*  Helper for unit test case execution:  */
+#include <iostream>
+#define UNITTEST(nrOfFailures,functionname)	try {			\
+		(functionname)();					\
+	} catch (UnitTestFailedException& ex) {				\
+		std::cerr << "### " #functionname " (" __FILE__ " line "\
+			<< __LINE__ << ") failed!\n"			\
+			"    > " << ex.GetMessage() << "\n\n";		\
+		++ (nrOfFailures);   					\
+	}
+#endif
 
 
 #endif	// UNITTEST_H

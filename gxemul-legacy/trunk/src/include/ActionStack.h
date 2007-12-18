@@ -28,12 +28,13 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ActionStack.h,v 1.2 2007-12-18 12:16:44 debug Exp $
+ *  $Id: ActionStack.h,v 1.3 2007-12-18 13:57:13 debug Exp $
  */
 
 #include "misc.h"
 
 #include "Action.h"
+#include "UnitTest.h"
 
 
 /**
@@ -45,6 +46,7 @@
  * functionality is also available from the text-only interface.
  */
 class ActionStack
+	: public UnitTestable
 {
 public:
 	/**
@@ -77,6 +79,9 @@ public:
 	 * @return a reference counter pointer to an Action
 	 */
 	refcount_ptr<Action> PopAction();
+
+
+	static int RunUnitTests();
 
 private:
 	vector< refcount_ptr<Action> >	m_vecActions;

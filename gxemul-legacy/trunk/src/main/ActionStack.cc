@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ActionStack.cc,v 1.1 2007-12-17 23:19:04 debug Exp $
+ *  $Id: ActionStack.cc,v 1.2 2007-12-18 13:57:13 debug Exp $
  */
 
 #include "ActionStack.h"
@@ -41,3 +41,25 @@ bool ActionStack::IsEmpty() const
 {
 	return m_vecActions.empty();
 }
+
+
+/*****************************************************************************/
+
+
+#ifndef WITHOUTUNITTESTS
+
+static void Test_IsInitiallyEmpty()
+{
+	UnitTest::Assert("apa 1", true);
+}
+
+int ActionStack::RunUnitTests()
+{
+	int nrOfFailures = 0;
+
+	UNITTEST(nrOfFailures, Test_IsInitiallyEmpty);
+
+	return nrOfFailures;
+}
+
+#endif
