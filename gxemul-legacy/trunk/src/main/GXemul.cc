@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemul.cc,v 1.10 2007-12-17 23:19:04 debug Exp $
+ *  $Id: GXemul.cc,v 1.11 2007-12-19 00:22:38 debug Exp $
  *
  *  This file contains three things:
  *
@@ -103,10 +103,11 @@
  *		dependencies should be optional!
  *	<li>Write <a href="http://en.wikipedia.org/wiki/Doxygen">
  *		Doxygen</a> documentation for everything.
- *	<li>Write unit tests for everything. For now, the UnitTest class
- *		is a simple helper for writing unit tests.
+ *	<li>Write unit tests for everything. The UnitTest class contains
+ *		static helper functions for writing unit tests.
  *	<li>Use <a href="http://en.wikipedia.org/wiki/Hungarian_notation">
- *		Hungarian notation</a> for symbol/variable names.
+ *		Hungarian notation</a> for symbol/variable names if/where
+ *		it makes sense. Use <tt>m_</tt> for member variables.
  *	<li>Keep to 80 columns width.
  *	<li>Use <tt>string</tt> for strings. This is typedeffed to
  *		<tt>Glib::ustring</tt> if it is available (for
