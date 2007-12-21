@@ -1,4 +1,4 @@
-$Id: TODO,v 1.579 2007-12-18 22:12:45 debug Exp $
+$Id: TODO,v 1.580 2007-12-21 18:16:45 debug Exp $
 
 Some things, in no specific order, that I'd like to implement or fix.
 Some items in this list are perhaps already fixed. This is just a place
@@ -164,6 +164,38 @@ GTKMM GUI
 Think about
 -----------
 
+	x)  Docked windows in the GUI.
+
+	x)  Inspection of state of any Component...
+
+	x)  Callstack window, etc.
+
+	x)  ARBITRARY break conditions, i.e. between each instruction,
+	    check any number of arbitrary conditions:
+		x) Contents of memory locations, even including stuff
+		   on the stack
+		x) Any flags
+		x) Any device state :)
+
+	    This obviously slows things down A LOT, so the default is
+	    to have no such break conditions.
+
+	    TODO: Compile these conditions into some form of internal
+	    byte code?
+
+	x)  All debugger commands are functions, returning values?
+	    read8(addr)   reads a byte from a memory object
+	    version       returns a string, indicating the GXemul version
+			  (note that "()" are optional, if the function
+			  takes no arguments)
+	    How about assignment of state variable values? TODO
+
+	x)  Timing modes:
+		1) Real-time approximation. (For guest OSes.)
+		2) Fixed. (For fixed 1 instruction/cycle speed.)
+		   Each device must then have a specified speed (such
+		   as 50 MHz...)
+
 	x)  Regular saving of state with time stamps (i.e. cycle numbers),
 	    so that running "backwards" is possible!
 	    NOTE:
@@ -175,10 +207,18 @@ Think about
 	x)  Actual machines being emulated 1 per process? Or all in the
 	    same process?
 
+	x)  Full-screen. CTRL-ALT-F11 toggles full-screen vs docked window
+	    in the designer view? CTRL-ALT-F12 toggles mouse capture?
+
 	x)  There can now be links directly into the documentation,
 	    assuming it is installed. ($PREFIX/share/doc/gxemul/*.html)
+	    I.e. F1 (and Help->Contents) can cause a web browser to be
+	    launched.
 
 	x)  Userland emulation! (Only from the command line.)
+
+	x)  Command-line options compatible with pre-0.5.0! Start e.g.
+	    framebuffers in full-screen / windowed mode, _not_ docked.
 
 	x)  Hot-swap of devices during runtime, depends on Bus support. e.g.:
 		PCMCIA
