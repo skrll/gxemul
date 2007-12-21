@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ActionStack.cc,v 1.4 2007-12-18 22:12:45 debug Exp $
+ *  $Id: ActionStack.cc,v 1.5 2007-12-21 18:16:57 debug Exp $
  */
 
 #include "ActionStack.h"
@@ -102,6 +102,9 @@ bool ActionStack::Redo()
 
 #ifndef WITHOUTUNITTESTS
 
+/**
+ * \brief A dummy Action, for unit testing purposes
+ */
 class DummyAction : public Action
 {
 public:

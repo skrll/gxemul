@@ -1,4 +1,10 @@
-/*  GXemul: $Id: static_assert.h,v 1.3 2007-12-13 12:30:09 debug Exp $  */
+/*
+ * GXemul: $Id: static_assert.h,v 1.4 2007-12-21 18:16:57 debug Exp $
+ *
+ * Modified for GXemul:
+ *
+ *      1. Better Doxygen comment for struct __nvwa_compile_time_error.
+ */
 
 // -*- Mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 // vim:tabstop=4:shiftwidth=4:expandtab:
@@ -41,6 +47,11 @@
 #ifndef STATIC_ASSERT
 
 template <bool> struct __nvwa_compile_time_error;
+
+/**
+ * \brief Part of Wu Yongwei's new/delete debug
+ * memory leak detector.
+ */
 template <>     struct __nvwa_compile_time_error<true> {};
 
 #define STATIC_ASSERT(_Expr, _Msg) \

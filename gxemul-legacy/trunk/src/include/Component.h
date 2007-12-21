@@ -28,17 +28,17 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Component.h,v 1.4 2007-12-18 14:39:30 debug Exp $
+ *  $Id: Component.h,v 1.5 2007-12-21 18:16:57 debug Exp $
  */
 
 #include "misc.h"
 
 
 /**
- * \brief A Component is a node in the configuration tree that
+ * \brief A %Component is a node in the configuration tree that
  *	makes up an emulation setup.
  *
- * The Component is the core concept in %GXemul. All devices,
+ * The %Component is the core concept in %GXemul. All devices,
  * CPUs, networks, and so on are components.
  */
 class Component
@@ -46,7 +46,7 @@ class Component
 {
 public:
 	/**
-	 * Base constructor for a Component.
+	 * Base constructor for a %Component.
 	 *
 	 * @param strClassName		The name of the component class.
 	 *				It should be a short, descriptive name.
@@ -61,7 +61,7 @@ public:
 	virtual ~Component();
 
 	/**
-	 * Calling Reset on a Component should reset its state
+	 * Calling Reset on a %Component should reset its state
 	 * to the same state that a newly created Component of that
 	 * type has.
 	 */
@@ -69,7 +69,7 @@ public:
 
 private:
 	/**
-	 * Disallow creating Component objects using the default constructor.
+	 * Disallow creating %Component objects using the default constructor.
 	 */
 	Component() { }
 

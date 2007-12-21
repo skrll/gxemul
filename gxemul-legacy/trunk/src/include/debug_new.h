@@ -1,4 +1,11 @@
-/*  GXemul: $Id: debug_new.h,v 1.1 2007-11-26 14:21:12 debug Exp $  */
+/*
+ * GXemul: $Id: debug_new.h,v 1.2 2007-12-21 18:16:57 debug Exp $
+ *
+ * Modified for GXemul:
+ *
+ *	1. Better Doxygen comment for class __debug_new_counter.
+ */
+
 
 // -*- Mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 // vim:tabstop=4:shiftwidth=4:expandtab:
@@ -131,7 +138,12 @@ extern const char* new_progname;// default to NULL; should be assigned argv[0]
 #   define free(p) delete[] (char*)(p)
 # endif
 
-/** Counter class for on-exit leakage check. */
+/**
+ * \brief Part of Wu Yongwei's new/delete debug
+ * memory leak detector.
+ *
+ * Counter class for on-exit leakage check.
+ */
 class __debug_new_counter
 {
     static int _count;

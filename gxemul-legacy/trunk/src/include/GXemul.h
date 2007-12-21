@@ -27,7 +27,7 @@
  *  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *  SUCH DAMAGE.
  *
- *  $Id: GXemul.h,v 1.6 2007-12-18 14:39:30 debug Exp $
+ *  $Id: GXemul.h,v 1.7 2007-12-21 18:16:57 debug Exp $
  */
 
 #include "misc.h"
@@ -43,22 +43,21 @@
  * main loop.
  *
  * A GXemul instance has a tree of components, which make up the full
- * state of the current emulation setup.
- *
- * Also, a stack of undo/redo actions is also kept.
+ * state of the current emulation setup. It also has an ActionStack,
+ * for undo/redo functionality.
  */
 class GXemul
 {
 public:
 	/**
-	 * Creates a GXemul instance.
+	 * \brief Creates a GXemul instance.
 	 *
 	 * @param bWithGUI      true if the GUI is to be used, false otherwise
 	 */
 	GXemul(bool bWithGUI);
 
 	/**
-	 * Parses command line arguments.
+	 * \brief Parses command line arguments.
 	 *
 	 * @param argc for parsing command line options
 	 * @param argv for parsing command line options
@@ -68,7 +67,9 @@ public:
 	bool ParseOptions(int argc, char *argv[]);
 
 	/**
-	 * Runs GXemul's main loop. This can be either a GUI main loop, or
+	 * \brief Runs GXemul's main loop.
+	 *
+	 * This can be either a GUI main loop, or
 	 * a text terminal based main loop.
 	 *
 	 * @return Zero on success, non-zero on error.
@@ -77,7 +78,7 @@ public:
 
 private:
 	/**
-	 * Prints help message to std::cout.
+	 * \brief Prints help message to std::cout.
 	 *
 	 * @param bLong true if the long help message should be printed,
 	 *		false to only print a short message.

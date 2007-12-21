@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemul.cc,v 1.11 2007-12-19 00:22:38 debug Exp $
+ *  $Id: GXemul.cc,v 1.12 2007-12-21 18:16:57 debug Exp $
  *
  *  This file contains three things:
  *
@@ -54,6 +54,10 @@
  * See GXemul's home page for more information about %GXemul in general:
  * <a href="http://gavare.se/gxemul/">http://gavare.se/gxemul/</a>
  *
+ * Most of the source code in %GXemul centers around a few core concepts.
+ * An overview of these concepts are given below. Anyone who wishes to
+ * delve into the source code should be familiar with them.
+ *
  *
  * \section concepts_sec Core concepts
  *
@@ -64,14 +68,10 @@
  * interrupt controllers, and all other kinds of devices.
  *
  * Each component has a parent, so the full set of components in an emulation
- * are in fact a tree. The state of each component is stored within
- * that component. (The root component is a dummy container, which contains
- * zero or more sub-components, but it doesn't actually do anything else.)
- *
- * Reference counting: All components are owned by the GXemul instance, either
- * as part of the normal tree of components, or owned by an action in the
- * undo stack. (Reference counting is implemented for an object by
- * using the ReferenceCountable helper class.)
+ * are in fact a tree. A GXemul instance has one such tree. The state of each
+ * component is stored within that component. (The root component is a dummy
+ * container, which contains zero or more sub-components, but it doesn't
+ * actually do anything else.)
  *
  * \subsection undostack_subsec Undo stack of Actions
  *
@@ -82,14 +82,32 @@
  * By pushing each such Action onto an undo stack, it is possible to implement
  * undo/redo functionality. This is available both via the GUI, and
  * when running via a text-only terminal. If an action is incapable of
- * providing undo information, then the undo stack is cleared when the action
- * is performed.
+ * providing undo information, then the undo stack should be cleared when the
+ * action is performed.
  *
- * The stack is implemented by the ActionStack class. Each GXemul instance
+ * The stack is implemented by the ActionStack class. A GXemul instance
  * has one such stack.
  *
+ * \subsection refcount_subsec Reference counting
  *
- * \section codestyle_sec Coding style
+ * All components are owned by the GXemul instance, either as part of the
+ * normal tree of components, or owned by an action in the undo stack.
+ * Reference counting is implemented for a class T by using the
+ * ReferenceCountable helper class, and using refcount_ptr<T> instead of
+ * just T* when pointing to such objects.
+ *
+ * \subsection unittest_subsec Unit tests
+ *
+ * Wherever it makes sense, unit tests should be written to make sure
+ * that the code is correct. The UnitTest class contains static helper
+ * functions for writing unit tests. To add unit tests to a class, the
+ * class should be UnitTestable, and in particular, it should implement
+ * UnitTestable::RunUnitTests. The exact way tests are performed may
+ * differ between different classes, but using the UNITTEST(n,test) macro
+ * in src/include/UnitTest.h is preferable.
+ *
+ *
+ * \section codeguidelines_sec Coding guidelines
  *
  * The most important guideline is:
  *
@@ -100,19 +118,24 @@
  * But also:
  * <ul>
  *	<li>Avoid using non-portable code constructs. Any external library
- *		dependencies should be optional!
+ *		dependencies should be optional! In particular, any
+ *		GUI code (using gtkmm) should go into src/gui/.
  *	<li>Write <a href="http://en.wikipedia.org/wiki/Doxygen">
- *		Doxygen</a> documentation for everything.
- *	<li>Write unit tests for everything. The UnitTest class contains
- *		static helper functions for writing unit tests.
+ *		Doxygen</a> documentation for everything. Run
+ *		<tt>make documentation</tt> often to check that the
+ *		documentation is correct.
+ *	<li>Write unit tests whenever it makes sense.
  *	<li>Use <a href="http://en.wikipedia.org/wiki/Hungarian_notation">
  *		Hungarian notation</a> for symbol/variable names if/where
- *		it makes sense. Use <tt>m_</tt> for member variables.
- *	<li>Keep to 80 columns width.
+ *		it makes sense, e.g. use <tt>m_</tt> for member variables,
+ *		<tt>p</tt> for pointers, etc.
+ *	<li>Keep to 80 columns width, if possible.
  *	<li>Use <tt>string</tt> for strings. This is typedeffed to
  *		<tt>Glib::ustring</tt> if it is available (for
  *		<a href="http://en.wikipedia.org/wiki/Unicode">unicode</a>
  *		support), otherwise it is typedeffed to <tt>std::string</tt>.
+ *	<li>All functionality should be available both via text-only
+ *		terminals and the GUI, unless really necessary.
  * </ul>
  */
 

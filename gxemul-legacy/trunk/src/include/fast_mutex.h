@@ -1,4 +1,11 @@
-/*  GXemul: $Id: fast_mutex.h,v 1.3 2007-12-13 12:30:09 debug Exp $  */
+/*
+ * GXemul: $Id: fast_mutex.h,v 1.4 2007-12-21 18:16:57 debug Exp $
+ *
+ * Modified for GXemul:
+ *
+ *	1. Classes have Doxygen brief sections, indicating that they are
+ *	   part of Wu Yongwei's debug new/delete package.
+ */
 
 // -*- Mode: C++; tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 // vim:tabstop=4:shiftwidth=4:expandtab:
@@ -111,6 +118,9 @@
  */
 #   define __VOLATILE volatile
     /**
+     * \brief Part of Wu Yongwei's new/delete debug
+     * memory leak detector.
+     *
      * Class for non-reentrant fast mutexes.  This is the implementation
      * for POSIX threads.
      */
@@ -185,6 +195,9 @@
  */
 #   define __VOLATILE volatile
     /**
+     * \brief Part of Wu Yongwei's new/delete debug
+     * memory leak detector.
+     *
      * Class for non-reentrant fast mutexes.  This is the implementation
      * for Win32 threads.
      */
@@ -253,6 +266,9 @@
  */
 #   define __VOLATILE
     /**
+     * \brief Part of Wu Yongwei's new/delete debug
+     * memory leak detector.
+     *
      * Class for non-reentrant fast mutexes.  This is the null
      * implementation for single-threaded environments.
      */
@@ -292,7 +308,12 @@
     };
 # endif // _NOTHREADS
 
-/** An acquistion-on-initialization lock class based on fast_mutex. */
+/**
+ * \brief Part of Wu Yongwei's new/delete debug
+ * memory leak detector.
+ *
+ * An acquistion-on-initialization lock class based on fast_mutex.
+ */
 class fast_mutex_autolock
 {
     fast_mutex& _M_mtx;

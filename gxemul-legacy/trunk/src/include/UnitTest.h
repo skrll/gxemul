@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: UnitTest.h,v 1.5 2007-12-18 21:35:13 debug Exp $
+ *  $Id: UnitTest.h,v 1.6 2007-12-21 18:16:57 debug Exp $
  */
 
 #include "misc.h"
@@ -97,7 +97,7 @@ public:
 	 * If WITHOUTUNITTESTS was defined in config.h, nothing is tested,
 	 * and zero is returned.
 	 *
-	 * Otherwise, unit tests for all classes listed in
+	 * Otherwise, unit tests for all UnitTestable classes listed in
 	 * src/main/UnitTest.cc are executed.
 	 *
 	 * Debug output is allowed to std::cout, but not to std::cerr.
@@ -137,9 +137,34 @@ public:
 
 
 #ifndef WITHOUTUNITTESTS
-/*  Helper for unit test case execution:  */
 #include <iostream>
-#define UNITTEST(nrOfFailures,functionname)	try {			\
+/**
+ * \brief Helper for unit test case execution.
+ *
+ * For each test case that throws a UnitTestFailedException, a counter
+ * (nrOfFailures) is increased.
+ *
+ * Usage:<pre>
+ * ...
+ * static void MyClass::Test_MyClass_SomeTest()
+ * {
+ *     UnitTest::Assert("expected blah blah", bool_condition);
+ *     ...
+ * }
+ *
+ * ...
+ *
+ * int MyClass::RunUnitTests()
+ * {
+ *     int nrOfFailures = 0;
+ *
+ *     UNITTEST(nrOfFailures, Test_MyClass_SomeTest);
+ *     UNITTEST(nrOfFailures, Test_MyClass_AnotherTest);
+ *
+ *     return nrOfFailures;
+ * }</pre>
+ */
+#define UNITTEST(nrOfFailures,functionname)		try {		\
 		std::cout << "### " #functionname "\n";			\
 		(functionname)();					\
 	} catch (UnitTestFailedException& ex) {				\

@@ -1,11 +1,13 @@
 /*
- *  GXemul: $Id: debug_new.cc,v 1.1 2007-11-26 14:21:13 debug Exp $
+ *  GXemul: $Id: debug_new.cc,v 1.2 2007-12-21 18:16:57 debug Exp $
  *
  *  GXemul specific changes to debug_new.cc:
  *
  *   x)	debug_new.cpp renamed debug_new.cc.
  *   x)	#include <alloca.h> commented out.
  *   x)	(unsigned) added in some places to get rid of warnings.
+ *   x) a brief Doxygen section added to struct new_ptr_list_t's
+ *      comment
  */
 
 #ifndef NDEBUG
@@ -200,6 +202,9 @@
         (((s) + _DEBUG_NEW_ALIGNMENT - 1) & ~(_DEBUG_NEW_ALIGNMENT - 1))
 
 /**
+ * \brief Part of Wu Yongwei's new/delete debug
+ * memory leak detector.
+ *
  * Structure to store the position information where \c new occurs.
  */
 struct new_ptr_list_t
