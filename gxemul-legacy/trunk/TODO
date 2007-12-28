@@ -1,6 +1,8 @@
-$Id: TODO,v 1.580 2007-12-21 18:16:45 debug Exp $
+$Id: TODO,v 1.581 2007-12-28 19:08:43 debug Exp $
 
-Some things, in no specific order, that I'd like to implement or fix.
+Some things, in approximate Time order, that I'd like to implement or fix.
+(Things at the top need to be fixed before those at the bottom.)
+
 Some items in this list are perhaps already fixed. This is just a place
 for me to do brain-storming.
 
@@ -13,45 +15,31 @@ of GXemul.
 Components
 ----------
 
-Actions for adding components, removing them...
+Actions for adding components to a GXemul instance, removing them...
+Write UNIT TESTS for these actions.
 
-	constructor:
-		Component = 0 virtual	State should be same as after a Reset.
-	functions:
-		Reset			(e.g. if after loading a saved state, the user
-					wishes to restart as if the components were Clean)
-		SetParent(Component)
-		GetChildren
-		GetTooltip		Default is something like description + "\n" + instance name
-		Get/Set state variables!
-		SaveState		(save/load the state variables)
-		LoadState		(default behaviour is to save/load raw "state variables")
-	vars:
-		class name	(e.g. "pcibus")		May not contain "."
-		description	(e.g. "PCI bus")
-		instance name	(e.g. "pcibus0")	class name + unique number
-		children	(pointers to other Components)
-		state variables... (How?)
-				Perhaps:  name = value, where value can only be one of a
-							few predetermined types.
+New component source code tree, src/components/:
+	busses/			mainbus, TurboChannel, ISA, PCI, ...
+	cpus/
+		CPU		class CPU : public Component, etc
+		arm/
+		alpha/
+		mips/		etc. One for each CPU architecture
+	graphics/		e.g. VGA graphics cards!
+	displays/
+		rgbmonitor	RGB monitor, for e.g. VGA output.
+		lcd		LCD display
+		led		A single led :)
+	dummy/			Contains dummy test components, for testing
+				the components framework (e.g. serialization...)
+	machines/		Machines are usually TEMPLATES which set up a
+				couple of other components!
+	memory/			RAM, ROM, caches, ...
+	network/		Ethernet and others end up here
+	sound/			sound cards
 
-New component source code tree:
-	src/components/
-		dummy/			Contains dummy test components, for testing
-					the components framework (e.g. serialization...)
-		cpus/
-			CPU		class CPU : public Component, etc
-			arm/
-			alpha/
-			mips/		etc. One for each CPU architecture
-		displays/
-			rgbmonitor	RGB monitor, for e.g. VGA output.
-			lcd		LCD display
-			led		A single led :)
-		network/		Ethernet and others end up here
-		busses/			TurboChannel, ISA, PCI, ...
-		devices/		MISC stuff ends up here, including
-					e.g. VGA graphics cards!
+
+Error handling, if loading a component tree fails! Think about this.
 
 
 Debugger / command interpreter
@@ -67,21 +55,26 @@ New debugger with basic functionality:
 		components' state variables
 	* Built-in commands:
 		quit
-		help
-		version
+		help		Returns help message, as a string
+		version		Returns the GXemul version (string)
 		undo
 		redo
-		tree    	Look at current configuration tree of components.
-		focus   	Set focus to somewhere in the tree (given a "path").
-		add     	Add a component somewhere in the tree.
-		remove  	Remove a component (including recursively removing all its children)
-		save    	Save configuration.
-		load    	Load configuration.
-		reset   	Reset configuration (i.e. reset all components).
-		print expr  	Prints expression (gets a state variable)
+		clearundo	Clears the undo/redo stack
+		tree    Look at current configuration tree of components.
+		focus   Set focus to somewhere in the tree (given a "path").
+		add     Add a component somewhere in the tree.
+		remove  Remove a component (including recursively
+				removing all its children)
+		save    Save configuration.
+		load    Load configuration.
+		close	Close current emulation.
+		copy	copy a component (and its children) to the clipboard
+		paste	paste a component from the clipboard
+		reset   Reset configuration (i.e. reset all components).
+		print expr  	Prints expression (gets a state variable).
 		expr = value	Sets a state variable
 	x)  "Object oriented" hierarchy, so that e.g.
-		print machine.pci0.dc0.register_this_and_that
+		print machine0.mainbus0.pcibus0.dc0.register_this_and_that
 	    would work.
 	x)  Tab completion, for all commands, including the
 	    object oriented extensions / variable names / etc.
@@ -95,6 +88,7 @@ New debugger with basic functionality:
 		machine1.pci0
 		machine1.pci1
 		machine2.pci0
+	x)  "Methods" on objects? E.g. ...vga.test
 	x)  Strings should be supported, both for e.g. variable
 	    assignment, and for e.g. placing strings in memory.
 	x)  Arrays?
@@ -103,35 +97,47 @@ New debugger with basic functionality:
 GTKMM GUI
 ---------
 
-	+)  Menu bar:
+	x)  Dockable windows!
+
+	x)  Command input window!  Make it look nice.
+
+	x)  Copy/Paste of components! Both inside one GXemul instance,
+	    and _BETWEEN APPLICATIONS_!
+
+	x)  Menu bar:
 		File
 			New ->
 				Emulation
-				Emulation from template
+				Emulation from template	  (e.g. "testmips")
 				-----------------------
 				GXemul instance
 			Open
 				(Open can show a list of "thumbnails"
 				of the workspace plus e.g. one main
 				window (such as a VGA display).)
+			Close
+			-----------
 			Save
 			Save as...
 			-----------
 			Quit
+		Edit
+			Copy
+			Paste
 		View
 			[ ]  Show toolbar
 			[ ]  Show workspace
 			[ ]  Show debug console
+			F11  Full screen mode (CTRL-ALT-F11 to get out of it)
 		Emulation
 			Start
-			Pause/unpause
+			Pause/continue
 			Reset
-			-------------
-			Edit annotation
 		Help
+			Contents  (installed html files)
 			About
 
-	+)  Toolbar button area:
+	x)  Toolbar button area:
 		Play (start emulation)
 		Pause (pause emulation, button kept down until unpaused)
 		Reset (with a dialog asking for confirmation)
@@ -139,36 +145,29 @@ GTKMM GUI
 	    (Optional plug-in-ability/extensibility. Buttons should
 	    be bound to debugger commands.)
 
-	+)  "Workspace", where emulations can be created
+	x)  "Workspace", where emulations can be created
 	    by drag-n-drop of components from a palette, and/or
-	    from other emulations.
+	    from other emulations. Normally, the workspace window would
+	    be docked in the "center" of the GXemul window, with the
+	    command window below it.
 
 	    The design mode should use cairo for drawing.
 
 	    Dockable/undockable windows for machines/devices/
-	    I/O-units' contents.
+	    I/O-units' contents ?
 
-	    Tooltips for components.
-
-	    (Tooltips should be a "summary" of the entire
+	    Tooltips for components. (A "summary" of the entire
 	    state window.)
-
-	+)  Debug console:
-	    A text area with a text entry field. Simply a way
-	    to get the same kind of interaction that will be
-	    available via the console-mode debugger.
-	    Click e.g. the "play" button would automatically
-	    execute the command "continue" in the debugger.
 
 
 Think about
 -----------
 
-	x)  Docked windows in the GUI.
-
 	x)  Inspection of state of any Component...
 
-	x)  Callstack window, etc.
+	x)  Callstack window, etc. (per CPU).
+
+	x)  Function call trace window (also per CPU).
 
 	x)  ARBITRARY break conditions, i.e. between each instruction,
 	    check any number of arbitrary conditions:
@@ -195,6 +194,10 @@ Think about
 		2) Fixed. (For fixed 1 instruction/cycle speed.)
 		   Each device must then have a specified speed (such
 		   as 50 MHz...)
+
+	x)  Generic timer framework
+
+	x)  Generic interrupt framework
 
 	x)  Regular saving of state with time stamps (i.e. cycle numbers),
 	    so that running "backwards" is possible!
@@ -226,11 +229,45 @@ Think about
 		Serial devices
 		Parallel devices
 		VGA monitors
+		ADB
+		Sun's old bus for keyboards/mice
 		...
 
 	x)  Architectures to concentrate on, from the beginning:
 		MIPS (since that's what works best in GXemul < 0.5.)
+			testmips, then pmax and others?
 		M88K (so that the work so far isn't lost)
-		amd64 (since there's more software to test that way)
+		amd64 (since there's more software to test that way, and
+			it will be fun/interesting to devle into
+			emulation of variable-length ISAs :-)
 		some simple AVR microcontroller? for demos
+
+
+
+Preparation for release 0.5.0:
+------------------------------
+
+ x) Not meaningful until enough functionality from the 0.4.x series have
+    been duplicated.
+    	o) testmips, testarm, etc?
+    	o) most MIPS machines
+    	o) basic debugger commands: trace tree, single step, registers, etc.
+
+ x) No exact date is set for this. Perhaps during the later
+    part of 2008? (If I am lucky enough to get lots of spare time.)
+
+ x) Carefully read through all the source code.
+
+ x) Build on as many platforms as possible, including running
+    unit tests.
+
+ x) Carefully check that the man page reflects the correct
+    command line options etc.
+
+ x) Carefully read through all the documentation, and test all
+    instructions given there.
+
+ x) Make sure that the web page looks reasonable. There should be
+    clear ways to download the old 0.4.x version in addition to
+    the 0.5.0 release.
 

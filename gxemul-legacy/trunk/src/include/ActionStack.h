@@ -2,7 +2,7 @@
 #define	ACTIONSTACK_H
 
 /*
- *  Copyright (C) 2007  Anders Gavare.  All rights reserved.
+ *  Copyright (C) 2007-2008  Anders Gavare.  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ActionStack.h,v 1.6 2007-12-18 22:12:45 debug Exp $
+ *  $Id: ActionStack.h,v 1.7 2007-12-28 19:08:44 debug Exp $
  */
 
 #include "misc.h"
@@ -62,11 +62,34 @@ public:
 	void ClearRedo();
 
 	/**
-	 * \brief Checks how many actions are in the undo stack.
+	 * \brief Checks if the undo stack has any items.
 	 *
 	 * The main purpose of this is for indication in the GUI. If the 
 	 * stack is empty, the undo button (or undo menu entry) can be 
 	 * greyed out.
+	 *
+	 * @return true if there are undo actions, false if the undo
+	 *		stack is empty
+	 */
+	bool IsUndoPossible() const;
+
+	/**
+	 * \brief Checks if the redo stack has any items.
+	 *
+	 * The main purpose of this is for indication in the GUI. If the stack
+	 * is empty, the redo button (or redo menu entry) can be greyed out.
+	 *
+	 * @return true if there are redo actions, false if the redo
+	 *		stack is empty
+	 */
+	bool IsRedoPossible() const;
+
+	/**
+	 * \brief Checks how many actions are in the undo stack.
+	 *
+	 * Note: This is not guaranteed to be O(1).
+	 *
+	 * The main purpose of this function is for use in unit tests!
 	 *
 	 * @return the number of undoable actions
 	 */
@@ -75,8 +98,9 @@ public:
 	/**
 	 * \brief Checks how many actions are in the redo stack.
 	 *
-	 * The main purpose of this is for indication in the GUI. If the stack
-	 * is empty, the redo button (or redo menu entry) can be greyed out.
+	 * Note: This is not guaranteed to be O(1).
+	 *
+	 * The main purpose of this function is for use in unit tests!
 	 *
 	 * @return the number of redoable actions
 	 */
@@ -85,11 +109,19 @@ public:
 	/**
 	 * \brief Pushes an Action onto the undo stack, and executes it.
 	 *
-	 * Note: The redo stack is cleared when this function is used.
+	 * The redo stack is always cleared when this function is used.
 	 * In practice, this means that as long as the user does not issue
 	 * <i>new</i> actions, it is possible to move back and forward in
 	 * time by using undo/redo. As soon as the user issues a new action,
 	 * this breaks the possibility to go forward in the old redo history.
+	 *
+	 * If the Action is not undoable, the undo stack is cleared.
+	 * Otherwise, the undo stack is kept, and the action is pushed
+	 * onto the stack.
+	 *
+	 * (Note: The "Push" part of the function's name is thus only valid
+	 * for undoable actions. If the action is not undoable, nothing
+	 * is really pushed.)
 	 *
 	 * @param pAction a pointer to the Action to push
 	 */
@@ -123,8 +155,8 @@ public:
 	static int RunUnitTests();
 
 private:
-	vector< refcount_ptr<Action> >	m_vecUndoActions;
-	vector< refcount_ptr<Action> >	m_vecRedoActions;
+	list< refcount_ptr<Action> >	m_undoActions;
+	list< refcount_ptr<Action> >	m_redoActions;
 };
 
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2003-2007  Anders Gavare.  All rights reserved.
+ *  Copyright (C) 2003-2008  Anders Gavare.  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemul.cc,v 1.12 2007-12-21 18:16:57 debug Exp $
+ *  $Id: GXemul.cc,v 1.13 2007-12-28 19:08:44 debug Exp $
  *
  *  This file contains three things:
  *
@@ -82,8 +82,8 @@
  * By pushing each such Action onto an undo stack, it is possible to implement
  * undo/redo functionality. This is available both via the GUI, and
  * when running via a text-only terminal. If an action is incapable of
- * providing undo information, then the undo stack should be cleared when the
- * action is performed.
+ * providing undo information, then the undo stack is automatically cleared when
+ * the action is performed.
  *
  * The stack is implemented by the ActionStack class. A GXemul instance
  * has one such stack.
@@ -93,7 +93,7 @@
  * All components are owned by the GXemul instance, either as part of the
  * normal tree of components, or owned by an action in the undo stack.
  * Reference counting is implemented for a class T by using the
- * ReferenceCountable helper class, and using refcount_ptr<T> instead of
+ * ReferenceCountable helper class, and using refcount_ptr<class T> instead of
  * just T* when pointing to such objects.
  *
  * \subsection unittest_subsec Unit tests
@@ -123,17 +123,20 @@
  *	<li>Write <a href="http://en.wikipedia.org/wiki/Doxygen">
  *		Doxygen</a> documentation for everything. Run
  *		<tt>make documentation</tt> often to check that the
- *		documentation is correct.
+ *		documentation is correct. In general, the documentation
+ *		should be in the .h file only, not in the .cc file.
  *	<li>Write unit tests whenever it makes sense.
  *	<li>Use <a href="http://en.wikipedia.org/wiki/Hungarian_notation">
- *		Hungarian notation</a> for symbol/variable names if/where
- *		it makes sense, e.g. use <tt>m_</tt> for member variables,
- *		<tt>p</tt> for pointers, etc.
+ *		Hungarian notation</a> for symbol/variable names sparingly,
+ *		e.g. use <tt>m_</tt> for member variables, <tt>p</tt> can
+ *		sometimes be used for pointers, etc. but don't overuse
+ *		Hungarian notation otherwise.
  *	<li>Keep to 80 columns width, if possible.
  *	<li>Use <tt>string</tt> for strings. This is typedeffed to
  *		<tt>Glib::ustring</tt> if it is available (for
  *		<a href="http://en.wikipedia.org/wiki/Unicode">unicode</a>
  *		support), otherwise it is typedeffed to <tt>std::string</tt>.
+ *	<li>Use const references for argument passing, to avoid copying.
  *	<li>All functionality should be available both via text-only
  *		terminals and the GUI, unless really necessary.
  * </ul>
@@ -196,10 +199,8 @@ bool GXemul::ParseOptions(int argc, char *argv[])
 
 static void PrintBanner()
 {
-	std::cout << "GXemul "VERSION
-	    "      Copyright (C) 2003-2007  Anders"
-	    " Gavare\nRead the source code and/or documentation for"
-	    " other Copyright messages.\n\n";
+	std::cout <<
+	    "GXemul "VERSION"      Copyright (C) 2003-2008  Anders Gavare\n\n";
 }
 
 

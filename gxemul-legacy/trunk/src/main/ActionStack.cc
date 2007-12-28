@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2007  Anders Gavare.  All rights reserved.
+ *  Copyright (C) 2007-2008  Anders Gavare.  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ActionStack.cc,v 1.5 2007-12-21 18:16:57 debug Exp $
+ *  $Id: ActionStack.cc,v 1.6 2007-12-28 19:08:44 debug Exp $
  */
 
 #include "ActionStack.h"
@@ -33,33 +33,49 @@
 
 void ActionStack::Clear()
 {
-	m_vecUndoActions.clear();
-	m_vecRedoActions.clear();
+	m_undoActions.clear();
+	m_redoActions.clear();
 }
 
 
 void ActionStack::ClearRedo()
 {
-	m_vecRedoActions.clear();
+	m_redoActions.clear();
+}
+
+
+bool ActionStack::IsUndoPossible() const
+{
+	return !m_undoActions.empty();
+}
+
+
+bool ActionStack::IsRedoPossible() const
+{
+	return !m_redoActions.empty();
 }
 
 
 int ActionStack::GetNrOfUndoableActions() const
 {
-	return m_vecUndoActions.size();
+	return m_undoActions.size();
 }
 
 
 int ActionStack::GetNrOfRedoableActions() const
 {
-	return m_vecRedoActions.size();
+	return m_redoActions.size();
 }
 
 
 void ActionStack::PushActionAndExecute(refcount_ptr<Action>& pAction)
 {
-	m_vecUndoActions.push_back(pAction);
-	ClearRedo();
+	if (pAction->IsUndoable()) {
+		m_undoActions.push_back(pAction);
+		ClearRedo();
+	} else {
+		Clear();
+	}
 
 	pAction->Execute();
 }
@@ -67,15 +83,15 @@ void ActionStack::PushActionAndExecute(refcount_ptr<Action>& pAction)
 
 bool ActionStack::Undo()
 {
-	if (m_vecUndoActions.empty())
+	if (m_undoActions.empty())
 		return false;
 
-	refcount_ptr<Action> pAction = m_vecUndoActions.back();
-	m_vecUndoActions.pop_back();
+	refcount_ptr<Action> pAction = m_undoActions.back();
+	m_undoActions.pop_back();
 
 	pAction->Undo();
 
-	m_vecRedoActions.push_back(pAction);
+	m_redoActions.push_back(pAction);
 
 	return true;
 }
@@ -83,15 +99,15 @@ bool ActionStack::Undo()
 
 bool ActionStack::Redo()
 {
-	if (m_vecRedoActions.empty())
+	if (m_redoActions.empty())
 		return false;
 
-	refcount_ptr<Action> pAction = m_vecRedoActions.back();
-	m_vecRedoActions.pop_back();
+	refcount_ptr<Action> pAction = m_redoActions.back();
+	m_redoActions.pop_back();
 
 	pAction->Execute();
 
-	m_vecUndoActions.push_back(pAction);
+	m_undoActions.push_back(pAction);
 
 	return true;
 }
@@ -129,13 +145,46 @@ private:
 };
 
 
+/**
+ * \brief A dummy non-undoable Action,
+ *	for unit testing purposes
+ */
+class DummyNonUndoableAction : public Action
+{
+public:
+	DummyNonUndoableAction(int& valueRef)
+		: Action("dummyName", "dummyDescription", false)
+		, m_value(valueRef)
+	{
+	}
+
+	virtual void Execute()
+	{
+		m_value ++;
+	}
+
+	virtual void Undo()
+	{
+		/*  Should never be here.  */
+		abort();
+	}
+
+private:
+	int&	m_value;
+};
+
+
 static void Test_ActionStack_IsInitiallyEmpty()
 {
 	ActionStack stack;
 
+	UnitTest::Assert("undo should not be possible",
+	    stack.IsUndoPossible() == false);
+	UnitTest::Assert("redo should not be possible",
+	    stack.IsRedoPossible() == false);
+
 	UnitTest::Assert("undo stack should be empty",
 	    stack.GetNrOfUndoableActions() == 0);
-
 	UnitTest::Assert("redo stack should be empty",
 	    stack.GetNrOfRedoableActions() == 0);
 }
@@ -169,6 +218,11 @@ static void Test_ActionStack_UndoRedo()
 	refcount_ptr<Action> pAction3 = new DummyAction(dummyInt);
 	refcount_ptr<Action> pAction4 = new DummyAction(dummyInt);
 
+	UnitTest::Assert("undo should not be possible",
+	    stack.IsUndoPossible() == false);
+	UnitTest::Assert("redo should not be possible",
+	    stack.IsRedoPossible() == false);
+
 	stack.PushActionAndExecute(pAction1);
 	stack.PushActionAndExecute(pAction2);
 	stack.PushActionAndExecute(pAction3);
@@ -176,9 +230,13 @@ static void Test_ActionStack_UndoRedo()
 
 	UnitTest::Assert("undo stack should contain 4 Actions",
 	    stack.GetNrOfUndoableActions() == 4);
-
 	UnitTest::Assert("redo stack should contain 0 Actions",
 	    stack.GetNrOfRedoableActions() == 0);
+
+	UnitTest::Assert("undo should be possible",
+	    stack.IsUndoPossible() == true);
+	UnitTest::Assert("redo should not be possible",
+	    stack.IsRedoPossible() == false);
 
 	stack.Undo();
 
@@ -186,6 +244,11 @@ static void Test_ActionStack_UndoRedo()
 	    stack.GetNrOfUndoableActions() == 3);
 	UnitTest::Assert("redo stack should contain 1 Action",
 	    stack.GetNrOfRedoableActions() == 1);
+
+	UnitTest::Assert("undo should be possible",
+	    stack.IsUndoPossible() == true);
+	UnitTest::Assert("redo should be possible",
+	    stack.IsRedoPossible() == true);
 
 	stack.Undo();
 
@@ -238,6 +301,40 @@ static void Test_ActionStack_PushShouldClearRedoStack()
 
 	UnitTest::Assert("redo stack should contain 0 Actions",
 	    stack.GetNrOfRedoableActions() == 0);
+}
+
+static void Test_ActionStack_NonUndoableAction()
+{
+	ActionStack stack;
+
+	int dummyInt;
+	refcount_ptr<Action> pAction1 = new DummyAction(dummyInt);
+	refcount_ptr<Action> pAction2 = new DummyAction(dummyInt);
+	refcount_ptr<Action> pAction3 = new DummyNonUndoableAction(dummyInt);
+	refcount_ptr<Action> pAction4 = new DummyAction(dummyInt);
+
+	UnitTest::Assert("A) undo should not be possible",
+	    stack.IsUndoPossible() == false);
+
+	stack.PushActionAndExecute(pAction1);
+	stack.PushActionAndExecute(pAction2);
+
+	UnitTest::Assert("B) undo should be possible",
+	    stack.IsUndoPossible() == true);
+	UnitTest::Assert("undo stack should contain 2 Actions",
+	    stack.GetNrOfUndoableActions() == 2);
+
+	stack.PushActionAndExecute(pAction3);
+
+	UnitTest::Assert("C) undo should not be possible",
+	    stack.IsUndoPossible() == false);
+	UnitTest::Assert("undo stack should contain 0 Actions",
+	    stack.GetNrOfUndoableActions() == 0);
+
+	stack.PushActionAndExecute(pAction4);
+
+	UnitTest::Assert("undo stack should contain 1 Actions",
+	    stack.GetNrOfUndoableActions() == 1);
 }
 
 static void Test_ActionStack_ExecuteAndUndo()
@@ -293,6 +390,7 @@ int ActionStack::RunUnitTests()
 	UNITTEST(nrOfFailures, Test_ActionStack_PushAction);
 	UNITTEST(nrOfFailures, Test_ActionStack_UndoRedo);
 	UNITTEST(nrOfFailures, Test_ActionStack_PushShouldClearRedoStack);
+	UNITTEST(nrOfFailures, Test_ActionStack_NonUndoableAction);
 
 	// Tests for execution in forward and reverse order:
 	UNITTEST(nrOfFailures, Test_ActionStack_ExecuteAndUndo);

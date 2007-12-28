@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile.skel,v 1.66 2007-12-17 23:19:03 debug Exp $
+#  $Id: Makefile.skel,v 1.67 2007-12-28 19:08:43 debug Exp $
 #
 #  Makefile for GXemul
 #
@@ -23,7 +23,7 @@ test: build
 documentation:
 	$(DOXYGEN) doc/Doxyfile
 
-install: build test documentation
+install: test documentation
 	@echo
 	@echo Installing binaries...
 	mkdir -p $(PREFIX)/bin

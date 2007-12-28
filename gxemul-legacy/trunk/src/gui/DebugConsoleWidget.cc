@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2007  Anders Gavare.  All rights reserved.
+ *  Copyright (C) 2007-2008  Anders Gavare.  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: DebugConsoleWidget.cc,v 1.3 2007-11-26 14:24:45 debug Exp $
+ *  $Id: DebugConsoleWidget.cc,v 1.4 2007-12-28 19:08:44 debug Exp $
  */
 
 #ifdef WITH_GUI

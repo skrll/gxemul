@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2007  Anders Gavare.  All rights reserved.
+ *  Copyright (C) 2007-2008  Anders Gavare.  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemulWindow.cc,v 1.9 2007-11-26 14:24:45 debug Exp $
+ *  $Id: GXemulWindow.cc,v 1.10 2007-12-28 19:08:44 debug Exp $
  */
 
 #ifdef WITH_GUI
@@ -110,7 +110,7 @@ void GXemulWindow::on_menu_about()
 {
 	Gtk::MessageDialog dialog(*this, "GXemul "VERSION,
 	    false, Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK);
-	dialog.set_secondary_text("Copyright (C) 2003-2007  Anders Gavare\n"
+	dialog.set_secondary_text("Copyright (C) 2003-2008  Anders Gavare\n"
 	    "\nIf you have questions or feedback, don't\n"
 	    "hesitate to mail me:  anders@gavare.se");
 	dialog.run();

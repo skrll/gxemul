@@ -1,4 +1,4 @@
-$Id: HISTORY,v 1.1669 2007-12-21 18:16:57 debug Exp $
+$Id: HISTORY,v 1.1670 2007-12-28 19:08:43 debug Exp $
 
 Changelog for GXemul:
 ---------------------
@@ -3744,3 +3744,16 @@ Changelog for GXemul:
 		Adding a small intro.html documentation page.
 20071219	(Making release 0.4.6.1 from the non-C++ branch.)
 20071221	Some extremely minor Doxygen comment updates.
+20071227	Adding StateVariable and StateVariableValue classes; writing
+		unit tests, etc.
+		The ActionStack now uses lists instead of vectors, for the
+		undo and redo stack. (For O(1) undo/redo operations.)
+		Continuing on the Component infrastructure: parent/child
+		relationships, state variables, and serialization.
+		Adding a simple Checksum class; useful as a helper for unit
+		tests.
+20071228	Implementing a CreateComponent function, which when given a
+		"component class name" creates a Component.
+		Adding a simple EscapedString helper class, for generating and
+		decoding C-style escaped strings.
+		Simple deserialization works. :)

@@ -1,5 +1,5 @@
-#ifndef ACTION_H
-#define	ACTION_H
+#ifndef CHECKSUM_H
+#define	CHECKSUM_H
 
 /*
  *  Copyright (C) 2007-2008  Anders Gavare.  All rights reserved.
@@ -28,67 +28,79 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Action.h,v 1.5 2007-12-28 19:08:44 debug Exp $
+ *  $Id: Checksum.h,v 1.1 2007-12-28 19:08:44 debug Exp $
  */
 
 #include "misc.h"
 
+#include "UnitTest.h"
+
 
 /**
- * \brief Actions are wrappers around undoable/redoable function calls.
+ * \brief A checksum accumulator.
  *
- * The main purpose of this class, together with the ActionStack class, is 
- * to enable undo/redo functionality for the end user via the GUI, but the 
- * functionality is also available from the text-only interface.
+ * The main purpose of this class is as a helper in unit tests, where
+ * objects such as trees are hard to compare to each other. A checksum
+ * of the first tree can then be compared with a checksum of the second
+ * tree.
+ *
+ * Note: This is not scientifically correct in any way. It is just something
+ * I made up, for unit testing purposes. (2007-12-27)
  */
-class Action
-	: public ReferenceCountable
+class Checksum
+	: public UnitTestable
 {
 public:
 	/**
-	 * \brief Base constructor for an Action.
+	 * \brief Constructs a zeroed checksum.
+	 */
+	Checksum();
+
+	/**
+	 * \brief Retrieves the value of the checksum, as a uint64_t.
 	 *
-	 * @param strClassName		The name of the action class.
-	 *				It should be a short, descriptive name,
-	 *				e.g. "add component".
-	 * @param strDescription	A short description describing the
-	 *				action. For e.g. the "add component"
-	 *				action, it can be "Adds a component to
-	 *				the current configuration tree."
-	 * @param undoable		True if the action is undoable, false
-	 *				if it should clear the undo stack on
-	 *				execution.
+	 * @return the checksum value
 	 */
-	Action(const string& strClassName,
-		const string& strDescription,
-		bool undoable = true);
-
-	virtual ~Action();
+	uint64_t Value() const;
 
 	/**
-	 * \brief Called to execute the Action.
-	 */
-	virtual void Execute() = 0;
-
-	/**
-	 * \brief Called to execute the Action in reverse, i.e. undo it.
-	 */
-	virtual void Undo() = 0;
-
-	/**
-	 * \brief Checks if the Action is undoable.
+	 * \brief Add a uint64_t to the checksum.
 	 *
-	 * @return true if the action is undoable (i.e. if the Undo
-	 *		function is implemented in a meaningful way),
-	 *		false if undo is not possible
+	 * @param x Value to add.
 	 */
-	bool IsUndoable() const;
+	void Add(uint64_t x);
+
+	/**
+	 * \brief Add a string to the checksum.
+	 *
+	 * @param str The string to add.
+	 */
+	void Add(const string& str);
+
+	/**
+	 * \brief Compares one %Checksum to another for equality.
+	 *
+	 * @param other  The %Checksum to compare to.
+	 * @return true if the checksums match, false otherwise.
+	 */
+	bool operator == (const Checksum& other) const;
+
+	/**
+	 * \brief Compares one %Checksum to another for inequality.
+	 *
+	 * @param other  The %Checksum to compare to.
+	 * @return false if the checksums match, true otherwise.
+	 */
+	bool operator != (const Checksum& other) const;
+
+
+	/********************************************************************/
+
+	static int RunUnitTests();
 
 private:
-	string	m_strClassName;
-	string	m_strDescription;
-	bool	m_undoable;
+	uint64_t	m_value;
 };
 
 
-#endif	// ACTION_H
+#endif	// CHECKSUM_H

@@ -1,5 +1,5 @@
-#ifndef ACTION_H
-#define	ACTION_H
+#ifndef STATEVARIABLE_H
+#define	STATEVARIABLE_H
 
 /*
  *  Copyright (C) 2007-2008  Anders Gavare.  All rights reserved.
@@ -28,67 +28,80 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Action.h,v 1.5 2007-12-28 19:08:44 debug Exp $
+ *  $Id: StateVariable.h,v 1.1 2007-12-28 19:08:44 debug Exp $
  */
 
 #include "misc.h"
 
+#include "SerializationContext.h"
+#include "StateVariableValue.h"
+#include "UnitTest.h"
+
+
+class StateVariable;
+typedef map<string,StateVariable> StateVariableMap;
+
 
 /**
- * \brief Actions are wrappers around undoable/redoable function calls.
+ * \brief StateVariables make up the persistent state of Component objects.
  *
- * The main purpose of this class, together with the ActionStack class, is 
- * to enable undo/redo functionality for the end user via the GUI, but the 
- * functionality is also available from the text-only interface.
+ * A %StateVariable has a name, and a value.
  */
-class Action
-	: public ReferenceCountable
+class StateVariable
+	: public UnitTestable
 {
 public:
 	/**
-	 * \brief Base constructor for an Action.
+	 * \brief Default constructor for a StateVariable.
+	 */
+	StateVariable() {}
+
+	/**
+	 * \brief Base constructor for a StateVariable.
 	 *
-	 * @param strClassName		The name of the action class.
-	 *				It should be a short, descriptive name,
-	 *				e.g. "add component".
-	 * @param strDescription	A short description describing the
-	 *				action. For e.g. the "add component"
-	 *				action, it can be "Adds a component to
-	 *				the current configuration tree."
-	 * @param undoable		True if the action is undoable, false
-	 *				if it should clear the undo stack on
-	 *				execution.
+	 * @param name		The name of the variable.
+	 * @param value		The variable's initial value.
 	 */
-	Action(const string& strClassName,
-		const string& strDescription,
-		bool undoable = true);
-
-	virtual ~Action();
+	StateVariable(const string& name, const StateVariableValue& value);
 
 	/**
-	 * \brief Called to execute the Action.
-	 */
-	virtual void Execute() = 0;
-
-	/**
-	 * \brief Called to execute the Action in reverse, i.e. undo it.
-	 */
-	virtual void Undo() = 0;
-
-	/**
-	 * \brief Checks if the Action is undoable.
+	 * \brief Gets the name of the variable.
 	 *
-	 * @return true if the action is undoable (i.e. if the Undo
-	 *		function is implemented in a meaningful way),
-	 *		false if undo is not possible
+	 * @return the name of the variable
 	 */
-	bool IsUndoable() const;
+	const string& GetName() const;
+	
+	/**
+	 * \brief Gets the value of the variable.
+	 *
+	 * @return the value of the variable
+	 */
+	const StateVariableValue& GetValue() const;
+
+	/**
+	 * \brief Sets the value of the variable.
+	 *
+	 * @param newValue	The value to assign to the variable.
+	 */
+	 void SetValue(const StateVariableValue& newValue);
+
+	/**
+	 * \brief Serializes the variable into a string.
+	 *
+	 * @return a string, representing the variable
+	 */
+	string Serialize(SerializationContext& context) const;
+
+
+	/********************************************************************/
+
+	static int RunUnitTests();
 
 private:
-	string	m_strClassName;
-	string	m_strDescription;
-	bool	m_undoable;
+	string			m_name;
+	StateVariableValue	m_value;
 };
 
 
-#endif	// ACTION_H
+#endif	// STATEVARIABLE_H
+

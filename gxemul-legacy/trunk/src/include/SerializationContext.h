@@ -1,3 +1,6 @@
+#ifndef SERIALIZATIONCONTEXT_H
+#define	SERIALIZATIONCONTEXT_H
+
 /*
  *  Copyright (C) 2007-2008  Anders Gavare.  All rights reserved.
  *
@@ -25,29 +28,54 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Action.cc,v 1.3 2007-12-28 19:08:44 debug Exp $
+ *  $Id: SerializationContext.h,v 1.1 2007-12-28 19:08:44 debug Exp $
  */
 
-#include "Action.h"
+#include "misc.h"
 
 
-Action::Action(const string& strClassName,
-		const string& strDescription,
-		bool undoable)
-	: m_strClassName(strClassName)
-	, m_strDescription(strDescription)
-	, m_undoable(undoable)
+/**
+ * \brief A context used during serialization of objects.
+ */
+class SerializationContext
 {
-}
+public:
+	/**
+	 * \brief Constructs a default SerializationContext.
+	 */
+	SerializationContext()
+		: m_indentation(0)
+	{
+	}
+
+	int GetIndentation() const
+	{
+		return m_indentation;
+	}
+
+	void SetIndentation(int indentation)
+	{
+		m_indentation = indentation;
+	}
+
+	SerializationContext Indented()
+	{
+		SerializationContext newContext;
+		newContext.SetIndentation(GetIndentation() + 1);
+		return newContext;
+	}
+
+	string Tabs() const
+	{
+		string retValue;
+		for (int i=0; i<m_indentation; i++)
+			retValue += "\t";
+		return retValue;
+	}
+
+private:
+	int	m_indentation;
+};
 
 
-Action::~Action()
-{
-}
-
-
-bool Action::IsUndoable() const
-{
-	return m_undoable;
-}
-
+#endif	// SERIALIZATIONCONTEXT_H

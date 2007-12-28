@@ -2,7 +2,7 @@
 #define	REFCOUNT_PTR_H
 
 /*
- *  Copyright (C) 2007  Anders Gavare.  All rights reserved.
+ *  Copyright (C) 2007-2008  Anders Gavare.  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: refcount_ptr.h,v 1.3 2007-12-18 14:39:30 debug Exp $
+ *  $Id: refcount_ptr.h,v 1.4 2007-12-28 19:08:44 debug Exp $
  */
 
 /**
@@ -167,6 +167,11 @@ public:
 		}
 	}
 
+	operator T* ()
+	{
+		return m_p;
+	}
+
 	T& operator *()
 	{
 		return *m_p;
@@ -188,8 +193,8 @@ public:
 	}
 
 	/**
-	 * Checks whether or not an object is referenced by the
-	 * reference counted pointer.
+	 * \brief Checks whether or not an object is referenced
+	 * by the reference counted pointer.
 	 *
 	 * @return true if the reference counted pointer is not
 	 *	referencing any object, false otherwise.
@@ -200,7 +205,7 @@ public:
 	}
 
 	/**
-	 * Less-than operator, e.g. for sorting.
+	 * \brief Less-than operator, e.g. for sorting.
 	 *
 	 * @param other The reference counted pointer to
 	 *	compare this object to.
@@ -210,6 +215,32 @@ public:
 	bool operator < (const refcount_ptr& other) const
 	{
 		return (size_t)m_p < (size_t)other.m_p;
+	}
+
+	/**
+	 * \brief Equals operator.
+	 *
+	 * @param other The reference counted pointer to
+	 *	compare this object to.
+	 * @return true if the pointed to objects have the same
+	 *	address, false otherwise.
+	 */
+	bool operator == (const refcount_ptr& other) const
+	{
+		return m_p == other.m_p;
+	}
+
+	/**
+	 * \brief Not-Equals operator.
+	 *
+	 * @param other The reference counted pointer to
+	 *	compare this object to.
+	 * @return true if the pointed to objects have
+	 *	different address, false otherwise.
+	 */
+	bool operator != (const refcount_ptr& other) const
+	{
+		return m_p != other.m_p;
 	}
 
 private:

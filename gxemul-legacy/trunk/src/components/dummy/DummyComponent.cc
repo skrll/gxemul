@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2007  Anders Gavare.  All rights reserved.
+ *  Copyright (C) 2007-2008  Anders Gavare.  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
@@ -25,14 +25,229 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: DummyComponent.cc,v 1.2 2007-12-17 13:43:01 debug Exp $
+ *  $Id: DummyComponent.cc,v 1.3 2007-12-28 19:08:44 debug Exp $
  */
 
 #include "components/DummyComponent.h"
+#include "Checksum.h"
 
 
 DummyComponent::DummyComponent()
-	: Component("dummy", "Dummy component")
+	: Component("dummy")
 {
 }
+
+
+/*****************************************************************************/
+
+
+#ifndef WITHOUTUNITTESTS
+
+static void Test_DummyComponent_CreateComponent()
+{
+	refcount_ptr<Component> component;
+
+	UnitTest::Assert("creating a dummy component should be possible",
+	    Component::CreateComponent("dummy", component) == true);
+
+	UnitTest::Assert("the component should not be null",
+	    component.IsNULL() == false);
+
+	UnitTest::Assert("the name should be 'dummy'",
+	    component->GetClassName() == "dummy");
+}
+
+static void Test_DummyComponent_GetSetParent()
+{
+	refcount_ptr<Component> dummyA = new DummyComponent;
+	refcount_ptr<Component> dummyB = new DummyComponent;
+
+	UnitTest::Assert("parent should initially be NULL",
+	    dummyA->GetParent() == NULL);
+
+	dummyA->SetParent(dummyB);
+
+	UnitTest::Assert("parent should be dummyB",
+	    dummyA->GetParent() == dummyB);
+
+	dummyA->SetParent(NULL);
+
+	UnitTest::Assert("parent should now be NULL",
+	    dummyA->GetParent() == NULL);
+}
+
+static void Test_DummyComponent_AddChild_Sets_Parent()
+{
+	refcount_ptr<Component> dummy = new DummyComponent;
+	refcount_ptr<Component> dummyChildA = new DummyComponent;
+
+	UnitTest::Assert("child A's parent should initially be NULL",
+	    dummyChildA->GetParent() == NULL);
+
+	dummy->AddChild(dummyChildA);
+
+	UnitTest::Assert("child A's parent should now be dummy",
+	    dummyChildA->GetParent() == dummy);
+}
+
+static void Test_DummyComponent_AddChildren_Count()
+{
+	refcount_ptr<Component> dummy = new DummyComponent;
+	refcount_ptr<Component> dummyChildA = new DummyComponent;
+	refcount_ptr<Component> dummyChildB = new DummyComponent;
+	refcount_ptr<Component> dummyChildC = new DummyComponent;
+
+	UnitTest::Assert("there should initially be no child components",
+	    dummy->GetChildren().size() == 0);
+
+	dummy->AddChild(dummyChildA);
+	dummy->AddChild(dummyChildB);
+	dummy->AddChild(dummyChildC);
+
+	UnitTest::Assert("there should be 3 child components",
+	    dummy->GetChildren().size() == 3);
+}
+
+static void Test_DummyComponent_Add_Tree_Of_Children()
+{
+	refcount_ptr<Component> dummy = new DummyComponent;
+	refcount_ptr<Component> dummyChildA = new DummyComponent;
+	refcount_ptr<Component> dummyChildB = new DummyComponent;
+	refcount_ptr<Component> dummyChildC = new DummyComponent;
+
+	dummyChildA->AddChild(dummyChildB);
+	dummyChildA->AddChild(dummyChildC);
+	dummy->AddChild(dummyChildA);
+
+	UnitTest::Assert("there should be 1 child component",
+	    dummy->GetChildren().size() == 1);
+	UnitTest::Assert("there should be 2 child components in dummyChildA",
+	    dummyChildA->GetChildren().size() == 2);
+}
+
+static void Test_DummyComponent_RemoveChild()
+{
+	refcount_ptr<Component> dummy = new DummyComponent;
+	refcount_ptr<Component> dummyChildA = new DummyComponent;
+	refcount_ptr<Component> dummyChildB = new DummyComponent;
+	refcount_ptr<Component> dummyChildC = new DummyComponent;
+
+	dummyChildA->AddChild(dummyChildB);
+	dummyChildA->AddChild(dummyChildC);
+	dummy->AddChild(dummyChildA);
+
+	UnitTest::Assert("there should be 1 child component",
+	    dummy->GetChildren().size() == 1);
+	UnitTest::Assert("child A's parent should be dummy",
+	    dummyChildA->GetParent() == dummy);
+	UnitTest::Assert("there should be 2 child components in dummyChildA",
+	    dummyChildA->GetChildren().size() == 2);
+
+	dummy->RemoveChild(dummyChildA);
+
+	UnitTest::Assert("there should now be 0 child components",
+	    dummy->GetChildren().size() == 0);
+
+	UnitTest::Assert(
+	    "there should still be 2 child components in dummyChildA",
+	    dummyChildA->GetChildren().size() == 2);
+	UnitTest::Assert("child A should have no parent",
+	    dummyChildA->GetParent() == NULL);
+}
+
+static void Test_DummyComponent_GetSet_Variables()
+{
+	refcount_ptr<Component> dummy = new DummyComponent;
+
+	UnitTest::Assert("variable variablename should not be set yet",
+	    dummy->GetVariable("variablename", NULL) == false);
+
+	StateVariableValue value("hello");
+	dummy->SetVariable("variablename", value);
+
+	StateVariableValue retrievedValue;
+
+	UnitTest::Assert("variable variablename should be set",
+	    dummy->GetVariable("variablename", &retrievedValue) == true);
+	UnitTest::Assert("retrieved value should be hello",
+	    retrievedValue.ToString() == "hello");
+
+	StateVariableValue value2("hello2");
+	dummy->SetVariable("variablename", value2);
+
+	UnitTest::Assert("variable variablename should still be set",
+	    dummy->GetVariable("variablename", &retrievedValue) == true);
+	UnitTest::Assert("retrieved value should be hello2",
+	    retrievedValue.ToString() == "hello2");
+}
+
+static void Test_DummyComponent_SerializeDeserialize()
+{
+	refcount_ptr<Component> dummy = new DummyComponent;
+	refcount_ptr<Component> dummyChildA = new DummyComponent;
+	refcount_ptr<Component> dummyChildA1 = new DummyComponent;
+	refcount_ptr<Component> dummyChildA2 = new DummyComponent;
+
+	dummy->SetVariable("x", StateVariableValue("value 1"));
+	dummy->SetVariable("y", StateVariableValue("value 2"));
+
+	dummyChildA1->SetVariable("x", StateVariableValue("value\nhello"));
+	dummyChildA2->SetVariable("something", StateVariableValue());
+	dummyChildA2->SetVariable("numericTest", StateVariableValue(123));
+	dummyChildA2->SetVariable("numericTest2", StateVariableValue(0));
+	dummyChildA2->SetVariable("numericTest3", StateVariableValue(-1));
+
+	dummyChildA->AddChild(dummyChildA1);
+	dummyChildA->AddChild(dummyChildA2);
+	dummy->AddChild(dummyChildA);
+
+	// Serialize
+	SerializationContext context;
+	string result = dummy->Serialize(context);
+
+	Checksum checksumOriginal;
+	dummy->AddChecksum(checksumOriginal);
+
+	// Deserialize
+	refcount_ptr<Component> deserializedTree;
+	size_t pos = 0;
+	UnitTest::Assert("deserialization should have been possible",
+	    Component::Deserialize(result, pos, deserializedTree) == true);
+	UnitTest::Assert("deserialized component tree should be non-NULL",
+	    deserializedTree.IsNULL() == false);
+
+	// ... and compare the checksums:
+	Checksum checksumDeserialized;
+	deserializedTree->AddChecksum(checksumDeserialized);
+
+	UnitTest::Assert("checksum after deserialization should be identical",
+	    checksumOriginal == checksumDeserialized);
+}
+
+int DummyComponent::RunUnitTests()
+{
+	int nrOfFailures = 0;
+
+	// Creation using CreateComponent
+	UNITTEST(nrOfFailures, Test_DummyComponent_CreateComponent);
+
+	// Parent tests
+	UNITTEST(nrOfFailures, Test_DummyComponent_GetSetParent);
+	
+	// Add/Remove children
+	UNITTEST(nrOfFailures, Test_DummyComponent_AddChild_Sets_Parent);
+	UNITTEST(nrOfFailures, Test_DummyComponent_AddChildren_Count);
+	UNITTEST(nrOfFailures, Test_DummyComponent_Add_Tree_Of_Children);
+	UNITTEST(nrOfFailures, Test_DummyComponent_RemoveChild);
+
+	// Get/Set state variables
+	UNITTEST(nrOfFailures, Test_DummyComponent_GetSet_Variables);
+
+	// Serialization/deserialization
+	UNITTEST(nrOfFailures, Test_DummyComponent_SerializeDeserialize);
+
+	return nrOfFailures;
+}
+
+#endif
 

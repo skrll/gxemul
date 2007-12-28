@@ -1,3 +1,6 @@
+#ifndef ESCAPEDSTRING_H
+#define	ESCAPEDSTRING_H
+
 /*
  *  Copyright (C) 2007-2008  Anders Gavare.  All rights reserved.
  *
@@ -25,29 +28,50 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Action.cc,v 1.3 2007-12-28 19:08:44 debug Exp $
+ *  $Id: EscapedString.h,v 1.1 2007-12-28 19:08:44 debug Exp $
  */
 
-#include "Action.h"
+#include "misc.h"
+
+#include "UnitTest.h"
 
 
-Action::Action(const string& strClassName,
-		const string& strDescription,
-		bool undoable)
-	: m_strClassName(strClassName)
-	, m_strDescription(strDescription)
-	, m_undoable(undoable)
+/**
+ * \brief A helper class for escaping strings using C-style escapes.
+ */
+class EscapedString
+	: public UnitTestable
 {
-}
+public:
+	/**
+	 * \brief Constructs an EscapedString helper.
+	 *
+	 * @param str	A string, either escaped or not escaped.
+	 */
+	EscapedString(const string& str);
+
+	/**
+	 * \brief Generates an escaped string, from the original string.
+	 *
+	 * @return	an escaped string
+	 */
+	string Generate() const;
+
+	/**
+	 * \brief Decodes an escaped string, from the original string.
+	 *
+	 * @return	a decoded (unescaped) string
+	 */
+	string Decode() const;
 
 
-Action::~Action()
-{
-}
+	/********************************************************************/
+
+	static int RunUnitTests();
+
+private:
+	string		m_str;
+};
 
 
-bool Action::IsUndoable() const
-{
-	return m_undoable;
-}
-
+#endif	// ESCAPEDSTRING_H

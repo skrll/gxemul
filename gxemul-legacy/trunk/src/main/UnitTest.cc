@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2007  Anders Gavare.  All rights reserved.
+ *  Copyright (C) 2007-2008  Anders Gavare.  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: UnitTest.cc,v 1.4 2007-12-18 14:09:28 debug Exp $
+ *  $Id: UnitTest.cc,v 1.5 2007-12-28 19:08:44 debug Exp $
  */
 
 #include <iostream>
@@ -33,7 +33,13 @@
 #include "misc.h"
 #include "UnitTest.h"
 
+// Classes to test:
 #include "ActionStack.h"
+#include "Checksum.h"
+#include "components/DummyComponent.h"
+#include "EscapedString.h"
+#include "StateVariable.h"
+#include "StateVariableValue.h"
 
 
 void UnitTest::Assert(const string& strFailMessage, bool bCondition)
@@ -70,6 +76,11 @@ int UnitTest::RunTests()
 
 	// Run tests in all specified classes:
 	nrOfErrors += ActionStack::RunUnitTests();
+	nrOfErrors += Checksum::RunUnitTests();
+	nrOfErrors += DummyComponent::RunUnitTests();
+	nrOfErrors += EscapedString::RunUnitTests();
+	nrOfErrors += StateVariable::RunUnitTests();
+	nrOfErrors += StateVariableValue::RunUnitTests();
 
 	if (nrOfErrors == 0)
 		std::cerr << "All tests passed.\n";
