@@ -1,4 +1,4 @@
-$Id: TODO,v 1.581 2007-12-28 19:08:43 debug Exp $
+$Id: TODO,v 1.582 2007-12-29 16:18:39 debug Exp $
 
 Some things, in approximate Time order, that I'd like to implement or fix.
 (Things at the top need to be fixed before those at the bottom.)
@@ -12,43 +12,10 @@ of GXemul.
 
 -------------------------------------------------------------------------------
 
-Components
-----------
-
-Actions for adding components to a GXemul instance, removing them...
-Write UNIT TESTS for these actions.
-
-New component source code tree, src/components/:
-	busses/			mainbus, TurboChannel, ISA, PCI, ...
-	cpus/
-		CPU		class CPU : public Component, etc
-		arm/
-		alpha/
-		mips/		etc. One for each CPU architecture
-	graphics/		e.g. VGA graphics cards!
-	displays/
-		rgbmonitor	RGB monitor, for e.g. VGA output.
-		lcd		LCD display
-		led		A single led :)
-	dummy/			Contains dummy test components, for testing
-				the components framework (e.g. serialization...)
-	machines/		Machines are usually TEMPLATES which set up a
-				couple of other components!
-	memory/			RAM, ROM, caches, ...
-	network/		Ethernet and others end up here
-	sound/			sound cards
-
-
-Error handling, if loading a component tree fails! Think about this.
-
-
-Debugger / command interpreter
-------------------------------
-
-New debugger with basic functionality:
-
-	* Same command interface when running from the command line, and
-	  inside a window in the GUI.
+CommandInterpreter
+	* Outputability!
+	* Print Prompt when ready, i.e. after each command.
+	* Implement the terminal stdin/out stuff!
 	* Tab completion for everything:
 		command names
 		component names
@@ -92,6 +59,36 @@ New debugger with basic functionality:
 	x)  Strings should be supported, both for e.g. variable
 	    assignment, and for e.g. placing strings in memory.
 	x)  Arrays?
+
+
+Components
+----------
+
+Actions for adding components to a GXemul instance, removing them...
+Write UNIT TESTS for these actions.
+
+New component source code tree, src/components/:
+	busses/			mainbus, TurboChannel, ISA, PCI, ...
+	cpus/
+		CPU		class CPU : public Component, etc
+		arm/
+		alpha/
+		mips/		etc. One for each CPU architecture
+	graphics/		e.g. VGA graphics cards!
+	displays/
+		rgbmonitor	RGB monitor, for e.g. VGA output.
+		lcd		LCD display
+		led		A single led :)
+	dummy/			Contains dummy test components, for testing
+				the components framework (e.g. serialization...)
+	machines/		Machines are usually TEMPLATES which set up a
+				couple of other components!
+	memory/			RAM, ROM, caches, ...
+	network/		Ethernet and others end up here
+	sound/			sound cards
+
+
+Error handling, if loading a component tree fails! Think about this.
 
 
 GTKMM GUI
