@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Component.h,v 1.6 2007-12-28 19:08:44 debug Exp $
+ *  $Id: Component.h,v 1.7 2007-12-29 16:18:51 debug Exp $
  */
 
 #include "misc.h"
@@ -185,6 +185,16 @@ public:
 	 */
 	static bool Deserialize(const string& str, size_t& pos,
 		refcount_ptr<Component>& deserializedTree);
+
+	/**
+	 * \brief Checks consistency by serializing and deserializing the
+	 *	component (including all its child components), and comparing
+	 *	the checksum of the original tree with the deserialized tree.
+	 *
+	 * @return true if the serialization/deserialization was correct,
+	 *	false if there was some inconsistency
+	 */
+	bool CheckConsistency() const;
 
 	/**
 	 * \brief Adds this component's state, including children, to

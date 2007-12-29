@@ -27,12 +27,13 @@
  *  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *  SUCH DAMAGE.
  *
- *  $Id: GXemul.h,v 1.8 2007-12-28 19:08:44 debug Exp $
+ *  $Id: GXemul.h,v 1.9 2007-12-29 16:18:51 debug Exp $
  */
 
 #include "misc.h"
 
 #include "ActionStack.h"
+#include "CommandInterpreter.h"
 #include "Component.h"
 
 
@@ -42,9 +43,14 @@
  * Its main purpose is to run the GUI main loop, or the text terminal
  * main loop.
  *
- * A GXemul instance has a tree of components, which make up the full
- * state of the current emulation setup. It also has an ActionStack,
- * for undo/redo functionality.
+ * A GXemul instance basically has the following member variables:
+ *
+ * <ol>
+ *	<li>a tree of components, which make up the full
+ *		state of the current emulation setup
+ *	<li>an ActionStack, for undo/redo functionality
+ *	<li>a CommandInterpreter
+ * </ol>
  */
 class GXemul
 {
@@ -76,6 +82,13 @@ public:
 	 */
 	int Run();
 
+	/**
+	 * \brief Gets a reference to the CommandInterpreter.
+	 *
+	 * @return a reference to the %GXemul instance' CommandInterpreter
+	 */
+	CommandInterpreter& GetCommandInterpreter();
+
 private:
 	/**
 	 * \brief Prints help message to std::cout.
@@ -91,6 +104,7 @@ private:
 
 	refcount_ptr<Component>	m_rootComponent;
 	ActionStack		m_actionStack;
+	CommandInterpreter	m_commandInterpreter;
 };
 
 #endif	// GXEMUL_H

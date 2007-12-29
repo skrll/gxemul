@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: SerializationContext.h,v 1.1 2007-12-28 19:08:44 debug Exp $
+ *  $Id: SerializationContext.h,v 1.2 2007-12-29 16:18:51 debug Exp $
  */
 
 #include "misc.h"
@@ -48,16 +48,32 @@ public:
 	{
 	}
 
+	/**
+	 * \brief Gets the indentation level of the context.
+	 *
+ 	 * @return the indentation level
+	 */
 	int GetIndentation() const
 	{
 		return m_indentation;
 	}
 
+	/**
+	 * \brief Sets the indentation level.
+	 *
+	 * @param indentation The new indentation level.
+	 */
 	void SetIndentation(int indentation)
 	{
 		m_indentation = indentation;
 	}
 
+	/**
+	 * \brief Constructs a SerializationContext which is indented (1
+	 *	step) compared to the current context.
+	 *
+	 * @return An indented context.
+	 */
 	SerializationContext Indented()
 	{
 		SerializationContext newContext;
@@ -65,6 +81,12 @@ public:
 		return newContext;
 	}
 
+	/**
+	 * \brief Generates a string of Tab characters, based on the
+	 *	indentation level.
+	 *
+	 * @return a string of tab characters
+	 */
 	string Tabs() const
 	{
 		string retValue;

@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: UnitTest.cc,v 1.5 2007-12-28 19:08:44 debug Exp $
+ *  $Id: UnitTest.cc,v 1.6 2007-12-29 16:18:51 debug Exp $
  */
 
 #include <iostream>
@@ -36,6 +36,7 @@
 // Classes to test:
 #include "ActionStack.h"
 #include "Checksum.h"
+#include "CommandInterpreter.h"
 #include "components/DummyComponent.h"
 #include "EscapedString.h"
 #include "StateVariable.h"
@@ -77,6 +78,7 @@ int UnitTest::RunTests()
 	// Run tests in all specified classes:
 	nrOfErrors += ActionStack::RunUnitTests();
 	nrOfErrors += Checksum::RunUnitTests();
+	nrOfErrors += CommandInterpreter::RunUnitTests();
 	nrOfErrors += DummyComponent::RunUnitTests();
 	nrOfErrors += EscapedString::RunUnitTests();
 	nrOfErrors += StateVariable::RunUnitTests();

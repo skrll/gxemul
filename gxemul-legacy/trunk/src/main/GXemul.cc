@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemul.cc,v 1.13 2007-12-28 19:08:44 debug Exp $
+ *  $Id: GXemul.cc,v 1.14 2007-12-29 16:18:51 debug Exp $
  *
  *  This file contains three things:
  *
@@ -87,6 +87,18 @@
  *
  * The stack is implemented by the ActionStack class. A GXemul instance
  * has one such stack.
+ *
+ * \subsection commandinterpreter_subsec Command interpreter
+ *
+ * A GXemul instance has a CommandInterpreter, which is the part that parses a
+ * command and executes it. The %CommandInterpreter can be given a complete
+ * command as a string, or it can be given one character (or keypress) at a
+ * time. In the later case, the TAB key either completes the word currently
+ * being written, or writes out a list of possible completions.
+ *
+ * When running <tt>gxemul</tt>, the %CommandInterpreter is the UI as seen
+ * by the user. When running <tt>gxemul-gui</tt>, the %CommandInterpreter is
+ * located in a window. The functionality should be the same in both cases.
  *
  * \subsection refcount_subsec Reference counting
  *
@@ -165,6 +177,7 @@ extern char *optarg;
 GXemul::GXemul(bool bWithGUI)
 	: m_bWithGUI(bWithGUI)
 	, m_bRunUnitTests(false)
+	, m_commandInterpreter(this)
 {
 }
 
@@ -217,7 +230,7 @@ void GXemul::PrintUsage(bool bLong) const
 #ifndef WITHOUTUNITTESTS
 		"  -W unittest    run unit tests\n"
 #endif
-	    ;
+		"\n";
 }
 
 
@@ -244,6 +257,12 @@ int GXemul::Run()
 	}
 
 	return 0;
+}
+
+
+CommandInterpreter& GXemul::GetCommandInterpreter()
+{
+	return m_commandInterpreter;
 }
 
 

@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: EscapedString.cc,v 1.1 2007-12-28 19:08:44 debug Exp $
+ *  $Id: EscapedString.cc,v 1.2 2007-12-29 16:18:51 debug Exp $
  */
 
 #include "EscapedString.h"
@@ -74,8 +74,12 @@ string EscapedString::Generate() const
 string EscapedString::Decode() const
 {
 	string result = "";
+	size_t offset = 0;
+	
+	if (m_str[0] == '"')
+		offset = 1;
 
-	for (size_t i=1; i<m_str.length()-1; i++) {
+	for (size_t i=offset; i<m_str.length()-offset; i++) {
 		char ch = m_str[i];
 
 		switch (ch) {
@@ -157,12 +161,36 @@ static void Test_EscapedString_Decode()
 	    "Hello\\world");
 }
 
+static void Test_EscapedString_Decode_WithoutQuotes()
+{
+	UnitTest::Assert("trivial escape: normal text",
+	    EscapedString("hello world 123").Decode() ==
+	    "hello world 123");
+
+	UnitTest::Assert("escape tab",
+	    EscapedString("hi\\tworld").Decode() ==
+	    "hi\tworld");
+
+	UnitTest::Assert("escape newline and carriage return",
+	    EscapedString("hi\\nworld\\ragain").Decode() ==
+	    "hi\nworld\ragain");
+
+	UnitTest::Assert("escape quotes",
+	    EscapedString("hi'123\\\"456\\\"789").Decode() ==
+	    "hi'123\"456\"789");
+
+	UnitTest::Assert("escaped escape char",
+	    EscapedString("Hello\\\\world").Decode() ==
+	    "Hello\\world");
+}
+
 int EscapedString::RunUnitTests()
 {
 	int nrOfFailures = 0;
 
 	UNITTEST(nrOfFailures, Test_EscapedString_Generate);
 	UNITTEST(nrOfFailures, Test_EscapedString_Decode);
+	UNITTEST(nrOfFailures, Test_EscapedString_Decode_WithoutQuotes);
 
 	return nrOfFailures;
 }

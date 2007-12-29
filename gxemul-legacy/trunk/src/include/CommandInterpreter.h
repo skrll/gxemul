@@ -1,5 +1,5 @@
-#ifndef ESCAPEDSTRING_H
-#define	ESCAPEDSTRING_H
+#ifndef COMMANDINTERPRETER_H
+#define	COMMANDINTERPRETER_H
 
 /*
  *  Copyright (C) 2007-2008  Anders Gavare.  All rights reserved.
@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: EscapedString.h,v 1.2 2007-12-29 16:18:51 debug Exp $
+ *  $Id: CommandInterpreter.h,v 1.1 2007-12-29 16:18:51 debug Exp $
  */
 
 #include "misc.h"
@@ -36,36 +36,50 @@
 #include "UnitTest.h"
 
 
+class GXemul;
+
+
 /**
- * \brief A helper class for escaping strings using C-style escapes.
+ * \brief An interactive command interpreter.
+ *
+ * A command interpreter can execute commands in the form of complete strings,
+ * or it can be given one character (keypress) at a time to build up a command.
+ * When given individual keypresses, the command interpreter echoes back
+ * what is to be printed. It also supports TAB completion.
  */
-class EscapedString
+class CommandInterpreter
 	: public UnitTestable
 {
 public:
 	/**
-	 * \brief Constructs an EscapedString helper.
+	 * \brief Constructs a %CommandInterpreter.
 	 *
-	 * @param str	A string, either escaped or not escaped.
+	 * @param owner the GXemul instance that owns the %CommandInterpreter
 	 */
-	EscapedString(const string& str);
+	CommandInterpreter(GXemul* owner);
 
 	/**
-	 * \brief Generates an escaped string, from the original string.
+	 * \brief Adds a character (keypress).
 	 *
-	 * @return	an escaped string
+	 * @param key the character/key to add
 	 */
-	string Generate() const;
+	void AddKey(char key);
 
 	/**
-	 * \brief Decodes an escaped string, from the original string.
+	 * \brief Runs a command, given as a string.
 	 *
-	 * The original string should be a C-style escaped string, with
-	 * or without surrounding quote (") characters.
-	 *
-	 * @return	a decoded (unescaped) string
+	 * @param command the command to run
+	 * @return true if the command was run, false if the command was
+	 *	not known
 	 */
-	string Decode() const;
+	bool RunCommand(const string& command);
+
+	/**
+	 * \brief Retrieves the current command buffer.
+	 *
+	 * @return a string representing the current command buffer
+	 */
+	const string& GetCurrentCommandBuffer() const;
 
 
 	/********************************************************************/
@@ -73,8 +87,9 @@ public:
 	static int RunUnitTests();
 
 private:
-	string		m_str;
+	GXemul*		m_GXemul;
+	string		m_currentCommandString;
 };
 
 
-#endif	// ESCAPEDSTRING_H
+#endif	// COMMANDINTERPRETER_H

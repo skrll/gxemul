@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Component.cc,v 1.4 2007-12-28 19:08:44 debug Exp $
+ *  $Id: Component.cc,v 1.5 2007-12-29 16:18:51 debug Exp $
  */
 
 #include "assert.h"
@@ -165,23 +165,23 @@ void Component::SetVariable(const string& name,
 string Component::Serialize(SerializationContext& context) const
 {
 	SerializationContext subContext = context.Indented();
+	string tabs, variables, children;
 
-	string variables;
+	tabs = context.Tabs();
+
 	for (StateVariableMap::const_iterator it = m_stateVariables.begin();
-	    it != m_stateVariables.end();
-	    ++ it)
+	    it != m_stateVariables.end(); ++it)
 		variables += (it->second).Serialize(subContext);
 
-	string children;
 	for (size_t i = 0; i < m_childComponents.size(); ++ i)
 		children += "\n" + m_childComponents[i]->Serialize(subContext);
 	
 	return
-	    context.Tabs() + "component " + m_className + "\n" +
-	    context.Tabs() + "{\n" +
+	    tabs + "component " + m_className + "\n" +
+	    tabs + "{\n" +
 	    variables +
 	    children +
-	    context.Tabs() + "}\n";
+	    tabs + "}\n";
 }
 
 
@@ -236,10 +236,9 @@ bool Component::Deserialize(const string& str, size_t& pos,
 	if (!GetNextToken(str, pos, token) || token != "component")
 		return false;
 
-	if (!GetNextToken(str, pos, token))
+	string className;
+	if (!GetNextToken(str, pos, className))
 		return false;
-
-	string className = token;
 
 	if (!GetNextToken(str, pos, token) || token != "{")
 		return false;
@@ -250,14 +249,14 @@ bool Component::Deserialize(const string& str, size_t& pos,
 	while (pos < str.length()) {
 		size_t savedPos = pos;
 
-		// Either 1)   variableType variableName "value"
-		// or     2)   component classname { ...
-		// or     3)   }     (end of current component)
+		// Either 1)   }     (end of current component)
+		// or     2)   component name { ...
+		// or     3)   variableType name "value"
 
 		if (!GetNextToken(str, pos, token))
-			return true;
+			return false;
 
-		// Case 3:
+		// Case 1:
 		if (token == "}")
 			return true;
 
@@ -270,14 +269,16 @@ bool Component::Deserialize(const string& str, size_t& pos,
 			refcount_ptr<Component> child;
 			if (!Component::Deserialize(str, savedPos, child))
 				return false;
+
 			deserializedTree->AddChild(child);
 			pos = savedPos;
 		} else {
-			// Case 1:
+			// Case 3:
 			string varType = token;
 			string varValue;
 			if (!GetNextToken(str, pos, varValue))
 				return false;
+
 			deserializedTree->SetVariable(name,
 			    StateVariableValue(varType, varValue));
 		}
@@ -287,11 +288,36 @@ bool Component::Deserialize(const string& str, size_t& pos,
 }
 
 
+bool Component::CheckConsistency() const
+{
+	// Serialize
+	SerializationContext context;
+	string result = Serialize(context);
+
+	Checksum checksumOriginal;
+	AddChecksum(checksumOriginal);
+
+	// Deserialize
+	refcount_ptr<Component> tmpDeserializedTree;
+	size_t pos = 0;
+	if (!Deserialize(result, pos, tmpDeserializedTree) ||
+	    tmpDeserializedTree.IsNULL())
+		return false;
+
+	Checksum checksumDeserialized;
+	tmpDeserializedTree->AddChecksum(checksumDeserialized);
+
+	// ... and compare the checksums:
+	return checksumOriginal == checksumDeserialized;
+}
+
+
 void Component::AddChecksum(Checksum& checksum) const
 {
 	// Some random stuff is added between normal fields to the checksum.
 	// This is to make it harder to get the same checksum for two different
-	// objects, that just have some fields swapped, or such.
+	// objects, that just have some fields swapped, or such. (Yes, I know,
+	// that is not a very scientific explanation :) but it will have to do.)
 
 	checksum.Add(0x12491725abcef011LL);
 	checksum.Add(m_className);

@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: DummyComponent.cc,v 1.3 2007-12-28 19:08:44 debug Exp $
+ *  $Id: DummyComponent.cc,v 1.4 2007-12-29 16:18:51 debug Exp $
  */
 
 #include "components/DummyComponent.h"
@@ -201,27 +201,8 @@ static void Test_DummyComponent_SerializeDeserialize()
 	dummyChildA->AddChild(dummyChildA2);
 	dummy->AddChild(dummyChildA);
 
-	// Serialize
-	SerializationContext context;
-	string result = dummy->Serialize(context);
-
-	Checksum checksumOriginal;
-	dummy->AddChecksum(checksumOriginal);
-
-	// Deserialize
-	refcount_ptr<Component> deserializedTree;
-	size_t pos = 0;
-	UnitTest::Assert("deserialization should have been possible",
-	    Component::Deserialize(result, pos, deserializedTree) == true);
-	UnitTest::Assert("deserialized component tree should be non-NULL",
-	    deserializedTree.IsNULL() == false);
-
-	// ... and compare the checksums:
-	Checksum checksumDeserialized;
-	deserializedTree->AddChecksum(checksumDeserialized);
-
-	UnitTest::Assert("checksum after deserialization should be identical",
-	    checksumOriginal == checksumDeserialized);
+	UnitTest::Assert("serialize/deserialize consistency failure",
+	    dummy->CheckConsistency() == true);
 }
 
 int DummyComponent::RunUnitTests()
