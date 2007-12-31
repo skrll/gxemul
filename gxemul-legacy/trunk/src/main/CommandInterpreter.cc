@@ -25,10 +25,11 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: CommandInterpreter.cc,v 1.2 2007-12-31 11:50:19 debug Exp $
+ *  $Id: CommandInterpreter.cc,v 1.3 2007-12-31 12:09:25 debug Exp $
  */
 
 #include "assert.h"
+#include <iostream>
 
 #include "GXemul.h"
 #include "CommandInterpreter.h"
