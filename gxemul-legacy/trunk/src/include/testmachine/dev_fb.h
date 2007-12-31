@@ -4,7 +4,7 @@
 /*
  *  Definitions used by the framebuffer device in GXemul.
  *
- *  $Id: dev_fb.h,v 1.6 2006-07-16 08:11:43 debug Exp $
+ *  $Id: dev_fb.h,v 1.7 2007-12-31 11:47:02 debug Exp $
  *  This file is in the public domain.
  */
 
@@ -48,10 +48,6 @@
 
 /*  Get current resolution into X1, Y1.  */
 #define	DEV_FBCTRL_COMMAND_GET_RESOLUTION		2
-
-/*  TODO:  */
-#define	DEV_FBCTRL_COMMAND_FILL				3
-#define	DEV_FBCTRL_COMMAND_COPY				4
 
 
 #define	DEV_FBCTRL_MAXY(x)	(((DEV_FBCTRL_ADDRESS-DEV_FB_ADDRESS) / 3) / x)
