@@ -28,18 +28,21 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: misc.h,v 1.268 2007-12-31 11:50:18 debug Exp $
+ *  $Id: misc.h,v 1.269 2007-12-31 12:27:42 debug Exp $
  *
- *  Misc. definitions for gxemul.
+ *  Misc. definitions for GXemul.
  */
 
 
 #include <sys/types.h>
 #include <inttypes.h>
 
+
 /*  config.h contains #defines set by the configure script.  */
 
 #include "../../config.h"
+
+#define	COPYRIGHT_MSG	"Copyright (C) 2003-2008  Anders Gavare"
 
 
 // Use Glib::ustring if available, otherwise std::string. Define
