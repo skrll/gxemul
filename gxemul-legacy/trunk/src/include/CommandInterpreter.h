@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: CommandInterpreter.h,v 1.1 2007-12-29 16:18:51 debug Exp $
+ *  $Id: CommandInterpreter.h,v 1.2 2007-12-31 11:50:18 debug Exp $
  */
 
 #include "misc.h"
@@ -59,11 +59,21 @@ public:
 	CommandInterpreter(GXemul* owner);
 
 	/**
-	 * \brief Adds a character (keypress).
+	 * \brief Adds a character (keypress) to the current command buffer.
+	 *
+	 * Most normal keys are added at the end of the buffer. Some exceptions
+	 * are:
+	 * <ul>
+	 *	<li>backspace: removes the last character (if any)
+	 *	<li>tab: attempts TAB completion of the last word
+	 *	<li>newline or cr: calls RunCommand, and then clears
+	 *		the current buffer
+	 *	<li>escape: special handling
+	 * </ul>
 	 *
 	 * @param key the character/key to add
 	 */
-	void AddKey(char key);
+	void AddKey(stringchar key);
 
 	/**
 	 * \brief Runs a command, given as a string.

@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: misc.h,v 1.267 2007-12-28 19:08:44 debug Exp $
+ *  $Id: misc.h,v 1.268 2007-12-31 11:50:18 debug Exp $
  *
  *  Misc. definitions for gxemul.
  */
@@ -37,22 +37,28 @@
 #include <sys/types.h>
 #include <inttypes.h>
 
-/*
- *  ../../config.h contains #defines set by the configure script. Some of these
- *  might reduce speed of the emulator, so don't enable them unless you
- *  need them.
- */
+/*  config.h contains #defines set by the configure script.  */
 
 #include "../../config.h"
 
 
-// Use Glib::ustring if available, otherwise std::string:
-#ifdef WITH_GUI
+// Use Glib::ustring if available, otherwise std::string. Define
+// stringchar to be the type of a character.
+#ifdef WITH_GTKMM
 #include <glibmm/ustring.h>
 typedef Glib::ustring string;
-#else   // !WITH_GUI
+typedef gunichar stringchar;
+#else   // !WITH_GTKMM
 #include <string>
 typedef std::string string;
+typedef char stringchar;
+#endif
+
+// Use Glib's I18N support if available
+#ifdef WITH_GTKMM
+#include <glibmm/i18n.h>
+#else   // !WITH_GTKMM
+#define	_(x)	(x)
 #endif
 
 #include <list>
@@ -65,10 +71,6 @@ using std::map;
 using std::set;
 using std::vector;
 
-#endif
- 
- 
-#ifdef __cplusplus
 
 #ifndef NDEBUG
 #include "debug_new.h"
@@ -105,34 +107,9 @@ using std::vector;
 
 
 #ifdef NO_MAP_ANON
-#ifdef mmap
-#undef mmap
-#endif
-#include <fcntl.h>
-#include <stdlib.h>
-#include <sys/mman.h>
-static void *no_map_anon_mmap(void *addr, size_t len, int prot, int flags,
-	int nonsense_fd, off_t offset)
-{
-	void *p;
-	int fd = open("/dev/zero", O_RDWR);
-	if (fd < 0) {
-		fprintf(stderr, "Could not open /dev/zero\n");
-		exit(1);
-	}
-
-	printf("addr=%p len=%lli prot=0x%x flags=0x%x nonsense_fd=%i "
-	    "offset=%16lli\n", addr, (long long) len, prot, flags,
-	    nonsense_fd, (long long) offset);
-
-	p = mmap(addr, len, prot, flags, fd, offset);
-
-	printf("p = %p\n", p);
-
-	/*  TODO: Close the descriptor?  */
-	return p;
-}
-#define mmap no_map_anon_mmap
+#error mmap for systems without MAP_ANON has not yet been implemented. \
+	The old implementation was too ugly. Please let me know about this \
+	if you see this error message.
 #endif
 
 

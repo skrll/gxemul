@@ -1,0 +1,26 @@
+#
+#  $Id: Makefile.skel,v 1.1 2007-12-31 11:50:19 debug Exp $
+#
+#  Makefile for GXemul src/ui
+#
+
+all: do_console do_gtkmm
+
+$(OBJS): Makefile
+
+do_console:
+	cd console; $(MAKE); cd ..
+
+do_gtkmm:
+	cd gtkmm; $(MAKE); cd ..
+
+clean:
+	cd console; $(MAKE) clean_all; cd ..
+	cd gtkmm; $(MAKE) clean_all; cd ..
+	rm -f $(OBJS) *core
+
+clean_all: clean
+	cd console; $(MAKE) clean_all; cd ..
+	cd gtkmm; $(MAKE) clean_all; cd ..
+	rm -f Makefile
+

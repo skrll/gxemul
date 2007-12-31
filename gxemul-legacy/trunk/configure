@@ -27,7 +27,7 @@
 #  SUCH DAMAGE.
 #
 #
-#  $Id: configure,v 1.293 2007-12-28 19:08:44 debug Exp $
+#  $Id: configure,v 1.294 2007-12-31 11:50:18 debug Exp $
 #
 #  This is a minimal configure script, hardcoded for GXemul. This script
 #  figures out which compiler flags will work, and creates Makefiles in
@@ -74,10 +74,10 @@ if [ z"$*" != z ]; then
 	for a in $*; do
 		if [ z$a = z--debug ]; then
 			DEBUG=YES
-		else if [ z$a = z--with-gui ]; then
-			WITHGUI=YES
-		else if [ z$a = z--without-gui ]; then
-			WITHOUTGUI=YES
+		else if [ z$a = z--with-gtkmm ]; then
+			WITHGTKMM=YES
+		else if [ z$a = z--without-gtkmm ]; then
+			WITHOUTGTKMM=YES
 		else if [ z$a = z--with-x11 ]; then
 			WITHX11=YES
 		else if [ z$a = z--without-x11 ]; then
@@ -92,8 +92,8 @@ if [ z"$*" != z ]; then
 			fi
 			echo "  --without-unit-tests  build without unit tests"
 			echo
-			echo "  --with-gui            build with the gtkmm GUI"
-			echo "  --without-gui         build without the gtkmm GUI"
+			echo "  --with-gtkmm          build with the gtkmm GUI"
+			echo "  --without-gtkmm       build without the gtkmm GUI"
 			echo "  --with-x11            build with X11 framebuffer support"
 			echo "  --without-x11         build without X11 framebuffer support"
 			echo
@@ -1207,17 +1207,17 @@ fi
 GTKMM_VER="2.12.1"
 printf "checking for gtkmm-2.4 >= $GTKMM_VER... "
 
-if [ z$WITHOUTGUI = zYES ]; then
+if [ z$WITHOUTGTKMM = zYES ]; then
 	echo skipping
 else
 	if pkg-config --atleast-version=$GTKMM_VER gtkmm-2.4; then
 		echo found
 		CFLAGS="$CFLAGS `pkg-config --cflags gtkmm-2.4`"
 		OTHERLIBS="$OTHERLIBS `pkg-config --libs gtkmm-2.4`"
-		CFLAGS="$CFLAGS -DWITH_GUI"
+		CFLAGS="$CFLAGS -DWITH_GTKMM"
 	else
 		echo not found
-		if [ z$WITHGUI = zYES ]; then
+		if [ z$WITHGTKMM = zYES ]; then
 			echo "Sorry, gtkmm-2.4 version $GTKMM_VER or newer" \
 			    "was not found. Aborting."
 			exit
@@ -1259,7 +1259,7 @@ echo "" >> _Makefile.header
 #  Create the Makefiles:
 D=". src src/components"
 D="$D src/components/dummy"
-D="$D src/gui src/main"
+D="$D src/ui src/ui/console src/ui/gtkmm src/main"
 for a in $D; do
 	echo "creating $a/Makefile"
 	touch $a/Makefile

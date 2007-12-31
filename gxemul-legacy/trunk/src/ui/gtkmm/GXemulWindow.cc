@@ -25,18 +25,19 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemulWindow.cc,v 1.10 2007-12-28 19:08:44 debug Exp $
+ *  $Id: GXemulWindow.cc,v 1.1 2007-12-31 11:50:19 debug Exp $
  */
 
-#ifdef WITH_GUI
+#ifdef WITH_GTKMM
 
 #include <iostream>
 
-#include "GXemulWindow.h"
 #include "misc.h"
+#include "ui/gtkmm/GXemulWindow.h"
 
 
-GXemulWindow::GXemulWindow()
+GXemulWindow::GXemulWindow(GXemul* gxemul)
+	: m_gxemul(gxemul)
 {
 	set_title("GXemul");
 
@@ -110,9 +111,9 @@ void GXemulWindow::on_menu_about()
 {
 	Gtk::MessageDialog dialog(*this, "GXemul "VERSION,
 	    false, Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK);
-	dialog.set_secondary_text("Copyright (C) 2003-2008  Anders Gavare\n"
+	dialog.set_secondary_text(_("Copyright (C) 2003-2008  Anders Gavare\n"
 	    "\nIf you have questions or feedback, don't\n"
-	    "hesitate to mail me:  anders@gavare.se");
+	    "hesitate to mail me:  anders@gavare.se"));
 	dialog.run();
 }
 
@@ -126,4 +127,4 @@ void GXemulWindow::on_menu_quit()
 	hide();
 }
 
-#endif	// WITH_GUI
+#endif	// WITH_GTKMM

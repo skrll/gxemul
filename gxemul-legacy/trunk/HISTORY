@@ -1,4 +1,4 @@
-$Id: HISTORY,v 1.1671 2007-12-29 16:18:51 debug Exp $
+$Id: HISTORY,v 1.1672 2007-12-31 11:50:18 debug Exp $
 
 Changelog for GXemul:
 ---------------------
@@ -3758,3 +3758,7 @@ Changelog for GXemul:
 		decoding C-style escaped strings.
 		Simple deserialization works. :)
 20071229	Beginning on the CommandInterpreter class.
+20071231	Moving src/gui to src/ui/gtkmm, and creating src/ui/console.
+		(The idea is that all UIs, not only graphical ones, will share
+		a common base class (the UI class), making it reasonably easy
+		to add other GUIs later on if necessary.)

@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemul.cc,v 1.14 2007-12-29 16:18:51 debug Exp $
+ *  $Id: GXemul.cc,v 1.15 2007-12-31 11:50:19 debug Exp $
  *
  *  This file contains three things:
  *
@@ -118,6 +118,12 @@
  * differ between different classes, but using the UNITTEST(n,test) macro
  * in src/include/UnitTest.h is preferable.
  *
+ * Unit tests are normally executed by <tt>make test</tt>. This is implicitly
+ * done when doing <tt>make install</tt> as well. It is recommended to run
+ * the configure script with the <tt>--debug</tt> option; this enables Wu
+ * Yongwei's new/debug memory leak detector. (It does not seem to work too
+ * well with GTKMM, so adding <tt>--without-gtkmm</tt> is also useful.)
+ *
  *
  * \section codeguidelines_sec Coding guidelines
  *
@@ -145,12 +151,24 @@
  *		Hungarian notation otherwise.
  *	<li>Keep to 80 columns width, if possible.
  *	<li>Use <tt>string</tt> for strings. This is typedeffed to
- *		<tt>Glib::ustring</tt> if it is available (for
+ *		<a href="http://www.gtkmm.org/docs/glibmm-2.4/docs/reference/html/classGlib_1_1ustring.html">
+ *		<tt>Glib::ustring</tt></a> if it is available (for
  *		<a href="http://en.wikipedia.org/wiki/Unicode">unicode</a>
  *		support), otherwise it is typedeffed to <tt>std::string</tt>.
+ *		Do not use <tt>char</tt> for characters, use <tt>stringchar</tt>
+ *		instead (typedeffed to <tt>gunichar</tt> if unicode is used).
+ *	<li>Use i18n macros for user-visible strings, where it makes sense.
+ *	<li>Simple and easy-to-read code is preferable; only optimize after
+ *		profiling, when it is known which code paths are in need
+ *		of optimization.
+ *	<li>Insert uppercase "TODO" if something is unclear at the time of
+ *		implementation. Periodically do a <tt>grep -R TODO src</tt>
+ *		to hunt down these TODOs and fix them permanently.
  *	<li>Use const references for argument passing, to avoid copying.
  *	<li>All functionality should be available both via text-only
- *		terminals and the GUI, unless really necessary.
+ *		terminals and the GUI. In practice, this means that all GUI
+ *		actions should result in commands sent to the
+ *		CommandInterpreter.
  * </ul>
  */
 
@@ -160,12 +178,13 @@
 
 #include <iostream>
 
-#ifdef WITH_GUI
-#include <gtkmm.h>
-#include "GXemulWindow.h"
-#endif
-
 #include "misc.h"
+
+#include "ui/console/ConsoleUI.h"
+#ifdef WITH_GTKMM
+#include <gtkmm.h>
+#include "ui/gtkmm/GtkmmUI.h"
+#endif
 
 #include "GXemul.h"
 #include "UnitTest.h"
@@ -236,25 +255,29 @@ void GXemul::PrintUsage(bool bLong) const
 
 int GXemul::Run()
 {
-	/*  Print startup message:  */
+	// Print startup message:
 	if (!m_bWithGUI)
 		PrintBanner();
 
-	/*  Run unit tests? Then only run those, and then exit.  */
+	// Run unit tests? Then only run those, and then exit.
 	if (m_bRunUnitTests)
 		return UnitTest::RunTests();
 
-	/*  Run the main loop:  */
+	// Choose UI...
 	if (m_bWithGUI) {
-#ifdef WITH_GUI
-		GXemulWindow window;
-		Gtk::Main::run(window);
+#ifdef WITH_GTKMM
+		m_ui = new GtkmmUI(this);
 #else
 		std::cerr << "Sorry, this installation of GXemul was "
 		    "compiled without GUI support.\n";
-#endif
 		return 0;
+#endif
+	} else {
+		m_ui = new ConsoleUI(this);
 	}
+
+	// ... and run the main loop:
+	m_ui->MainLoop();
 
 	return 0;
 }
@@ -298,7 +321,7 @@ int main(int argc, char *argv[])
 {
 	const char *progname = argv[0];
 
-#ifdef WITH_GUI
+#ifdef WITH_GTKMM
 	Gtk::Main main(argc, argv);
 #endif
 

@@ -25,12 +25,13 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: DebugConsoleWidget.cc,v 1.4 2007-12-28 19:08:44 debug Exp $
+ *  $Id: DebugConsoleWidget.cc,v 1.1 2007-12-31 11:50:19 debug Exp $
  */
 
-#ifdef WITH_GUI
+#ifdef WITH_GTKMM
 
-#include "DebugConsoleWidget.h"
+#include "ui/gtkmm/DebugConsoleWidget.h"
+
 
 DebugConsoleWidget::DebugConsoleWidget()
 {
@@ -42,4 +43,4 @@ DebugConsoleWidget::~DebugConsoleWidget()
 {
 }
 
-#endif	// WITH_GUI
+#endif	// WITH_GTKMM

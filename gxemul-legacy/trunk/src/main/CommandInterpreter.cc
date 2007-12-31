@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: CommandInterpreter.cc,v 1.1 2007-12-29 16:18:51 debug Exp $
+ *  $Id: CommandInterpreter.cc,v 1.2 2007-12-31 11:50:19 debug Exp $
  */
 
 #include "assert.h"
@@ -42,7 +42,7 @@ CommandInterpreter::CommandInterpreter(GXemul* owner)
 }
 
 
-void CommandInterpreter::AddKey(char key)
+void CommandInterpreter::AddKey(stringchar key)
 {
 	switch (key) {
 	case '\b':
@@ -144,9 +144,15 @@ static void Test_CommandInterpreter_KeyBuffer()
 	    ci.GetCurrentCommandBuffer() == "");
 
 	ci.AddKey('Z');
+	ci.AddKey('Q');
 
 	UnitTest::Assert("new command should have been possible",
-	    ci.GetCurrentCommandBuffer() == "Z");
+	    ci.GetCurrentCommandBuffer() == "ZQ");
+
+	ci.AddKey('\r');
+
+	UnitTest::Assert("buffer should be empty after executing '\\r'",
+	    ci.GetCurrentCommandBuffer() == "");
 }
 
 static void Test_CommandInterpreter_NonExistingCommand()

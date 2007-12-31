@@ -28,21 +28,24 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemulWindow.h,v 1.6 2007-12-28 19:08:44 debug Exp $
+ *  $Id: GXemulWindow.h,v 1.1 2007-12-31 11:50:18 debug Exp $
  */
 
 #include <gtkmm.h>
 
-#include "DebugConsoleWidget.h"
-#include "EmulationDesignArea.h"
+#include "GXemul.h"
+#include "ui/gtkmm/DebugConsoleWidget.h"
+#include "ui/gtkmm/EmulationDesignArea.h"
+
 
 /**
  * \brief The main GUI window.
  */
-class GXemulWindow : public Gtk::Window
+class GXemulWindow
+	: public Gtk::Window
 {
 public:
-	GXemulWindow();
+	GXemulWindow(GXemul* gxemul);
 	virtual ~GXemulWindow();
 
 private:
@@ -50,8 +53,11 @@ private:
 	virtual void on_menu_new();
 	virtual void on_menu_quit();
 
-	Gtk::VBox m_Box;
-	Gtk::VPaned m_VPaned;
+private:
+	GXemul*		m_gxemul;
+
+	Gtk::VBox	m_Box;
+	Gtk::VPaned	m_VPaned;
 
 	EmulationDesignArea m_EmulationDesignArea;
 	DebugConsoleWidget m_DebugConsoleWidget;

@@ -1,5 +1,5 @@
-#ifndef EMULATIONDESIGNAREA_H
-#define	EMULATIONDESIGNAREA_H
+#ifndef DEBUGCONSOLEWIDGET_H
+#define DEBUGCONSOLEWIDGET_H
 
 /*
  *  Copyright (C) 2007-2008  Anders Gavare.  All rights reserved.
@@ -27,19 +27,21 @@
  *  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *  SUCH DAMAGE.
  *
- *  $Id: EmulationDesignArea.h,v 1.3 2007-12-28 19:08:44 debug Exp $
+ *  $Id: DebugConsoleWidget.h,v 1.1 2007-12-31 11:50:18 debug Exp $
  */
 
 #include <gtkmm.h>
 
-class EmulationDesignArea : public Gtk::DrawingArea
+class DebugConsoleWidget : public Gtk::VBox
 {
 public:
-	EmulationDesignArea();
-	virtual ~EmulationDesignArea();
+	DebugConsoleWidget();
+	virtual ~DebugConsoleWidget();
 
 protected:
-	virtual bool on_expose_event(GdkEventExpose* event);
+	Gtk::TextView	m_TextView;
+	Gtk::Entry	m_Entry;
 };
 
-#endif	// EMULATIONDESIGNAREA_H
+#endif	// DEBUGCONSOLEWIDGET_H
+

@@ -27,7 +27,7 @@
  *  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *  SUCH DAMAGE.
  *
- *  $Id: GXemul.h,v 1.9 2007-12-29 16:18:51 debug Exp $
+ *  $Id: GXemul.h,v 1.10 2007-12-31 11:50:18 debug Exp $
  */
 
 #include "misc.h"
@@ -35,6 +35,7 @@
 #include "ActionStack.h"
 #include "CommandInterpreter.h"
 #include "Component.h"
+#include "UI.h"
 
 
 /**
@@ -89,6 +90,7 @@ public:
 	 */
 	CommandInterpreter& GetCommandInterpreter();
 
+
 private:
 	/**
 	 * \brief Prints help message to std::cout.
@@ -101,7 +103,7 @@ private:
 private:
 	bool			m_bWithGUI;
 	bool			m_bRunUnitTests;
-
+	refcount_ptr<UI>	m_ui;
 	refcount_ptr<Component>	m_rootComponent;
 	ActionStack		m_actionStack;
 	CommandInterpreter	m_commandInterpreter;

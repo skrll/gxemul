@@ -1,4 +1,4 @@
-$Id: TODO,v 1.582 2007-12-29 16:18:39 debug Exp $
+$Id: TODO,v 1.583 2007-12-31 11:50:18 debug Exp $
 
 Some things, in approximate Time order, that I'd like to implement or fix.
 (Things at the top need to be fixed before those at the bottom.)
@@ -6,20 +6,29 @@ Some things, in approximate Time order, that I'd like to implement or fix.
 Some items in this list are perhaps already fixed. This is just a place
 for me to do brain-storming.
 
-Please note that GXemul 0.5.0 is a complete rewrite of GXemul, from scratch.
-This file has nothing to do with the TODO files from previous versions
+Please note that GXemul 0.5.0 will be a complete rewrite of GXemul, from
+scratch. This file has nothing to do with the TODO files from previous versions
 of GXemul.
 
 -------------------------------------------------------------------------------
 
+UI:
+	MainLoop
+	input and output of messages
+	 x) ConsoleUI first... set stdin to single character, without echo.
+	 x) Listen to CTRL-C.
+
 CommandInterpreter
 	* Outputability!
-	* Print Prompt when ready, i.e. after each command.
-	* Implement the terminal stdin/out stuff!
+		* Implement the terminal stdin/out stuff!
+		* Print Prompt when ready, i.e. after each command.
+			* Who/what prints the prompt?
+
 	* Tab completion for everything:
 		command names
 		component names
 		components' state variables
+
 	* Built-in commands:
 		quit
 		help		Returns help message, as a string
@@ -40,9 +49,20 @@ CommandInterpreter
 		reset   Reset configuration (i.e. reset all components).
 		print expr  	Prints expression (gets a state variable).
 		expr = value	Sets a state variable
+
+	* Emulation-related commands:
+		c
+		continue
+		s
+		step
+		trace		toggle function call tracing
+		r
+		registers	dump registers of a cpu
+
 	x)  "Object oriented" hierarchy, so that e.g.
 		print machine0.mainbus0.pcibus0.dc0.register_this_and_that
 	    would work.
+
 	x)  Tab completion, for all commands, including the
 	    object oriented extensions / variable names / etc.
 	    INCLUDING tab completion inside sub components.
@@ -55,14 +75,32 @@ CommandInterpreter
 		machine1.pci0
 		machine1.pci1
 		machine2.pci0
+
 	x)  "Methods" on objects? E.g. ...vga.test
+
 	x)  Strings should be supported, both for e.g. variable
 	    assignment, and for e.g. placing strings in memory.
+
 	x)  Arrays?
+
+
+GXemul command line argument
+----------------------------
+
+	* Configuration file (.gxemul).
+	* Directory, containing exactly one .gxemul file.
+	* => initial "load" command. if it fails, gxemul quits.
 
 
 Components
 ----------
+
+LARGE state? Memory contents, disk images, ... these need to be
+saved on disk, or at least not into a string as is currently done.
+Perhaps a stringstream? Or perhaps a type "rawdata" which, instead
+of being stored in the serialized stream, is stored as a "handle"?
+While in memory, handles point to copy-on-write memory, while when
+being saved, the handles' contents is stored to a file?
 
 Actions for adding components to a GXemul instance, removing them...
 Write UNIT TESTS for these actions.
@@ -88,7 +126,24 @@ New component source code tree, src/components/:
 	sound/			sound cards
 
 
-Error handling, if loading a component tree fails! Think about this.
+I18N
+----
+
+	x) Use _(x) for user-readable strings.
+	x) Investigate intltool or gettext or whatever is necessary to get
+	   it all working. po directories/files, etc.
+	x) Initial translation would be Swedish.   LANG=sv_SE.UTF-8 ./gxemul-gui
+	x) Use LANG=he_IL.UTF-8 ./gxemul-gui to try a right-to-left languages,
+	   or  LANG=ja_JP.UTF-8 ./gxemul-gui tp try an asian language.
+
+
+Error handling
+--------------
+
+	x) Stack of errors? With human readable (i18n'd) messages.
+	x) if loading a component tree fails
+	x) if parsing a command fails
+	x) if executing a command fails
 
 
 GTKMM GUI
@@ -102,10 +157,12 @@ GTKMM GUI
 	    and _BETWEEN APPLICATIONS_!
 
 	x)  Menu bar:
+		NOTE: i18n of these! Default names for "File", "Help" etc!
+		
 		File
 			New ->
-				Emulation
 				Emulation from template	  (e.g. "testmips")
+				Empty Emulation
 				-----------------------
 				GXemul instance
 			Open
@@ -221,6 +278,9 @@ Think about
 	    framebuffers in full-screen / windowed mode, _not_ docked.
 
 	x)  Hot-swap of devices during runtime, depends on Bus support. e.g.:
+		Floppies
+		CDROMS
+		Some harddisks?
 		PCMCIA
 		USB
 		Serial devices

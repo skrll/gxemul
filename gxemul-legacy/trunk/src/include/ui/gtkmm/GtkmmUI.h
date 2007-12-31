@@ -1,5 +1,5 @@
-#ifndef DEBUGCONSOLEWIDGET_H
-#define DEBUGCONSOLEWIDGET_H
+#ifndef GTKMMUI_H
+#define	GTKMMUI_H
 
 /*
  *  Copyright (C) 2007-2008  Anders Gavare.  All rights reserved.
@@ -27,21 +27,24 @@
  *  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *  SUCH DAMAGE.
  *
- *  $Id: DebugConsoleWidget.h,v 1.3 2007-12-28 19:08:44 debug Exp $
+ *
+ *  $Id: GtkmmUI.h,v 1.1 2007-12-31 11:50:18 debug Exp $
  */
 
-#include <gtkmm.h>
+#include "UI.h"
 
-class DebugConsoleWidget : public Gtk::VBox
+
+/**
+ * \brief GTK+-based User Interface, using GTKMM.
+ */
+class GtkmmUI
+	: public UI
 {
 public:
-	DebugConsoleWidget();
-	virtual ~DebugConsoleWidget();
-
-protected:
-	Gtk::TextView	m_TextView;
-	Gtk::Entry	m_Entry;
+	GtkmmUI(GXemul *gxemul);
+	virtual ~GtkmmUI();
+	virtual int MainLoop();
 };
 
-#endif	// DEBUGCONSOLEWIDGET_H
 
+#endif	// GTKMMUI_H
