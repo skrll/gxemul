@@ -1,4 +1,4 @@
-$Id: HISTORY,v 1.1672 2007-12-31 11:50:18 debug Exp $
+$Id: HISTORY,v 1.1673 2007-12-31 12:28:02 debug Exp $
 
 Changelog for GXemul:
 ---------------------
@@ -3759,6 +3759,9 @@ Changelog for GXemul:
 		Simple deserialization works. :)
 20071229	Beginning on the CommandInterpreter class.
 20071231	Moving src/gui to src/ui/gtkmm, and creating src/ui/console.
-		(The idea is that all UIs, not only graphical ones, will share
+		The idea is that all UIs, not only graphical ones, will share
 		a common base class (the UI class), making it reasonably easy
-		to add other GUIs later on if necessary.)
+		to add other GUIs later on if necessary.
+		Moving printing of the startup "banner" to a UI member
+		function. (No banner is currently displayed for the GTKMM UI
+		though, because it would feel too heavy-weight.)

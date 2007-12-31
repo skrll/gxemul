@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GtkmmUI.h,v 1.1 2007-12-31 11:50:18 debug Exp $
+ *  $Id: GtkmmUI.h,v 1.2 2007-12-31 12:28:02 debug Exp $
  */
 
 #include "UI.h"
@@ -42,7 +42,11 @@ class GtkmmUI
 {
 public:
 	GtkmmUI(GXemul *gxemul);
+
 	virtual ~GtkmmUI();
+
+	virtual void ShowStartupBanner();
+
 	virtual int MainLoop();
 };
 

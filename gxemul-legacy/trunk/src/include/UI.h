@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: UI.h,v 1.1 2007-12-31 11:50:18 debug Exp $
+ *  $Id: UI.h,v 1.2 2007-12-31 12:28:02 debug Exp $
  */
 
 #include "misc.h"
@@ -56,6 +56,11 @@ public:
 	virtual ~UI()
 	{
 	}
+
+	/**
+	 * \brief Shows a startup banner.
+	 */
+	virtual void ShowStartupBanner() = 0;
 
 	/**
 	 * \brief Runs the UI's main loop.

@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ConsoleUI.cc,v 1.1 2007-12-31 11:50:19 debug Exp $
+ *  $Id: ConsoleUI.cc,v 1.2 2007-12-31 12:28:02 debug Exp $
  */
 
 #include "misc.h"
@@ -42,6 +42,12 @@ ConsoleUI::ConsoleUI(GXemul *gxemul)
 
 ConsoleUI::~ConsoleUI()
 {
+}
+
+
+void ConsoleUI::ShowStartupBanner()
+{
+	std::cout << "GXemul "VERSION"      "COPYRIGHT_MSG"\n\n";
 }
 
 

@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemul.cc,v 1.15 2007-12-31 11:50:19 debug Exp $
+ *  $Id: GXemul.cc,v 1.16 2007-12-31 12:28:02 debug Exp $
  *
  *  This file contains three things:
  *
@@ -161,8 +161,8 @@
  *	<li>Simple and easy-to-read code is preferable; only optimize after
  *		profiling, when it is known which code paths are in need
  *		of optimization.
- *	<li>Insert uppercase "TODO" if something is unclear at the time of
- *		implementation. Periodically do a <tt>grep -R TODO src</tt>
+ *	<li>Insert uppercase <tt>TODO</tt> if something is unclear at the time
+ *		of implementation. Periodically do a <tt>grep -R TODO src</tt>
  *		to hunt down these TODOs and fix them permanently.
  *	<li>Use const references for argument passing, to avoid copying.
  *	<li>All functionality should be available both via text-only
@@ -180,6 +180,7 @@
 
 #include "misc.h"
 
+// UIs:
 #include "ui/console/ConsoleUI.h"
 #ifdef WITH_GTKMM
 #include <gtkmm.h>
@@ -229,17 +230,8 @@ bool GXemul::ParseOptions(int argc, char *argv[])
 }
 
 
-static void PrintBanner()
-{
-	std::cout <<
-	    "GXemul "VERSION"      Copyright (C) 2003-2008  Anders Gavare\n\n";
-}
-
-
 void GXemul::PrintUsage(bool bLong) const
 {
-	PrintBanner();
-
 	std::cout << "Usage: gxemul [options]\n"
 		     "   or  gxemul-gui [options]\n\n"
 		     "where options may be:\n\n";
@@ -255,15 +247,15 @@ void GXemul::PrintUsage(bool bLong) const
 
 int GXemul::Run()
 {
-	// Print startup message:
-	if (!m_bWithGUI)
-		PrintBanner();
-
 	// Run unit tests? Then only run those, and then exit.
 	if (m_bRunUnitTests)
 		return UnitTest::RunTests();
 
-	// Choose UI...
+	// Default to the console UI:
+	m_ui = new ConsoleUI(this);
+
+	// But switch to a graphical UI if gxemul-gui was used
+	// to launch gxemul:
 	if (m_bWithGUI) {
 #ifdef WITH_GTKMM
 		m_ui = new GtkmmUI(this);
@@ -272,11 +264,12 @@ int GXemul::Run()
 		    "compiled without GUI support.\n";
 		return 0;
 #endif
-	} else {
-		m_ui = new ConsoleUI(this);
 	}
 
-	// ... and run the main loop:
+	// ... show a startup banner:
+	m_ui->ShowStartupBanner();
+
+	// ... and finally run the main loop:
 	m_ui->MainLoop();
 
 	return 0;
@@ -322,6 +315,8 @@ int main(int argc, char *argv[])
 	const char *progname = argv[0];
 
 #ifdef WITH_GTKMM
+	// Special case: Gtk::Main must be initialized early on, to make
+	// things such as unicode locales etc. work correctly.
 	Gtk::Main main(argc, argv);
 #endif
 
