@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ActionStack.cc,v 1.6 2007-12-28 19:08:44 debug Exp $
+ *  $Id: ActionStack.cc,v 1.7 2008-01-02 10:56:41 debug Exp $
  */
 
 #include "ActionStack.h"
@@ -307,7 +307,7 @@ static void Test_ActionStack_NonUndoableAction()
 {
 	ActionStack stack;
 
-	int dummyInt;
+	int dummyInt = 42;
 	refcount_ptr<Action> pAction1 = new DummyAction(dummyInt);
 	refcount_ptr<Action> pAction2 = new DummyAction(dummyInt);
 	refcount_ptr<Action> pAction3 = new DummyNonUndoableAction(dummyInt);
@@ -341,11 +341,12 @@ static void Test_ActionStack_ExecuteAndUndo()
 {
 	ActionStack stack;
 
-	int dummyInt = 0;
+	int dummyInt = 42;
 	refcount_ptr<Action> pAction1 = new DummyAction(dummyInt);
 	refcount_ptr<Action> pAction2 = new DummyAction(dummyInt);
 	refcount_ptr<Action> pAction3 = new DummyAction(dummyInt);
 
+	dummyInt = 0;
 	UnitTest::Assert("A: dummyInt should be 0", dummyInt == 0);
 
 	stack.PushActionAndExecute(pAction1);
@@ -381,21 +382,17 @@ static void Test_ActionStack_ExecuteAndUndo()
 	UnitTest::Assert("D: dummyInt should be 3", dummyInt == 3);
 }
 
-int ActionStack::RunUnitTests()
+void ActionStack::RunUnitTests(int& nSucceeded, int& nFailures)
 {
-	int nrOfFailures = 0;
-
 	// Tests for number of elements on the undo and redo stacks:
-	UNITTEST(nrOfFailures, Test_ActionStack_IsInitiallyEmpty);
-	UNITTEST(nrOfFailures, Test_ActionStack_PushAction);
-	UNITTEST(nrOfFailures, Test_ActionStack_UndoRedo);
-	UNITTEST(nrOfFailures, Test_ActionStack_PushShouldClearRedoStack);
-	UNITTEST(nrOfFailures, Test_ActionStack_NonUndoableAction);
+	UNITTEST(Test_ActionStack_IsInitiallyEmpty);
+	UNITTEST(Test_ActionStack_PushAction);
+	UNITTEST(Test_ActionStack_UndoRedo);
+	UNITTEST(Test_ActionStack_PushShouldClearRedoStack);
+	UNITTEST(Test_ActionStack_NonUndoableAction);
 
 	// Tests for execution in forward and reverse order:
-	UNITTEST(nrOfFailures, Test_ActionStack_ExecuteAndUndo);
-
-	return nrOfFailures;
+	UNITTEST(Test_ActionStack_ExecuteAndUndo);
 }
 
 #endif

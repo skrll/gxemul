@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: DummyComponent.h,v 1.3 2007-12-28 19:08:44 debug Exp $
+ *  $Id: DummyComponent.h,v 1.4 2008-01-02 10:56:41 debug Exp $
  */
 
 #include "Component.h"
@@ -52,7 +52,7 @@ public:
 
 	/********************************************************************/
 
-	static int RunUnitTests();
+	static void RunUnitTests(int& nSucceeded, int& nFailures);
 };
 
 

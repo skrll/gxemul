@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemul.cc,v 1.16 2007-12-31 12:28:02 debug Exp $
+ *  $Id: GXemul.cc,v 1.17 2008-01-02 10:56:41 debug Exp $
  *
  *  This file contains three things:
  *
@@ -115,14 +115,15 @@
  * functions for writing unit tests. To add unit tests to a class, the
  * class should be UnitTestable, and in particular, it should implement
  * UnitTestable::RunUnitTests. The exact way tests are performed may
- * differ between different classes, but using the UNITTEST(n,test) macro
+ * differ between different classes, but using the UNITTEST(testname) macro
  * in src/include/UnitTest.h is preferable.
  *
  * Unit tests are normally executed by <tt>make test</tt>. This is implicitly
- * done when doing <tt>make install</tt> as well. It is recommended to run
- * the configure script with the <tt>--debug</tt> option; this enables Wu
- * Yongwei's new/debug memory leak detector. (It does not seem to work too
- * well with GTKMM, so adding <tt>--without-gtkmm</tt> is also useful.)
+ * done when doing <tt>make install</tt> as well, for non-release builds.
+ * It is recommended to run the configure script with the <tt>--debug</tt>
+ * option; this enables Wu Yongwei's new/debug memory leak detector. (It does
+ * not seem to work too well with GTKMM, so adding <tt>--without-gtkmm</tt> is
+ * also useful.)
  *
  *
  * \section codeguidelines_sec Coding guidelines
@@ -195,7 +196,8 @@ extern char *optarg;
 
 
 GXemul::GXemul(bool bWithGUI)
-	: m_bWithGUI(bWithGUI)
+	: m_runState(Paused)
+	, m_bWithGUI(bWithGUI)
 	, m_bRunUnitTests(false)
 	, m_commandInterpreter(this)
 {
@@ -266,10 +268,8 @@ int GXemul::Run()
 #endif
 	}
 
-	// ... show a startup banner:
+	m_ui->Initialize();
 	m_ui->ShowStartupBanner();
-
-	// ... and finally run the main loop:
 	m_ui->MainLoop();
 
 	return 0;
@@ -279,6 +279,24 @@ int GXemul::Run()
 CommandInterpreter& GXemul::GetCommandInterpreter()
 {
 	return m_commandInterpreter;
+}
+
+
+UI* GXemul::GetUI()
+{
+	return m_ui;
+}
+
+
+void GXemul::SetRunState(RunState newState)
+{
+	m_runState = newState;
+}
+
+
+GXemul::RunState GXemul::GetRunState() const
+{
+	return m_runState;
 }
 
 

@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: CommandInterpreter.cc,v 1.3 2007-12-31 12:09:25 debug Exp $
+ *  $Id: CommandInterpreter.cc,v 1.4 2008-01-02 10:56:41 debug Exp $
  */
 
 #include "assert.h"
@@ -34,52 +34,107 @@
 #include "GXemul.h"
 #include "CommandInterpreter.h"
 
+// Individual commands:
+#include "commands/QuitCommand.h"
+
 
 CommandInterpreter::CommandInterpreter(GXemul* owner)
 	: m_GXemul(owner)
 {
 	// It would be bad to run without a working GXemul instance.
 	assert(m_GXemul != NULL);
+
+	// Add the default built-in commands:
+	AddCommand(new QuitCommand);
 }
 
 
-void CommandInterpreter::AddKey(stringchar key)
+void CommandInterpreter::AddCommand(refcount_ptr<Command> command)
+{
+	m_commands[command->GetCommandName()] = command;
+}
+
+
+void CommandInterpreter::ShowInputLineCharacter(stringchar key)
+{
+	if (m_GXemul->GetUI() != NULL)
+		m_GXemul->GetUI()->ShowInputLineCharacter(key);
+}
+
+
+bool CommandInterpreter::AddKey(stringchar key)
 {
 	switch (key) {
-	case '\b':
+
+	case '\0':
+		// Add nothing.
+		break;
+
+	case '\177':	// ASCII 127 (octal 177) = del
+	case '\b':	// backspace
 		// Backspace removes the last character, if any:
-		if (!m_currentCommandString.empty())
+		if (!m_currentCommandString.empty()) {
 			m_currentCommandString.resize(
 			    m_currentCommandString.length() - 1);
+
+			ShowInputLineCharacter('\b');
+			ShowInputLineCharacter(' ');
+			ShowInputLineCharacter('\b');
+		}
 		break;
+
 	case '\e':
 		// Escape key handling: TODO
 		std::cerr << "TODO: Escape key handling!\n";
 		assert(false);
 		break;
+
 	case '\t':
 		// Tab completion: TODO
 		std::cerr << "TODO: TAB completion!\n";
 		assert(false);
 		break;
+
 	case '\n':
 	case '\r':
 		// Newline executes the command, if it is non-empty:
+		ShowInputLineCharacter('\n');
+
 		if (!m_currentCommandString.empty()) {
 			RunCommand(m_currentCommandString);
 			m_currentCommandString = "";
 		}
 		break;
+
 	default:
 		// Most other keys just add a character to the command:
 		m_currentCommandString += key;
+
+		ShowInputLineCharacter(key);
 	}
+
+	// Return value is true for newline, false otherwise:
+	return key == '\n' || key == '\r';
+}
+
+
+void CommandInterpreter::ClearCurrentCommandBuffer()
+{
+	m_currentCommandString = "";
+}
+
+
+void CommandInterpreter::ReshowCurrentCommandBuffer()
+{
+	for (size_t i=0; i<m_currentCommandString.length(); i++)
+		ShowInputLineCharacter(m_currentCommandString[i]);
 }
 
 
 bool CommandInterpreter::RunCommand(const string& command)
 {
 	// TODO
+	std::cout << "RunCommand: TODO\n";
 	
 	return false;
 }
@@ -96,6 +151,24 @@ const string& CommandInterpreter::GetCurrentCommandBuffer() const
 
 #ifndef WITHOUTUNITTESTS
 
+static void Test_CommandInterpreter_AddKey_ReturnValue()
+{
+	GXemul gxemul(false);
+	CommandInterpreter& ci = gxemul.GetCommandInterpreter();
+
+	UnitTest::Assert("addkey of regular char should return false",
+	    ci.AddKey('a') == false);
+
+	UnitTest::Assert("addkey of nul char should return false",
+	    ci.AddKey('\0') == false);
+
+	UnitTest::Assert("addkey of newline should return true",
+	    ci.AddKey('\n') == true);
+
+	UnitTest::Assert("addkey of carriage return should return true too",
+	    ci.AddKey('\r') == true);
+}
+
 static void Test_CommandInterpreter_KeyBuffer()
 {
 	GXemul gxemul(false);
@@ -104,19 +177,29 @@ static void Test_CommandInterpreter_KeyBuffer()
 	UnitTest::Assert("buffer should initially be empty",
 	    ci.GetCurrentCommandBuffer() == "");
 
-	ci.AddKey('a');
+	ci.AddKey('a');		// normal char
 
 	UnitTest::Assert("buffer should contain 'a'",
 	    ci.GetCurrentCommandBuffer() == "a");
 
-	ci.AddKey('A');
+	ci.AddKey('\0');	// nul char should have no effect
 
-	UnitTest::Assert("buffer should contain 'aA'",
+	UnitTest::Assert("buffer should still contain only 'a'",
+	    ci.GetCurrentCommandBuffer() == "a");
+
+	ci.AddKey('A');		// multiple chars
+	ci.AddKey('B');
+	UnitTest::Assert("buffer should contain 'aAB'",
+	    ci.GetCurrentCommandBuffer() == "aAB");
+
+	ci.AddKey('\177');	// del
+
+	UnitTest::Assert("buffer should contain 'aA' (del didn't work?)",
 	    ci.GetCurrentCommandBuffer() == "aA");
 
-	ci.AddKey('\b');
+	ci.AddKey('\b');	// backspace
 
-	UnitTest::Assert("buffer should contain 'a' again",
+	UnitTest::Assert("buffer should contain 'a' again (BS didn't work)",
 	    ci.GetCurrentCommandBuffer() == "a");
 
 	ci.AddKey('\b');
@@ -124,7 +207,7 @@ static void Test_CommandInterpreter_KeyBuffer()
 	UnitTest::Assert("buffer should now be empty '' again",
 	    ci.GetCurrentCommandBuffer() == "");
 
-	ci.AddKey('\b');
+	ci.AddKey('\b');	// cannot be emptier than... well... empty :)
 
 	UnitTest::Assert("buffer should still be empty",
 	    ci.GetCurrentCommandBuffer() == "");
@@ -139,7 +222,7 @@ static void Test_CommandInterpreter_KeyBuffer()
 	UnitTest::Assert("buffer should contain 'aQ'",
 	    ci.GetCurrentCommandBuffer() == "aQ");
 
-	ci.AddKey('\n');
+	ci.AddKey('\n');	// newline should execute the command
 
 	UnitTest::Assert("buffer should be empty after executing '\\n'",
 	    ci.GetCurrentCommandBuffer() == "");
@@ -150,7 +233,7 @@ static void Test_CommandInterpreter_KeyBuffer()
 	UnitTest::Assert("new command should have been possible",
 	    ci.GetCurrentCommandBuffer() == "ZQ");
 
-	ci.AddKey('\r');
+	ci.AddKey('\r');	// carriage return should work like newline
 
 	UnitTest::Assert("buffer should be empty after executing '\\r'",
 	    ci.GetCurrentCommandBuffer() == "");
@@ -161,31 +244,31 @@ static void Test_CommandInterpreter_NonExistingCommand()
 	GXemul gxemul(false);
 	CommandInterpreter& ci = gxemul.GetCommandInterpreter();
 
-	UnitTest::Assert("nonsense command should fail",
+	UnitTest::Assert("nonexisting (nonsense) command should fail",
 	    ci.RunCommand("nonexistingcommand") == false);
 }
 
-static void Test_CommandInterpreter_Simple_Version()
+static void Test_CommandInterpreter_Simple()
 {
 	GXemul gxemul(false);
 	CommandInterpreter& ci = gxemul.GetCommandInterpreter();
 
 	UnitTest::Assert("simple command should succeed",
 	    ci.RunCommand("version") == true);
+
+	UnitTest::Assert("simple command with whitespace should succeed",
+	    ci.RunCommand("   version   ") == true);
 }
 
-int CommandInterpreter::RunUnitTests()
+void CommandInterpreter::RunUnitTests(int& nSucceeded, int& nFailures)
 {
-	int nrOfFailures = 0;
-
 	// Key and current buffer:
-	UNITTEST(nrOfFailures, Test_CommandInterpreter_KeyBuffer);
+	UNITTEST(Test_CommandInterpreter_AddKey_ReturnValue);
+	UNITTEST(Test_CommandInterpreter_KeyBuffer);
 
 	// RunCommand:
-	UNITTEST(nrOfFailures, Test_CommandInterpreter_NonExistingCommand);
-	UNITTEST(nrOfFailures, Test_CommandInterpreter_Simple_Version);
-
-	return nrOfFailures;
+	UNITTEST(Test_CommandInterpreter_NonExistingCommand);
+	UNITTEST(Test_CommandInterpreter_Simple);
 }
 
 #endif

@@ -1,8 +1,8 @@
-#ifndef GTKMMUI_H
-#define	GTKMMUI_H
+#ifndef COMMAND_H
+#define	COMMAND_H
 
 /*
- *  Copyright (C) 2007-2008  Anders Gavare.  All rights reserved.
+ *  Copyright (C) 2008  Anders Gavare.  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
@@ -28,33 +28,71 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GtkmmUI.h,v 1.3 2008-01-02 10:56:41 debug Exp $
+ *  $Id: Command.h,v 1.1 2008-01-02 10:56:40 debug Exp $
  */
 
-#include "UI.h"
+#include "misc.h"
+
+#include "UnitTest.h"
+
+class GXemul;
 
 
 /**
- * \brief GTK+-based User Interface, using GTKMM.
+ * \brief A %Command is a named function, executed by the CommandInterpreter.
  */
-class GtkmmUI
-	: public UI
+class Command
+	: public ReferenceCountable
+	, public UnitTestable
 {
 public:
-	GtkmmUI(GXemul *gxemul);
+	/**
+	 * \brief Constructs a %Command.
+	 *
+	 * @param name The command's name. This should be a unique lower-case
+	 *	string, consisting only of letters a-z.
+	 */
+	Command(const string& name);
 
-	virtual ~GtkmmUI();
+	virtual ~Command() = 0;
 
-	virtual void Initialize();
+	/**
+	 * \brief Gets the name of the command.
+	 *
+	 * @return The name of the command.
+	 */
+	const string& GetCommandName() const
+	{
+		return m_name;
+	}
 
-	virtual void ShowStartupBanner();
+	/**
+	 * \brief Executes the command on a given GXemul instance.
+	 */
+	virtual void Execute(GXemul& gxemul) = 0;
 
-	virtual void ShowDebugMessage(const string& msg);
+	/**
+	 * \brief Returns a short (one-line) description of the command.
+	 *
+	 * @return A short description of the command.
+	 */
+	virtual string GetShortDescription() = 0;
 
-	virtual void ShowInputLineCharacter(stringchar ch);
+	/**
+	 * \brief Returns a long description/help message for the command.
+	 *
+	 * @return A long description/help message for the command.
+	 */
+	virtual string GetLongDescription() = 0;
 
-	virtual int MainLoop();
+
+	/********************************************************************/
+
+	static void RunUnitTests(int& nSucceeded, int& nFailures);
+
+private:
+	string		m_name;
 };
 
 
-#endif	// GTKMMUI_H
+#endif	// COMMAND_H

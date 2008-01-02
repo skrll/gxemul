@@ -28,11 +28,12 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: CommandInterpreter.h,v 1.2 2007-12-31 11:50:18 debug Exp $
+ *  $Id: CommandInterpreter.h,v 1.3 2008-01-02 10:56:40 debug Exp $
  */
 
 #include "misc.h"
 
+#include "Command.h"
 #include "UnitTest.h"
 
 
@@ -40,7 +41,7 @@ class GXemul;
 
 
 /**
- * \brief An interactive command interpreter.
+ * \brief An interactive command interpreter, which run Commands.
  *
  * A command interpreter can execute commands in the form of complete strings,
  * or it can be given one character (keypress) at a time to build up a command.
@@ -72,8 +73,24 @@ public:
 	 * </ul>
 	 *
 	 * @param key the character/key to add
+	 * @return true if this was a complete command line (i.e. the key
+	 *	was a newline), false otherwise
 	 */
-	void AddKey(stringchar key);
+	bool AddKey(stringchar key);
+
+	/**
+	 * \brief Clears the current command buffer.
+	 */
+	void ClearCurrentCommandBuffer();
+
+	/**
+	 * \brief Re-displays the current command buffer.
+	 *
+	 * Useful e.g. when running in text console mode, and the user has
+	 * pressed CTRL-Z. When returning to %GXemul, the current command
+	 * buffer can be showed again by calling this function.
+	 */
+	void ReshowCurrentCommandBuffer();
 
 	/**
 	 * \brief Runs a command, given as a string.
@@ -91,14 +108,32 @@ public:
 	 */
 	const string& GetCurrentCommandBuffer() const;
 
-
-	/********************************************************************/
-
-	static int RunUnitTests();
+	/**
+	 * \brief Adds a new Command to the command interpreter.
+	 *
+	 * @param command A reference counter pointer to the Command.
+	 */
+	void AddCommand(refcount_ptr<Command> command);
 
 private:
-	GXemul*		m_GXemul;
-	string		m_currentCommandString;
+	/**
+	 * \brief Shows a character on the command input line, using the
+	 *	GXemul instance' UI.
+	 *
+	 * @param key The character to show.
+	 */
+	void ShowInputLineCharacter(stringchar key);
+
+
+	/********************************************************************/
+public:
+	static void RunUnitTests(int& nSucceeded, int& nFailures);
+
+private:
+	GXemul*					m_GXemul;
+	map< string,refcount_ptr<Command> >	m_commands;
+
+	string					m_currentCommandString;
 };
 
 

@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: DummyComponent.cc,v 1.4 2007-12-29 16:18:51 debug Exp $
+ *  $Id: DummyComponent.cc,v 1.5 2008-01-02 10:56:40 debug Exp $
  */
 
 #include "components/DummyComponent.h"
@@ -205,29 +205,25 @@ static void Test_DummyComponent_SerializeDeserialize()
 	    dummy->CheckConsistency() == true);
 }
 
-int DummyComponent::RunUnitTests()
+void DummyComponent::RunUnitTests(int& nSucceeded, int& nFailures)
 {
-	int nrOfFailures = 0;
-
 	// Creation using CreateComponent
-	UNITTEST(nrOfFailures, Test_DummyComponent_CreateComponent);
+	UNITTEST(Test_DummyComponent_CreateComponent);
 
 	// Parent tests
-	UNITTEST(nrOfFailures, Test_DummyComponent_GetSetParent);
+	UNITTEST(Test_DummyComponent_GetSetParent);
 	
 	// Add/Remove children
-	UNITTEST(nrOfFailures, Test_DummyComponent_AddChild_Sets_Parent);
-	UNITTEST(nrOfFailures, Test_DummyComponent_AddChildren_Count);
-	UNITTEST(nrOfFailures, Test_DummyComponent_Add_Tree_Of_Children);
-	UNITTEST(nrOfFailures, Test_DummyComponent_RemoveChild);
+	UNITTEST(Test_DummyComponent_AddChild_Sets_Parent);
+	UNITTEST(Test_DummyComponent_AddChildren_Count);
+	UNITTEST(Test_DummyComponent_Add_Tree_Of_Children);
+	UNITTEST(Test_DummyComponent_RemoveChild);
 
 	// Get/Set state variables
-	UNITTEST(nrOfFailures, Test_DummyComponent_GetSet_Variables);
+	UNITTEST(Test_DummyComponent_GetSet_Variables);
 
 	// Serialization/deserialization
-	UNITTEST(nrOfFailures, Test_DummyComponent_SerializeDeserialize);
-
-	return nrOfFailures;
+	UNITTEST(Test_DummyComponent_SerializeDeserialize);
 }
 
 #endif

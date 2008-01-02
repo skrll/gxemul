@@ -25,35 +25,160 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ConsoleUI.cc,v 1.2 2007-12-31 12:28:02 debug Exp $
+ *  $Id: ConsoleUI.cc,v 1.3 2008-01-02 10:56:41 debug Exp $
  */
+
+#include <signal.h>
+#include <iostream>
 
 #include "misc.h"
 #include "ui/console/ConsoleUI.h"
-
-#include <iostream>
+#include "GXemul.h"
 
 
 ConsoleUI::ConsoleUI(GXemul *gxemul)
 	: UI(gxemul)
+	, m_consoleIsInitialized(false)
 {
 }
 
 
 ConsoleUI::~ConsoleUI()
 {
+	// Restore the terminal mode:
+	if (m_consoleIsInitialized)
+		tcsetattr(STDIN_FILENO, TCSANOW, &m_oldTermios);
+}
+
+
+// Note: Use of global GXemul pointer!
+static GXemul* g_GXemul;
+static struct termios g_curTermios;
+
+static void ReshowCurrentCommandBuffer()
+{
+	if (g_GXemul->GetRunState() == GXemul::Paused) {
+		// Reshow the prompt and the current command line:
+		std::cout << "GXemul> ";
+		g_GXemul->GetCommandInterpreter().ReshowCurrentCommandBuffer();
+		std::cout.flush();
+	}
+}
+
+/**
+ * \brief CTRL-C handler which sets the run state to Paused.
+ */
+static void ConsoleUI_SIGINT_Handler(int n)
+{
+	g_GXemul->SetRunState(GXemul::Paused);
+	std::cout << "^C\n";
+	g_GXemul->GetCommandInterpreter().ClearCurrentCommandBuffer();
+	ReshowCurrentCommandBuffer();
+	signal(SIGINT, ConsoleUI_SIGINT_Handler);
+}
+
+/**
+ * \brief Restore terminal settings after a CTRL-Z.
+ *
+ * If the user presses CTRL-Z (to stop the emulator process) and then
+ * continues, the termios settings might have been invalidated. This
+ * function restores them.
+ */
+static void ConsoleUI_SIGCONT_Handler(int n)
+{
+	tcsetattr(STDIN_FILENO, TCSANOW, &g_curTermios);
+	ReshowCurrentCommandBuffer();
+	signal(SIGCONT, ConsoleUI_SIGCONT_Handler);
+}
+
+
+void ConsoleUI::Initialize()
+{
+	if (m_consoleIsInitialized)
+		return;
+
+	tcgetattr(STDIN_FILENO, &m_oldTermios);
+	m_currentTermios = m_oldTermios;
+
+	// Set the terminal mode:
+	m_currentTermios.c_lflag &= ~ICANON;
+	m_currentTermios.c_cc[VTIME] = 0;
+	m_currentTermios.c_cc[VMIN] = 1;
+	m_currentTermios.c_lflag &= ~ECHO;
+
+	tcsetattr(STDIN_FILENO, TCSANOW, &m_currentTermios);
+
+	// Signal handlers for CTRL-C and CTRL-Z.
+	// Note: Using a global GXemul instance pointer!
+	g_GXemul = m_gxemul;
+	g_curTermios = m_currentTermios;
+	signal(SIGINT, ConsoleUI_SIGINT_Handler);
+	signal(SIGCONT, ConsoleUI_SIGCONT_Handler);
+
+	m_consoleIsInitialized = true;
 }
 
 
 void ConsoleUI::ShowStartupBanner()
 {
-	std::cout << "GXemul "VERSION"      "COPYRIGHT_MSG"\n\n";
+	std::cout << "GXemul "VERSION"     "COPYRIGHT_MSG"\n"SECONDARY_MSG"\n";
+}
+
+
+void ConsoleUI::ShowDebugMessage(const string& msg)
+{
+	std::cout << msg;
+	std::cout.flush();
+}
+
+
+void ConsoleUI::ShowInputLineCharacter(stringchar ch)
+{
+	std::cout << (string() + ch);
+	std::cout.flush();
+}
+
+
+/**
+ * \brief Read a key from stdin, blocking.
+ *
+ * @return The key read from stdin.
+ */
+static stringchar ReadKey()
+{
+	return std::cin.get();
+}
+
+
+void ConsoleUI::ReadAndExecuteCommand()
+{
+	std::cout << "GXemul> ";
+	std::cout.flush();
+
+	while (!m_gxemul->GetCommandInterpreter().AddKey(ReadKey()))
+		;
 }
 
 
 int ConsoleUI::MainLoop()
 {
-	std::cout << "ConsoleUI::MainLoop: TODO\n";
+	while (m_gxemul->GetRunState() != GXemul::Quitting) {
+		switch (m_gxemul->GetRunState()) {
+
+		case GXemul::Running:
+			std::cout << "Running: TODO\n";
+			m_gxemul->SetRunState(GXemul::Quitting);
+			break;
+			
+		case GXemul::Quitting:
+			break;
+
+		case GXemul::Paused:
+			ReadAndExecuteCommand();
+			break;
+		}
+	}
+
 	return 0;
 }
 

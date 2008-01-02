@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: StateVariableValue.cc,v 1.1 2007-12-28 19:08:44 debug Exp $
+ *  $Id: StateVariableValue.cc,v 1.2 2008-01-02 10:56:41 debug Exp $
  */
 
 #include "assert.h"
@@ -226,16 +226,12 @@ static void Test_StateVariableValue_FromTypeString_S()
 	    var.ToString() == "something");
 }
 
-int StateVariableValue::RunUnitTests()
+void StateVariableValue::RunUnitTests(int& nSucceeded, int& nFailures)
 {
-	int nrOfFailures = 0;
-
-	UNITTEST(nrOfFailures, Test_StateVariableValue_Empty);
-	UNITTEST(nrOfFailures, Test_StateVariableValue_String);
-	UNITTEST(nrOfFailures, Test_StateVariableValue_FromTypeString_E);
-	UNITTEST(nrOfFailures, Test_StateVariableValue_FromTypeString_S);
-
-	return nrOfFailures;
+	UNITTEST(Test_StateVariableValue_Empty);
+	UNITTEST(Test_StateVariableValue_String);
+	UNITTEST(Test_StateVariableValue_FromTypeString_E);
+	UNITTEST(Test_StateVariableValue_FromTypeString_S);
 }
 
 #endif

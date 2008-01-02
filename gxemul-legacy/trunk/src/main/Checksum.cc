@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Checksum.cc,v 1.1 2007-12-28 19:08:44 debug Exp $
+ *  $Id: Checksum.cc,v 1.2 2008-01-02 10:56:41 debug Exp $
  */
 
 #include "Checksum.h"
@@ -176,19 +176,15 @@ static void Test_Checksum_String_Concatenation()
 	UnitTest::Assert("valueA and valueB should differ", valueA != valueB);
 }
 
-int Checksum::RunUnitTests()
+void Checksum::RunUnitTests(int& nSucceeded, int& nFailures)
 {
-	int nrOfFailures = 0;
-
-	UNITTEST(nrOfFailures, Test_Checksum_DefaultValue);
-	UNITTEST(nrOfFailures, Test_Checksum_Add);
-	UNITTEST(nrOfFailures, Test_Checksum_SameChecksum);
-	UNITTEST(nrOfFailures, Test_Checksum_OrderIsSignificant_Numeric);
-	UNITTEST(nrOfFailures, Test_Checksum_OrderIsSignificant_String);
-	UNITTEST(nrOfFailures, Test_Checksum_OrderIsSignificant_String_2);
-	UNITTEST(nrOfFailures, Test_Checksum_String_Concatenation);
-
-	return nrOfFailures;
+	UNITTEST(Test_Checksum_DefaultValue);
+	UNITTEST(Test_Checksum_Add);
+	UNITTEST(Test_Checksum_SameChecksum);
+	UNITTEST(Test_Checksum_OrderIsSignificant_Numeric);
+	UNITTEST(Test_Checksum_OrderIsSignificant_String);
+	UNITTEST(Test_Checksum_OrderIsSignificant_String_2);
+	UNITTEST(Test_Checksum_String_Concatenation);
 }
 
 #endif

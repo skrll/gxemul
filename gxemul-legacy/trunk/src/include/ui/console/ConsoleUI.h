@@ -28,8 +28,10 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ConsoleUI.h,v 1.2 2007-12-31 12:28:02 debug Exp $
+ *  $Id: ConsoleUI.h,v 1.3 2008-01-02 10:56:41 debug Exp $
  */
+
+#include <termios.h>
 
 #include "UI.h"
 
@@ -41,13 +43,65 @@ class ConsoleUI
 	: public UI
 {
 public:
+	/**
+	 * \brief Constructs a text console %UI instance.
+	 *
+	 * @param gxemul Pointer to the owning GXemul instance.
+	 */
 	ConsoleUI(GXemul *gxemul);
 
 	virtual ~ConsoleUI();
 
+	/**
+	 * \brief Initializes the terminal for blocking, non-echo I/O.
+	 */
+	virtual void Initialize();
+
+	/**
+	 * \brief Prints the text console startup banner.
+	 */
 	virtual void ShowStartupBanner();
 
+	/**
+	 * \brief Shows a debug message, by printing it to stdout.
+	 *
+	 * @param msg The message to show.
+	 */
+	virtual void ShowDebugMessage(const string& msg);
+
+	/**
+	 * \brief Echoes a character to the command line input field.
+	 *
+	 * @param ch The character to output.
+	 */
+	virtual void ShowInputLineCharacter(stringchar ch);
+
+	/**
+	 * \brief Runs the text console main loop.
+	 *
+	 * As long as the RunState is not Quitting:
+	 * <ul>
+	 *	<li>If an emulation is Running, the main loop lets the
+	 *		emulation run, until Ctrl-C is pressed.
+	 *	<li>Otherwise, if the RunState is Paused, the main loop shows
+	 *		a prompt and lets the user input commands.
+	 * </ul>
+	 */
 	virtual int MainLoop();
+
+private:
+	/**
+	 * \brief Shows the %GXemul&gt; prompt, reads characters from stdin
+	 *	until a newline char, and executes the resulting command.
+	 *
+	 * This function is blocking.
+	 */
+	void ReadAndExecuteCommand();
+
+private:
+	bool		m_consoleIsInitialized;
+	struct termios	m_oldTermios;
+	struct termios	m_currentTermios;
 };
 
 

@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemulWindow.cc,v 1.2 2007-12-31 12:28:02 debug Exp $
+ *  $Id: GXemulWindow.cc,v 1.3 2008-01-02 10:56:41 debug Exp $
  */
 
 #ifdef WITH_GTKMM
@@ -111,9 +111,9 @@ void GXemulWindow::on_menu_about()
 {
 	Gtk::MessageDialog dialog(*this, "GXemul "VERSION,
 	    false, Gtk::MESSAGE_INFO, Gtk::BUTTONS_OK);
-	dialog.set_secondary_text(_(COPYRIGHT_MSG"\n"
-	    "\nIf you have questions or feedback, don't\n"
-	    "hesitate to mail me:  anders@gavare.se"));
+	dialog.set_secondary_text(_(COPYRIGHT_MSG"\n"SECONDARY_MSG"\n"
+	    "If you have questions or feedback, don't "
+	    "hesitate to mail me.\nanders@gavare.se"));
 	dialog.run();
 }
 

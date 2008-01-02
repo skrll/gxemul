@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GtkmmUI.cc,v 1.2 2007-12-31 12:28:02 debug Exp $
+ *  $Id: GtkmmUI.cc,v 1.3 2008-01-02 10:56:41 debug Exp $
  */
 
 #ifdef WITH_GTKMM
@@ -46,9 +46,27 @@ GtkmmUI::~GtkmmUI()
 }
 
 
+void GtkmmUI::Initialize()
+{
+	// No specific initialization necessary.
+}
+
+
 void GtkmmUI::ShowStartupBanner()
 {
 	// No startup banner, for now.
+}
+
+
+void GtkmmUI::ShowDebugMessage(const string& msg)
+{
+	// TODO
+}
+
+
+void GtkmmUI::ShowInputLineCharacter(stringchar ch)
+{
+	// TODO
 }
 
 

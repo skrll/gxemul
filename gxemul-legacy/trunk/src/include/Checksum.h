@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Checksum.h,v 1.1 2007-12-28 19:08:44 debug Exp $
+ *  $Id: Checksum.h,v 1.2 2008-01-02 10:56:40 debug Exp $
  */
 
 #include "misc.h"
@@ -96,7 +96,7 @@ public:
 
 	/********************************************************************/
 
-	static int RunUnitTests();
+	static void RunUnitTests(int& nSucceeded, int& nFailures);
 
 private:
 	uint64_t	m_value;

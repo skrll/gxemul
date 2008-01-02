@@ -1,4 +1,4 @@
-$Id: TODO,v 1.583 2007-12-31 11:50:18 debug Exp $
+$Id: TODO,v 1.584 2008-01-02 10:56:40 debug Exp $
 
 Some things, in approximate Time order, that I'd like to implement or fix.
 (Things at the top need to be fixed before those at the bottom.)
@@ -12,27 +12,30 @@ of GXemul.
 
 -------------------------------------------------------------------------------
 
-UI:
-	MainLoop
-	input and output of messages
-	 x) ConsoleUI first... set stdin to single character, without echo.
-	 x) Listen to CTRL-C.
-
 CommandInterpreter
-	* Outputability!
-		* Implement the terminal stdin/out stuff!
-		* Print Prompt when ready, i.e. after each command.
-			* Who/what prints the prompt?
+	* Split command into tokens. Remove whitespace.
+
+	* Execute command:
+		WITH arguments!  (Add this!)
+
+	* Automatic generation of documentation for all commands,
+		brief section with href links to full descriptions of each
+		command.
+		Generate by calling a "generate HTML help" function
+		on the command interpreter; all default commands will
+		then be included. (Think about this.)
 
 	* Tab completion for everything:
 		command names
 		component names
 		components' state variables
+		TAB+TAB = show available names, both commands, components,
+			and variables!
 
 	* Built-in commands:
-		quit
-		help		Returns help message, as a string
-		version		Returns the GXemul version (string)
+	[X]	quit		Sets RunState to Quitting.
+		help		Prints help message [for a command]
+		version		Prints the GXemul version (string)
 		undo
 		redo
 		clearundo	Clears the undo/redo stack
@@ -317,6 +320,10 @@ Preparation for release 0.5.0:
 
  x) Build on as many platforms as possible, including running
     unit tests.
+
+ x) Mention in the documentation the recommended way to do customized
+    distributions of gxemul (by naming the directory gxemul-MyVersion-1.2.3
+    etc, and supplying all source code). + SECONDARY_MSG in misc.h.
 
  x) Carefully check that the man page reflects the correct
     command line options etc.

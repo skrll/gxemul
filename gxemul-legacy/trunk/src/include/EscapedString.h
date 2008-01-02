@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: EscapedString.h,v 1.2 2007-12-29 16:18:51 debug Exp $
+ *  $Id: EscapedString.h,v 1.3 2008-01-02 10:56:40 debug Exp $
  */
 
 #include "misc.h"
@@ -38,6 +38,9 @@
 
 /**
  * \brief A helper class for escaping strings using C-style escapes.
+ *
+ * TODO: It is ugly to use this for conversions in both directions! Should
+ *	be fixed some day.
  */
 class EscapedString
 	: public UnitTestable
@@ -70,7 +73,7 @@ public:
 
 	/********************************************************************/
 
-	static int RunUnitTests();
+	static void RunUnitTests(int& nSucceeded, int& nFailures);
 
 private:
 	string		m_str;

@@ -1,4 +1,4 @@
-$Id: HISTORY,v 1.1673 2007-12-31 12:28:02 debug Exp $
+$Id: HISTORY,v 1.1674 2008-01-02 10:56:40 debug Exp $
 
 Changelog for GXemul:
 ---------------------
@@ -3765,3 +3765,11 @@ Changelog for GXemul:
 		Moving printing of the startup "banner" to a UI member
 		function. (No banner is currently displayed for the GTKMM UI
 		though, because it would feel too heavy-weight.)
+		The ConsoleUI shows a "GXemul> " prompt, but does not support
+		input yet.
+20080101	Continuing on the ConsoleUI; it now reads input from stdin and
+		sends it to a CommandInterpreter. Simple handling of CTRL-C,
+		CTRL-Z, and treating DEL as backspace.
+		Adding a Command base class, and adding the first command,
+		which is "quit" :-).
+		Simplifying the syntax of the UNITTEST macro.

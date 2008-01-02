@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: UI.h,v 1.2 2007-12-31 12:28:02 debug Exp $
+ *  $Id: UI.h,v 1.3 2008-01-02 10:56:41 debug Exp $
  */
 
 #include "misc.h"
@@ -58,9 +58,28 @@ public:
 	}
 
 	/**
+	 * \brief Initializes the UI.
+	 */
+	virtual void Initialize() = 0;
+
+	/**
 	 * \brief Shows a startup banner.
 	 */
 	virtual void ShowStartupBanner() = 0;
+
+	/**
+	 * \brief Shows a debug message.
+	 *
+	 * @param msg The message to show.
+	 */
+	virtual void ShowDebugMessage(const string& msg) = 0;
+
+	/**
+	 * \brief Echoes a character to the command input line.
+	 *
+	 * @param ch The character to output.
+	 */
+	virtual void ShowInputLineCharacter(stringchar ch) = 0;
 
 	/**
 	 * \brief Runs the UI's main loop.

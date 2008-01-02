@@ -1,8 +1,5 @@
-#ifndef GTKMMUI_H
-#define	GTKMMUI_H
-
 /*
- *  Copyright (C) 2007-2008  Anders Gavare.  All rights reserved.
+ *  Copyright (C) 2008  Anders Gavare.  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
@@ -28,33 +25,85 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GtkmmUI.h,v 1.3 2008-01-02 10:56:41 debug Exp $
+ *  $Id: Command.cc,v 1.1 2008-01-02 10:56:41 debug Exp $
  */
 
-#include "UI.h"
+#include "Command.h"
+#include "GXemul.h"
 
+
+Command::Command(const string& name)
+	: m_name(name)
+{
+}
+
+
+Command::~Command()
+{
+}
+
+
+/*****************************************************************************/
+
+
+#ifndef WITHOUTUNITTESTS
 
 /**
- * \brief GTK+-based User Interface, using GTKMM.
+ * \brief A dummy Command, for unit testing purposes
  */
-class GtkmmUI
-	: public UI
+class DummyCommand
+	: public Command
 {
 public:
-	GtkmmUI(GXemul *gxemul);
+	DummyCommand(int& valueRef)
+		: Command("dummycommand")
+		, m_value(valueRef)
+	{
+	}
 
-	virtual ~GtkmmUI();
+	~DummyCommand()
+	{
+	}
 
-	virtual void Initialize();
+	void Execute(GXemul& gxemul)
+	{
+		m_value ++;
+	}
 
-	virtual void ShowStartupBanner();
+	string GetShortDescription()
+	{
+		return "A dummy command used for unit testing.";
+	}
 
-	virtual void ShowDebugMessage(const string& msg);
+	string GetLongDescription()
+	{
+		return "This is just a dummy command used for unit testing.";
+	}
 
-	virtual void ShowInputLineCharacter(stringchar ch);
-
-	virtual int MainLoop();
+private:
+	int&	m_value;
 };
 
+static void Test_Command_DummyCommand()
+{
+	GXemul gxemulDummy(false);
 
-#endif	// GTKMMUI_H
+	int dummyInt = 0;
+	refcount_ptr<Command> cmd = new DummyCommand(dummyInt);
+
+	dummyInt = 42;
+
+	UnitTest::Assert("dummyInt should initially be 42", dummyInt == 42);
+
+	cmd->Execute(gxemulDummy);
+	
+	UnitTest::Assert("dummyInt should now be 43", dummyInt == 43);
+
+}
+
+void Command::RunUnitTests(int& nSucceeded, int& nFailures)
+{
+	UNITTEST(Test_Command_DummyCommand);
+}
+
+#endif

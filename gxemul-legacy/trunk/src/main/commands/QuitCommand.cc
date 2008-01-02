@@ -1,8 +1,5 @@
-#ifndef GTKMMUI_H
-#define	GTKMMUI_H
-
 /*
- *  Copyright (C) 2007-2008  Anders Gavare.  All rights reserved.
+ *  Copyright (C) 2008  Anders Gavare.  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
@@ -28,33 +25,65 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GtkmmUI.h,v 1.3 2008-01-02 10:56:41 debug Exp $
+ *  $Id: QuitCommand.cc,v 1.1 2008-01-02 10:56:41 debug Exp $
  */
 
-#include "UI.h"
+#include "commands/QuitCommand.h"
+#include "GXemul.h"
 
 
-/**
- * \brief GTK+-based User Interface, using GTKMM.
- */
-class GtkmmUI
-	: public UI
+QuitCommand::QuitCommand()
+	: Command("quit")
 {
-public:
-	GtkmmUI(GXemul *gxemul);
-
-	virtual ~GtkmmUI();
-
-	virtual void Initialize();
-
-	virtual void ShowStartupBanner();
-
-	virtual void ShowDebugMessage(const string& msg);
-
-	virtual void ShowInputLineCharacter(stringchar ch);
-
-	virtual int MainLoop();
-};
+}
 
 
-#endif	// GTKMMUI_H
+QuitCommand::~QuitCommand()
+{
+}
+
+
+void QuitCommand::Execute(GXemul& gxemul)
+{
+	gxemul.SetRunState(GXemul::Quitting);
+}
+
+
+string QuitCommand::GetShortDescription()
+{
+	return "Quits the application.";
+}
+
+
+string QuitCommand::GetLongDescription()
+{
+	return "Quits the application.";
+}
+
+
+/*****************************************************************************/
+
+
+#ifndef WITHOUTUNITTESTS
+
+static void Test_QuitCommand_Affect_RunState()
+{
+	refcount_ptr<Command> cmd = new QuitCommand;
+
+	GXemul gxemul(false);
+
+	UnitTest::Assert("the default GXemul instance should be paused",
+	    gxemul.GetRunState() == GXemul::Paused);
+
+	cmd->Execute(gxemul);
+
+	UnitTest::Assert("runstate should have been changed to Quitting",
+	    gxemul.GetRunState() == GXemul::Quitting);
+}
+
+void QuitCommand::RunUnitTests(int& nSucceeded, int& nFailures)
+{
+	UNITTEST(Test_QuitCommand_Affect_RunState);
+}
+
+#endif

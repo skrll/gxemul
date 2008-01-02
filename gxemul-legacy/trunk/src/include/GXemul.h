@@ -27,7 +27,7 @@
  *  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *  SUCH DAMAGE.
  *
- *  $Id: GXemul.h,v 1.10 2007-12-31 11:50:18 debug Exp $
+ *  $Id: GXemul.h,v 1.11 2008-01-02 10:56:41 debug Exp $
  */
 
 #include "misc.h"
@@ -55,6 +55,14 @@
  */
 class GXemul
 {
+public:
+	enum RunState
+	{
+		Paused,
+		Running,
+		Quitting
+	};
+
 public:
 	/**
 	 * \brief Creates a GXemul instance.
@@ -90,6 +98,29 @@ public:
 	 */
 	CommandInterpreter& GetCommandInterpreter();
 
+	/**
+	 * \brief Gets a pointer to the %GXemul instance' active UI.
+	 *
+	 * Note: May return NULL if no UI has been initialized.
+	 *
+	 * @return A pointer to the UI in use.
+	 */
+	UI* GetUI();
+
+	/**
+	 * \brief Sets the RunState.
+	 *
+	 * @param newState The new RunState.
+	 */
+	void SetRunState(RunState newState);
+
+	/**
+	 * \brief Gets the current RunState.
+	 *
+	 * @return The current RunState.
+	 */
+	RunState GetRunState() const;
+
 
 private:
 	/**
@@ -101,6 +132,7 @@ private:
 	void PrintUsage(bool bLong) const;
 
 private:
+	RunState		m_runState;
 	bool			m_bWithGUI;
 	bool			m_bRunUnitTests;
 	refcount_ptr<UI>	m_ui;

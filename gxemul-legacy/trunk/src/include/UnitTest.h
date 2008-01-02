@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: UnitTest.h,v 1.7 2007-12-28 19:08:44 debug Exp $
+ *  $Id: UnitTest.h,v 1.8 2008-01-02 10:56:41 debug Exp $
  */
 
 #include "misc.h"
@@ -39,7 +39,8 @@
 /**
  * \brief An exception thrown by unit test cases that fail.
  */
-class UnitTestFailedException : public std::exception
+class UnitTestFailedException
+	: public std::exception
 {
 public:
 	UnitTestFailedException(const string& strMessage)
@@ -79,9 +80,12 @@ public:
 	/**
 	 * \brief Runs unit test cases.
 	 *
-	 * @return the number of failed test cases
+	 * @param nSucceeded A reference to a variable which keeps count
+	 *	of the number of succeeded test cases.
+	 * @param nFailures A reference to a variable which keeps count
+	 *	of the number of failed test cases.
 	 */
-	static int RunUnitTests();
+	static void RunUnitTests(int& nSucceeded, int& nFailures);
 };
 
 
@@ -154,25 +158,22 @@ public:
  *
  * ...
  *
- * int MyClass::RunUnitTests()
+ * void MyClass::RunUnitTests(int& nSucceeded, int& nFailures)
  * {
- *     int nrOfFailures = 0;
- *
- *     UNITTEST(nrOfFailures, Test_MyClass_SomeTest);
- *     UNITTEST(nrOfFailures, Test_MyClass_AnotherTest);
- *
- *     return nrOfFailures;
+ *     UNITTEST(Test_MyClass_SomeTest);
+ *     UNITTEST(Test_MyClass_AnotherTest);
  * }</pre>
  */
-#define UNITTEST(nrOfFailures,functionname)		try {		\
-		std::cout << "### " #functionname "\n";			\
-		(functionname)();					\
-	} catch (UnitTestFailedException& ex) {				\
-		std::cerr << "\n### " #functionname " (" __FILE__ " line "\
-			<< __LINE__ << ") failed!\n"			\
-			"    > " << ex.GetMessage() << "\n";		\
-		++ (nrOfFailures);   					\
-	}
+#define UNITTEST(functionname)	try {					\
+	std::cout << "### " #functionname "\n";				\
+	(functionname)();						\
+	++ (nSucceeded);						\
+} catch (UnitTestFailedException& ex) {					\
+	std::cerr << "\n### " #functionname " (" __FILE__ " line "	\
+		<< __LINE__ << ") failed!\n"				\
+		"    > " << ex.GetMessage() << "\n";			\
+	++ (nFailures);   						\
+}
 #endif
 
 

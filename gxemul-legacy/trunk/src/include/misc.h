@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: misc.h,v 1.269 2007-12-31 12:27:42 debug Exp $
+ *  $Id: misc.h,v 1.270 2008-01-02 10:56:41 debug Exp $
  *
  *  Misc. definitions for GXemul.
  */
@@ -38,11 +38,15 @@
 #include <inttypes.h>
 
 
-/*  config.h contains #defines set by the configure script.  */
-
+// config.h contains #defines set by the configure script.
 #include "../../config.h"
 
 #define	COPYRIGHT_MSG	"Copyright (C) 2003-2008  Anders Gavare"
+
+// The recommended way to add a specific message to the startup banner or
+// about box is to use the SECONDARY_MSG. This should end with a newline
+// character, unless it is completely empty.
+#define	SECONDARY_MSG	""
 
 
 // Use Glib::ustring if available, otherwise std::string. Define

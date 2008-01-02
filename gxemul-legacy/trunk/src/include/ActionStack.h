@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ActionStack.h,v 1.7 2007-12-28 19:08:44 debug Exp $
+ *  $Id: ActionStack.h,v 1.8 2008-01-02 10:56:40 debug Exp $
  */
 
 #include "misc.h"
@@ -152,7 +152,7 @@ public:
 
 	/********************************************************************/
 
-	static int RunUnitTests();
+	static void RunUnitTests(int& nSucceeded, int& nFailures);
 
 private:
 	list< refcount_ptr<Action> >	m_undoActions;

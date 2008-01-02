@@ -1,8 +1,8 @@
-#ifndef GTKMMUI_H
-#define	GTKMMUI_H
+#ifndef QUITCOMMAND_H
+#define	QUITCOMMAND_H
 
 /*
- *  Copyright (C) 2007-2008  Anders Gavare.  All rights reserved.
+ *  Copyright (C) 2008  Anders Gavare.  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
@@ -28,33 +28,44 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GtkmmUI.h,v 1.3 2008-01-02 10:56:41 debug Exp $
+ *  $Id: QuitCommand.h,v 1.1 2008-01-02 10:56:41 debug Exp $
  */
 
-#include "UI.h"
+#include "misc.h"
+
+#include "Command.h"
+#include "UnitTest.h"
 
 
 /**
- * \brief GTK+-based User Interface, using GTKMM.
+ * \brief A Command whichs quits the %GXemul application.
  */
-class GtkmmUI
-	: public UI
+class QuitCommand
+	: public Command
 {
 public:
-	GtkmmUI(GXemul *gxemul);
+	/**
+	 * \brief Constructs a %QuitCommand.
+	 */
+	QuitCommand();
 
-	virtual ~GtkmmUI();
+	virtual ~QuitCommand();
 
-	virtual void Initialize();
+	/**
+	 * \brief Executes the command: Quits the given GXemul application
+	 *	instance, by setting its RunState to Quitting.
+	 */
+	virtual void Execute(GXemul& gxemul);
 
-	virtual void ShowStartupBanner();
+	virtual string GetShortDescription();
 
-	virtual void ShowDebugMessage(const string& msg);
+	virtual string GetLongDescription();
 
-	virtual void ShowInputLineCharacter(stringchar ch);
 
-	virtual int MainLoop();
+	/********************************************************************/
+
+	static void RunUnitTests(int& nSucceeded, int& nFailures);
 };
 
 
-#endif	// GTKMMUI_H
+#endif	// QUITCOMMAND_H

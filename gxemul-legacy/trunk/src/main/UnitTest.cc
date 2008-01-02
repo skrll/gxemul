@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: UnitTest.cc,v 1.6 2007-12-29 16:18:51 debug Exp $
+ *  $Id: UnitTest.cc,v 1.7 2008-01-02 10:56:41 debug Exp $
  */
 
 #include <iostream>
@@ -36,6 +36,8 @@
 // Classes to test:
 #include "ActionStack.h"
 #include "Checksum.h"
+#include "Command.h"
+#include "commands/QuitCommand.h"
 #include "CommandInterpreter.h"
 #include "components/DummyComponent.h"
 #include "EscapedString.h"
@@ -73,24 +75,28 @@ int UnitTest::RunTests()
 
 int UnitTest::RunTests()
 {
-	int nrOfErrors = 0;
+	int nSucceeded = 0, nFailed = 0;
 
-	// Run tests in all specified classes:
-	nrOfErrors += ActionStack::RunUnitTests();
-	nrOfErrors += Checksum::RunUnitTests();
-	nrOfErrors += CommandInterpreter::RunUnitTests();
-	nrOfErrors += DummyComponent::RunUnitTests();
-	nrOfErrors += EscapedString::RunUnitTests();
-	nrOfErrors += StateVariable::RunUnitTests();
-	nrOfErrors += StateVariableValue::RunUnitTests();
+	// Misc.:
+	ActionStack::RunUnitTests(nSucceeded, nFailed);
+	Checksum::RunUnitTests(nSucceeded, nFailed);
+	Command::RunUnitTests(nSucceeded, nFailed);
+	CommandInterpreter::RunUnitTests(nSucceeded, nFailed);
+	DummyComponent::RunUnitTests(nSucceeded, nFailed);
+	EscapedString::RunUnitTests(nSucceeded, nFailed);
+	StateVariable::RunUnitTests(nSucceeded, nFailed);
+	StateVariableValue::RunUnitTests(nSucceeded, nFailed);
 
-	if (nrOfErrors == 0)
-		std::cerr << "All tests passed.\n";
+	// Commands:
+	QuitCommand::RunUnitTests(nSucceeded, nFailed);
+
+	if (nFailed == 0)
+		std::cerr << nSucceeded << " (all) tests passed.\n";
 	else
-		std::cerr << "\n" << nrOfErrors << " TESTS FAILED!\n";
+		std::cerr << "\n" << nFailed << " TESTS FAILED!\n";
 
 	// Returns 0 if there were no errors.
-	return nrOfErrors > 0;
+	return nFailed > 0;
 }
 
 
