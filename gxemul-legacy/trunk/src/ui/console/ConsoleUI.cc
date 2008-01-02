@@ -25,10 +25,11 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ConsoleUI.cc,v 1.3 2008-01-02 10:56:41 debug Exp $
+ *  $Id: ConsoleUI.cc,v 1.4 2008-01-02 10:59:36 debug Exp $
  */
 
 #include <signal.h>
+#include <unistd.h>
 #include <iostream>
 
 #include "misc.h"
