@@ -28,22 +28,29 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: refcount_ptr.h,v 1.4 2007-12-28 19:08:44 debug Exp $
+ *  $Id: refcount_ptr.h,v 1.5 2008-01-02 11:31:24 debug Exp $
  */
 
 /**
  * \brief Base class for reference countable objects.
  *
- * Usage:
- *	refcount_ptr<MyClass> myPtr = new MyClass(...);
- *
+ * Usage:<pre>
+ * refcount_ptr<MyClass> myPtr = new MyClass(...);
+ * </pre>
  * where MyClass should have increase_refcount and
- * decrease_refcount, e.g.
- *
+ * decrease_refcount, e.g.<pre>
  * class MyClass : public ReferenceCountable
  * {
  *	...
- * }
+ * }</pre>
+ *
+ * Note: Although MyClass objects can be created using the following 
+ * syntax:<pre>
+ * MyClass myobject(...);
+ * </pre>
+ * this causes the object to have a reference count of 0. That is, the
+ * address should not be taken of such an object and exposed to the
+ * outside.
  */
 class ReferenceCountable
 {

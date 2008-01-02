@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemul.cc,v 1.17 2008-01-02 10:56:41 debug Exp $
+ *  $Id: GXemul.cc,v 1.18 2008-01-02 11:31:24 debug Exp $
  *
  *  This file contains three things:
  *
@@ -73,6 +73,9 @@
  * container, which contains zero or more sub-components, but it doesn't
  * actually do anything else.)
  *
+ * Individual components are implemented in <tt>src/components/</tt>, with
+ * header files in <tt>src/include/components/</tt>.
+ *
  * \subsection undostack_subsec Undo stack of Actions
  *
  * Most actions that the user performs in %GXemul can be seen as reversible.
@@ -91,10 +94,11 @@
  * \subsection commandinterpreter_subsec Command interpreter
  *
  * A GXemul instance has a CommandInterpreter, which is the part that parses a
- * command and executes it. The %CommandInterpreter can be given a complete
- * command as a string, or it can be given one character (or keypress) at a
- * time. In the later case, the TAB key either completes the word currently
- * being written, or writes out a list of possible completions.
+ * command line, figures out which Command is to be executed, and executes it.
+ * The %CommandInterpreter can be given a complete command line as a string, or
+ * it can be given one character (or keypress) at a time. In the later case,
+ * the TAB key either completes the word currently being written, or writes
+ * out a list of possible completions.
  *
  * When running <tt>gxemul</tt>, the %CommandInterpreter is the UI as seen
  * by the user. When running <tt>gxemul-gui</tt>, the %CommandInterpreter is
@@ -105,7 +109,7 @@
  * All components are owned by the GXemul instance, either as part of the
  * normal tree of components, or owned by an action in the undo stack.
  * Reference counting is implemented for a class T by using the
- * ReferenceCountable helper class, and using refcount_ptr<class T> instead of
+ * ReferenceCountable helper class, and using refcount_ptr instead of
  * just T* when pointing to such objects.
  *
  * \subsection unittest_subsec Unit tests
@@ -136,21 +140,31 @@
  *
  * But also:
  * <ul>
- *	<li>Avoid using non-portable code constructs. Any external library
- *		dependencies should be optional! In particular, any
- *		GUI code (using gtkmm) should go into src/gui/.
+ *	<li>Avoid using non-portable code constructs. If possible, avoid
+ *		using GNU-specific C++.
+ *	<li>Any external library dependencies should be optional! Why?
+ *		Because one of the best regression tests for the emulator is
+ *		to build and run the emulator inside an emulated guest
+ *		operating system. If dependencies need to be installed before
+ *		being able to do such a test build, it severely increases the
+ *		cost (in time) to do such a regression test.
  *	<li>Write <a href="http://en.wikipedia.org/wiki/Doxygen">
- *		Doxygen</a> documentation for everything. Run
- *		<tt>make documentation</tt> often to check that the
- *		documentation is correct. In general, the documentation
- *		should be in the .h file only, not in the .cc file.
+ *		Doxygen</a> documentation for everything.
+ *		<ul>
+ *			<li>Run <tt>make documentation</tt> often to check
+ *				that the generated documentation is correct.
+ *			<li>In general, the documentation should be in the .h
+ *				file only, not in the .cc file.
+ *			<li>Keep the Main page (this page) updated with
+ *				clear descriptions of the core concepts.
+ *		</ul>
  *	<li>Write unit tests whenever it makes sense.
  *	<li>Use <a href="http://en.wikipedia.org/wiki/Hungarian_notation">
  *		Hungarian notation</a> for symbol/variable names sparingly,
  *		e.g. use <tt>m_</tt> for member variables, <tt>p</tt> can
  *		sometimes be used for pointers, etc. but don't overuse
  *		Hungarian notation otherwise.
- *	<li>Keep to 80 columns width, if possible.
+ *	<li>Keep to 80 columns width for all source code.
  *	<li>Use <tt>string</tt> for strings. This is typedeffed to
  *		<a href="http://www.gtkmm.org/docs/glibmm-2.4/docs/reference/html/classGlib_1_1ustring.html">
  *		<tt>Glib::ustring</tt></a> if it is available (for

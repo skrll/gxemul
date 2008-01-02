@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: UnitTest.h,v 1.8 2008-01-02 10:56:41 debug Exp $
+ *  $Id: UnitTest.h,v 1.9 2008-01-02 11:31:24 debug Exp $
  */
 
 #include "misc.h"
@@ -145,11 +145,13 @@ public:
 /**
  * \brief Helper for unit test case execution.
  *
- * For each test case that throws a UnitTestFailedException, a counter
- * (nrOfFailures) is increased.
+ * For each test case that throws a UnitTestFailedException, the number
+ * of failures is increased. For test cases that don't fail, the number
+ * of successful test cases is increased instead.
  *
- * Usage:<pre>
- * ...
+ * Usage: (usually at the end of a class implementation file)<pre>
+ * \#ifndef WITHOUTUNITTESTS
+ *
  * static void MyClass::Test_MyClass_SomeTest()
  * {
  *     UnitTest::Assert("expected blah blah", bool_condition);
@@ -162,7 +164,12 @@ public:
  * {
  *     UNITTEST(Test_MyClass_SomeTest);
  *     UNITTEST(Test_MyClass_AnotherTest);
- * }</pre>
+ * }
+ *
+ * \#endif // WITHOUTUNITTESTS</pre>
+ *
+ * Note that MyClass (in the example above) should inherit from the
+ * UnitTestable class.
  */
 #define UNITTEST(functionname)	try {					\
 	std::cout << "### " #functionname "\n";				\
