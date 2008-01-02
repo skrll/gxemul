@@ -1,4 +1,4 @@
-$Id: HISTORY,v 1.1674 2008-01-02 10:56:40 debug Exp $
+$Id: HISTORY,v 1.1675 2008-01-02 12:39:13 debug Exp $
 
 Changelog for GXemul:
 ---------------------
@@ -3773,3 +3773,5 @@ Changelog for GXemul:
 		Adding a Command base class, and adding the first command,
 		which is "quit" :-).
 		Simplifying the syntax of the UNITTEST macro.
+20080102	Implementing CommandInterpreter::RunCommand, so that commands
+		can be executed. "quit" and "version" work interactively :)

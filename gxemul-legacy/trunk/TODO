@@ -1,4 +1,4 @@
-$Id: TODO,v 1.584 2008-01-02 10:56:40 debug Exp $
+$Id: TODO,v 1.585 2008-01-02 12:39:13 debug Exp $
 
 Some things, in approximate Time order, that I'd like to implement or fix.
 (Things at the top need to be fixed before those at the bottom.)
@@ -13,17 +13,13 @@ of GXemul.
 -------------------------------------------------------------------------------
 
 CommandInterpreter
-	* Split command into tokens. Remove whitespace.
-
-	* Execute command:
-		WITH arguments!  (Add this!)
-
 	* Automatic generation of documentation for all commands,
 		brief section with href links to full descriptions of each
 		command.
 		Generate by calling a "generate HTML help" function
 		on the command interpreter; all default commands will
 		then be included. (Think about this.)
+		These should probably be checked into CVS.
 
 	* Tab completion for everything:
 		command names
@@ -35,7 +31,7 @@ CommandInterpreter
 	* Built-in commands:
 	[X]	quit		Sets RunState to Quitting.
 		help		Prints help message [for a command]
-		version		Prints the GXemul version (string)
+	[X]	version		Prints the GXemul version (string)
 		undo
 		redo
 		clearundo	Clears the undo/redo stack
@@ -318,12 +314,13 @@ Preparation for release 0.5.0:
 
  x) Carefully read through all the source code.
 
- x) Build on as many platforms as possible, including running
-    unit tests.
+ x) Build on as many platforms as possible, including running unit tests.
 
- x) Mention in the documentation the recommended way to do customized
-    distributions of gxemul (by naming the directory gxemul-MyVersion-1.2.3
-    etc, and supplying all source code). + SECONDARY_MSG in misc.h.
+ x) Documentation:
+	x) Mention in the documentation the recommended way to do customized
+	   distributions of gxemul (by naming the directory gxemul-MyVer-1.2.3
+	   etc, and supplying all source code). + SECONDARY_MSG in misc.h.
+	x) Automated build of Commands as HTML?
 
  x) Carefully check that the man page reflects the correct
     command line options etc.
@@ -333,5 +330,5 @@ Preparation for release 0.5.0:
 
  x) Make sure that the web page looks reasonable. There should be
     clear ways to download the old 0.4.x version in addition to
-    the 0.5.0 release.
+    the 0.5.0 release, even when 0.5.0 has been released.
 

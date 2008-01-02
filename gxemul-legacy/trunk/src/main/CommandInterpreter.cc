@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: CommandInterpreter.cc,v 1.4 2008-01-02 10:56:41 debug Exp $
+ *  $Id: CommandInterpreter.cc,v 1.5 2008-01-02 12:39:13 debug Exp $
  */
 
 #include "assert.h"
@@ -36,6 +36,7 @@
 
 // Individual commands:
 #include "commands/QuitCommand.h"
+#include "commands/VersionCommand.h"
 
 
 CommandInterpreter::CommandInterpreter(GXemul* owner)
@@ -46,6 +47,7 @@ CommandInterpreter::CommandInterpreter(GXemul* owner)
 
 	// Add the default built-in commands:
 	AddCommand(new QuitCommand);
+	AddCommand(new VersionCommand);
 }
 
 
@@ -131,12 +133,51 @@ void CommandInterpreter::ReshowCurrentCommandBuffer()
 }
 
 
+static void SplitIntoWords(const string& command,
+	string& commandName, vector<string>& arguments)
+{
+	// Split command into words, ignoring all whitespace:
+	size_t pos = 0;
+	while (pos < command.length()) {
+		// Skip initial whitespace:
+		while (pos < command.length() && command[pos] == ' ')
+			pos ++;
+		
+		if (pos >= command.length())
+			break;
+		
+		// This is a new word. Add all characters, until
+		// whitespace or end of string:
+		string newWord = "";
+		while (pos < command.length() && command[pos] != ' ') {
+			newWord += command[pos];
+			pos ++;
+		}
+
+		if (commandName.empty())
+			commandName = newWord;
+		else
+			arguments.push_back(newWord);
+	}
+}
+
+
 bool CommandInterpreter::RunCommand(const string& command)
 {
-	// TODO
-	std::cout << "RunCommand: TODO\n";
+	string commandName;
+	vector<string> arguments;
+	SplitIntoWords(command, commandName, arguments);
+
+	Commands::iterator it = m_commands.find(commandName);
+	if (it == m_commands.end()) {
+		std::cout << commandName <<
+		    ": unknown command. Type  help  for help.\n";
+		return false;
+	}
+
+	(it->second)->Execute(*m_GXemul, arguments);
 	
-	return false;
+	return true;
 }
 
 

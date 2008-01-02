@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: QuitCommand.h,v 1.1 2008-01-02 10:56:41 debug Exp $
+ *  $Id: QuitCommand.h,v 1.2 2008-01-02 12:39:13 debug Exp $
  */
 
 #include "misc.h"
@@ -38,7 +38,7 @@
 
 
 /**
- * \brief A Command whichs quits the %GXemul application.
+ * \brief A Command which quits the %GXemul application.
  */
 class QuitCommand
 	: public Command
@@ -54,8 +54,11 @@ public:
 	/**
 	 * \brief Executes the command: Quits the given GXemul application
 	 *	instance, by setting its RunState to Quitting.
+	 *
+	 * @param gxemul A reference to the GXemul instance.
+	 * @param arguments A vector of zero or more string arguments.
 	 */
-	virtual void Execute(GXemul& gxemul);
+	virtual void Execute(GXemul& gxemul, vector<string>& arguments);
 
 	virtual string GetShortDescription();
 

@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: QuitCommand.cc,v 1.1 2008-01-02 10:56:41 debug Exp $
+ *  $Id: QuitCommand.cc,v 1.2 2008-01-02 12:39:13 debug Exp $
  */
 
 #include "commands/QuitCommand.h"
@@ -33,7 +33,7 @@
 
 
 QuitCommand::QuitCommand()
-	: Command("quit")
+	: Command("quit", "")
 {
 }
 
@@ -43,8 +43,15 @@ QuitCommand::~QuitCommand()
 }
 
 
-void QuitCommand::Execute(GXemul& gxemul)
+void QuitCommand::Execute(GXemul& gxemul, vector<string>& arguments)
 {
+	if (arguments.size() != 0) {
+		if (gxemul.GetUI() != NULL)
+			gxemul.GetUI()->ShowDebugMessage(
+			    _("quit takes no arguments.\n"));
+		return;
+	}
+	
 	gxemul.SetRunState(GXemul::Quitting);
 }
 
@@ -66,16 +73,39 @@ string QuitCommand::GetLongDescription()
 
 #ifndef WITHOUTUNITTESTS
 
-static void Test_QuitCommand_Affect_RunState()
+static void Test_QuitCommand_DontAcceptArgs()
 {
 	refcount_ptr<Command> cmd = new QuitCommand;
+	vector<string> dummyArguments;
 
+	UnitTest::Assert("quit should not take any arguments",
+	    cmd->GetArgumentFormat() == "");
+	
 	GXemul gxemul(false);
 
 	UnitTest::Assert("the default GXemul instance should be paused",
 	    gxemul.GetRunState() == GXemul::Paused);
 
-	cmd->Execute(gxemul);
+	dummyArguments.push_back("something");
+
+	// The quit command should not accept arguments:
+	cmd->Execute(gxemul, dummyArguments);
+
+	UnitTest::Assert("the runstate should still be paused",
+	    gxemul.GetRunState() == GXemul::Paused);
+}
+
+static void Test_QuitCommand_Affect_RunState()
+{
+	refcount_ptr<Command> cmd = new QuitCommand;
+	vector<string> dummyArguments;
+	
+	GXemul gxemul(false);
+
+	UnitTest::Assert("the default GXemul instance should be paused",
+	    gxemul.GetRunState() == GXemul::Paused);
+
+	cmd->Execute(gxemul, dummyArguments);
 
 	UnitTest::Assert("runstate should have been changed to Quitting",
 	    gxemul.GetRunState() == GXemul::Quitting);
@@ -83,6 +113,7 @@ static void Test_QuitCommand_Affect_RunState()
 
 void QuitCommand::RunUnitTests(int& nSucceeded, int& nFailures)
 {
+	UNITTEST(Test_QuitCommand_DontAcceptArgs);
 	UNITTEST(Test_QuitCommand_Affect_RunState);
 }
 

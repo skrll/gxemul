@@ -1,5 +1,5 @@
-#ifndef COMMAND_H
-#define	COMMAND_H
+#ifndef VERSIONCOMMAND_H
+#define	VERSIONCOMMAND_H
 
 /*
  *  Copyright (C) 2008  Anders Gavare.  All rights reserved.
@@ -28,90 +28,46 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Command.h,v 1.2 2008-01-02 12:39:13 debug Exp $
+ *  $Id: VersionCommand.h,v 1.1 2008-01-02 12:39:13 debug Exp $
  */
 
 #include "misc.h"
 
+#include "Command.h"
 #include "UnitTest.h"
-
-class GXemul;
 
 
 /**
- * \brief A %Command is a named function, executed by the CommandInterpreter.
+ * \brief A Command which prints the version of the application.
  */
-class Command
-	: public ReferenceCountable
-	, public UnitTestable
+class VersionCommand
+	: public Command
 {
 public:
 	/**
-	 * \brief Constructs a %Command.
-	 *
-	 * @param name The command's name. This should be a unique lower-case
-	 *	string, consisting only of letters a-z.
-	 * @param argumentFormat A string describing the command's arguments.
-	 *	May be empty, if the command takes no arguments.
+	 * \brief Constructs a %VersionCommand.
 	 */
-	Command(const string& name, const string& argumentFormat);
+	VersionCommand();
 
-	virtual ~Command() = 0;
+	virtual ~VersionCommand();
 
 	/**
-	 * \brief Gets the name of the command.
-	 *
-	 * @return The name of the command.
-	 */
-	const string& GetCommandName() const
-	{
-		return m_name;
-	}
-
-	/**
-	 * \brief Gets the argument format for the command.
-	 *
-	 * @return The argument format for the command.
-	 */
-	const string& GetArgumentFormat() const
-	{
-		return m_argumentFormat;
-	}
-
-	/**
-	 * \brief Executes the command on a given GXemul instance.
+	 * \brief Executes the command: Prints the application version.
 	 *
 	 * @param gxemul A reference to the GXemul instance.
 	 * @param arguments A vector of zero or more string arguments.
 	 */
-	virtual void Execute(GXemul& gxemul, vector<string>& arguments) = 0;
+	virtual void Execute(GXemul& gxemul, vector<string>& arguments);
 
-	/**
-	 * \brief Returns a short (one-line) description of the command.
-	 *
-	 * @return A short description of the command.
-	 */
-	virtual string GetShortDescription() = 0;
+	virtual string GetShortDescription();
 
-	/**
-	 * \brief Returns a long description/help message for the command.
-	 *
-	 * @return A long description/help message for the command.
-	 */
-	virtual string GetLongDescription() = 0;
+	virtual string GetLongDescription();
 
 
 	/********************************************************************/
 
 	static void RunUnitTests(int& nSucceeded, int& nFailures);
-
-private:
-	string		m_name;
-	string		m_argumentFormat;
 };
 
 
-typedef map< string,refcount_ptr<Command> > Commands;
-
-
-#endif	// COMMAND_H
+#endif	// VERSIONCOMMAND_H

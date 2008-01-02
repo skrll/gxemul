@@ -25,22 +25,42 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Command.cc,v 1.2 2008-01-02 12:39:13 debug Exp $
+ *  $Id: VersionCommand.cc,v 1.1 2008-01-02 12:39:13 debug Exp $
  */
 
-#include "Command.h"
+#include "commands/VersionCommand.h"
 #include "GXemul.h"
 
 
-Command::Command(const string& name, const string& argumentFormat)
-	: m_name(name)
-	, m_argumentFormat(argumentFormat)
+VersionCommand::VersionCommand()
+	: Command("version", "")
 {
 }
 
 
-Command::~Command()
+VersionCommand::~VersionCommand()
 {
+}
+
+
+void VersionCommand::Execute(GXemul& gxemul, vector<string>& arguments)
+{
+	if (gxemul.GetUI() != NULL)
+		gxemul.GetUI()->ShowDebugMessage(
+		    "GXemul "VERSION"     "COPYRIGHT_MSG"\n"
+		    SECONDARY_MSG);
+}
+
+
+string VersionCommand::GetShortDescription()
+{
+	return "Prints version information.";
+}
+
+
+string VersionCommand::GetLongDescription()
+{
+	return "Prints version information.";
 }
 
 
@@ -49,63 +69,18 @@ Command::~Command()
 
 #ifndef WITHOUTUNITTESTS
 
-/**
- * \brief A dummy Command, for unit testing purposes
- */
-class DummyCommand
-	: public Command
+static void Test_VersionCommand_DontAcceptArgs()
 {
-public:
-	DummyCommand(int& valueRef)
-		: Command("dummycommand", "[args]")
-		, m_value(valueRef)
-	{
-	}
+	refcount_ptr<Command> cmd = new VersionCommand;
+	vector<string> dummyArguments;
 
-	~DummyCommand()
-	{
-	}
-
-	void Execute(GXemul& gxemul, vector<string>& arguments)
-	{
-		m_value ++;
-	}
-
-	string GetShortDescription()
-	{
-		return "A dummy command used for unit testing.";
-	}
-
-	string GetLongDescription()
-	{
-		return "This is just a dummy command used for unit testing.";
-	}
-
-private:
-	int&	m_value;
-};
-
-static void Test_Command_DummyCommand()
-{
-	GXemul gxemulDummy(false);
-	vector<string> dummyArgs;
-	
-	int dummyInt = 0;
-	refcount_ptr<Command> cmd = new DummyCommand(dummyInt);
-
-	dummyInt = 42;
-
-	UnitTest::Assert("dummyInt should initially be 42", dummyInt == 42);
-
-	cmd->Execute(gxemulDummy, dummyArgs);
-	
-	UnitTest::Assert("dummyInt should now be 43", dummyInt == 43);
-
+	UnitTest::Assert("version should not take any arguments",
+	    cmd->GetArgumentFormat() == "");
 }
 
-void Command::RunUnitTests(int& nSucceeded, int& nFailures)
+void VersionCommand::RunUnitTests(int& nSucceeded, int& nFailures)
 {
-	UNITTEST(Test_Command_DummyCommand);
+	UNITTEST(Test_VersionCommand_DontAcceptArgs);
 }
 
 #endif

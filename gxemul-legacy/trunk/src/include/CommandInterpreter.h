@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: CommandInterpreter.h,v 1.3 2008-01-02 10:56:40 debug Exp $
+ *  $Id: CommandInterpreter.h,v 1.4 2008-01-02 12:39:13 debug Exp $
  */
 
 #include "misc.h"
@@ -130,10 +130,10 @@ public:
 	static void RunUnitTests(int& nSucceeded, int& nFailures);
 
 private:
-	GXemul*					m_GXemul;
-	map< string,refcount_ptr<Command> >	m_commands;
+	GXemul*		m_GXemul;
+	Commands	m_commands;
 
-	string					m_currentCommandString;
+	string		m_currentCommandString;
 };
 
 

@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: UnitTest.cc,v 1.7 2008-01-02 10:56:41 debug Exp $
+ *  $Id: UnitTest.cc,v 1.8 2008-01-02 12:39:13 debug Exp $
  */
 
 #include <iostream>
@@ -38,6 +38,7 @@
 #include "Checksum.h"
 #include "Command.h"
 #include "commands/QuitCommand.h"
+#include "commands/VersionCommand.h"
 #include "CommandInterpreter.h"
 #include "components/DummyComponent.h"
 #include "EscapedString.h"
@@ -89,6 +90,7 @@ int UnitTest::RunTests()
 
 	// Commands:
 	QuitCommand::RunUnitTests(nSucceeded, nFailed);
+	VersionCommand::RunUnitTests(nSucceeded, nFailed);
 
 	if (nFailed == 0)
 		std::cerr << nSucceeded << " (all) tests passed.\n";
