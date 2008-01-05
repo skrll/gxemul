@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: CommandInterpreter.cc,v 1.6 2008-01-05 13:13:50 debug Exp $
+ *  $Id: CommandInterpreter.cc,v 1.7 2008-01-05 13:23:28 debug Exp $
  */
 
 #include "assert.h"
@@ -146,8 +146,8 @@ void CommandInterpreter::TabComplete()
 		Commands::const_iterator it = m_commands.begin();
 		for (; it != m_commands.end(); ++it) {
 			const string& commandName = it->first;
-			if (commandName.compare(0, wordToComplete.length(),
-			    wordToComplete) == 0) {
+			if (commandName.substr(0, wordToComplete.length())
+			    == wordToComplete) {
 				matches.push_back(commandName);
 			}
 		}
@@ -376,7 +376,7 @@ void CommandInterpreter::ReshowCurrentCommandBuffer()
 void CommandInterpreter::ClearCurrentInputLineVisually()
 {
 	string clearString = "";
-	clearString.insert(0, m_currentCommandString.length(), ' ');
+	clearString.insert((size_t)0, m_currentCommandString.length(), ' ');
 
 	if (m_GXemul->GetUI() != NULL)
 		m_GXemul->GetUI()->RedisplayInputLine(
