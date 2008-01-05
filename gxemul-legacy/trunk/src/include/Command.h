@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Command.h,v 1.2 2008-01-02 12:39:13 debug Exp $
+ *  $Id: Command.h,v 1.3 2008-01-05 13:13:49 debug Exp $
  */
 
 #include "misc.h"
@@ -84,21 +84,22 @@ public:
 	 * @param gxemul A reference to the GXemul instance.
 	 * @param arguments A vector of zero or more string arguments.
 	 */
-	virtual void Execute(GXemul& gxemul, vector<string>& arguments) = 0;
+	virtual void Execute(GXemul& gxemul,
+		const vector<string>& arguments) = 0;
 
 	/**
 	 * \brief Returns a short (one-line) description of the command.
 	 *
 	 * @return A short description of the command.
 	 */
-	virtual string GetShortDescription() = 0;
+	virtual string GetShortDescription() const = 0;
 
 	/**
 	 * \brief Returns a long description/help message for the command.
 	 *
 	 * @return A long description/help message for the command.
 	 */
-	virtual string GetLongDescription() = 0;
+	virtual string GetLongDescription() const = 0;
 
 
 	/********************************************************************/

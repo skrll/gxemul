@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: QuitCommand.cc,v 1.2 2008-01-02 12:39:13 debug Exp $
+ *  $Id: QuitCommand.cc,v 1.3 2008-01-05 13:13:50 debug Exp $
  */
 
 #include "commands/QuitCommand.h"
@@ -43,7 +43,7 @@ QuitCommand::~QuitCommand()
 }
 
 
-void QuitCommand::Execute(GXemul& gxemul, vector<string>& arguments)
+void QuitCommand::Execute(GXemul& gxemul, const vector<string>& arguments)
 {
 	if (arguments.size() != 0) {
 		if (gxemul.GetUI() != NULL)
@@ -56,13 +56,13 @@ void QuitCommand::Execute(GXemul& gxemul, vector<string>& arguments)
 }
 
 
-string QuitCommand::GetShortDescription()
+string QuitCommand::GetShortDescription() const
 {
 	return "Quits the application.";
 }
 
 
-string QuitCommand::GetLongDescription()
+string QuitCommand::GetLongDescription() const
 {
 	return "Quits the application.";
 }
@@ -111,7 +111,7 @@ static void Test_QuitCommand_Affect_RunState()
 	    gxemul.GetRunState() == GXemul::Quitting);
 }
 
-void QuitCommand::RunUnitTests(int& nSucceeded, int& nFailures)
+UNITTESTS(QuitCommand)
 {
 	UNITTEST(Test_QuitCommand_DontAcceptArgs);
 	UNITTEST(Test_QuitCommand_Affect_RunState);

@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: EscapedString.cc,v 1.3 2008-01-02 10:56:41 debug Exp $
+ *  $Id: EscapedString.cc,v 1.4 2008-01-05 13:13:50 debug Exp $
  */
 
 #include "EscapedString.h"
@@ -184,7 +184,7 @@ static void Test_EscapedString_Decode_WithoutQuotes()
 	    "Hello\\world");
 }
 
-void EscapedString::RunUnitTests(int& nSucceeded, int& nFailures)
+UNITTESTS(EscapedString)
 {
 	UNITTEST(Test_EscapedString_Generate);
 	UNITTEST(Test_EscapedString_Decode);

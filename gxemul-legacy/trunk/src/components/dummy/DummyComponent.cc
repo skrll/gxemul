@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: DummyComponent.cc,v 1.5 2008-01-02 10:56:40 debug Exp $
+ *  $Id: DummyComponent.cc,v 1.6 2008-01-05 13:13:49 debug Exp $
  */
 
 #include "components/DummyComponent.h"
@@ -47,10 +47,8 @@ static void Test_DummyComponent_CreateComponent()
 {
 	refcount_ptr<Component> component;
 
+	component = Component::CreateComponent("dummy");
 	UnitTest::Assert("creating a dummy component should be possible",
-	    Component::CreateComponent("dummy", component) == true);
-
-	UnitTest::Assert("the component should not be null",
 	    component.IsNULL() == false);
 
 	UnitTest::Assert("the name should be 'dummy'",
@@ -181,6 +179,65 @@ static void Test_DummyComponent_GetSet_Variables()
 	    retrievedValue.ToString() == "hello2");
 }
 
+static void Test_DummyComponent_Clone()
+{
+	refcount_ptr<Component> dummy = new DummyComponent;
+	refcount_ptr<Component> dummyChildA = new DummyComponent;
+	refcount_ptr<Component> dummyChildA1 = new DummyComponent;
+	refcount_ptr<Component> dummyChildA2 = new DummyComponent;
+
+	dummy->SetVariable("x", StateVariableValue("value 1"));
+	dummy->SetVariable("y", StateVariableValue("value 2"));
+
+	dummyChildA1->SetVariable("x", StateVariableValue("value\nhello"));
+	dummyChildA2->SetVariable("something", StateVariableValue());
+	dummyChildA2->SetVariable("numericTest", StateVariableValue(123));
+	dummyChildA2->SetVariable("z", StateVariableValue(-1));
+
+	dummyChildA->AddChild(dummyChildA1);
+	dummyChildA->AddChild(dummyChildA2);
+	dummy->AddChild(dummyChildA);
+
+	Checksum originalChecksum;
+	dummy->AddChecksum(originalChecksum);
+
+	refcount_ptr<Component> clone = dummy->Clone();
+
+	Checksum cloneChecksum;
+	clone->AddChecksum(cloneChecksum);
+
+	UnitTest::Assert("clone should have same checksum",
+	    originalChecksum == cloneChecksum);
+
+	dummy->SetVariable("x", StateVariableValue("modified"));
+
+	Checksum originalChecksumAfterModifyingOriginal;
+	dummy->AddChecksum(originalChecksumAfterModifyingOriginal);
+	Checksum cloneChecksumAfterModifyingOriginal;
+	clone->AddChecksum(cloneChecksumAfterModifyingOriginal);
+
+	UnitTest::Assert("original should have changed checksum",
+	    originalChecksum != originalChecksumAfterModifyingOriginal);
+	UnitTest::Assert("clone should have same checksum",
+	    cloneChecksum == cloneChecksumAfterModifyingOriginal);
+
+	clone->SetVariable("x", StateVariableValue("modified"));
+
+	Checksum originalChecksumAfterModifyingClone;
+	dummy->AddChecksum(originalChecksumAfterModifyingClone);
+	Checksum cloneChecksumAfterModifyingClone;
+	clone->AddChecksum(cloneChecksumAfterModifyingClone);
+
+	UnitTest::Assert("original should have same checksum, after the "
+		"clone has been modified",
+	    originalChecksumAfterModifyingClone ==
+	    originalChecksumAfterModifyingOriginal);
+	UnitTest::Assert("modified clone should have same checksum as "
+		"modified original",
+	    cloneChecksumAfterModifyingClone ==
+	    originalChecksumAfterModifyingOriginal);
+}
+
 static void Test_DummyComponent_SerializeDeserialize()
 {
 	refcount_ptr<Component> dummy = new DummyComponent;
@@ -205,7 +262,7 @@ static void Test_DummyComponent_SerializeDeserialize()
 	    dummy->CheckConsistency() == true);
 }
 
-void DummyComponent::RunUnitTests(int& nSucceeded, int& nFailures)
+UNITTESTS(DummyComponent)
 {
 	// Creation using CreateComponent
 	UNITTEST(Test_DummyComponent_CreateComponent);
@@ -221,6 +278,9 @@ void DummyComponent::RunUnitTests(int& nSucceeded, int& nFailures)
 
 	// Get/Set state variables
 	UNITTEST(Test_DummyComponent_GetSet_Variables);
+
+	// Clone
+	UNITTEST(Test_DummyComponent_Clone);
 
 	// Serialization/deserialization
 	UNITTEST(Test_DummyComponent_SerializeDeserialize);

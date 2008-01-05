@@ -1,6 +1,3 @@
-#ifndef VERSIONCOMMAND_H
-#define	VERSIONCOMMAND_H
-
 /*
  *  Copyright (C) 2008  Anders Gavare.  All rights reserved.
  *
@@ -28,46 +25,51 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: VersionCommand.h,v 1.2 2008-01-05 13:13:50 debug Exp $
+ *  $Id: RedoCommand.cc,v 1.1 2008-01-05 13:13:50 debug Exp $
  */
 
-#include "misc.h"
-
-#include "Command.h"
-#include "UnitTest.h"
+#include "commands/RedoCommand.h"
+#include "GXemul.h"
 
 
-/**
- * \brief A Command which prints the version of the application.
- */
-class VersionCommand
-	: public Command
+RedoCommand::RedoCommand()
+	: Command("redo", "")
 {
-public:
-	/**
-	 * \brief Constructs a %VersionCommand.
-	 */
-	VersionCommand();
-
-	virtual ~VersionCommand();
-
-	/**
-	 * \brief Executes the command: Prints the application version.
-	 *
-	 * @param gxemul A reference to the GXemul instance.
-	 * @param arguments A vector of zero or more string arguments.
-	 */
-	virtual void Execute(GXemul& gxemul, const vector<string>& arguments);
-
-	virtual string GetShortDescription() const;
-
-	virtual string GetLongDescription() const;
+}
 
 
-	/********************************************************************/
+RedoCommand::~RedoCommand()
+{
+}
 
-	static void RunUnitTests(int& nSucceeded, int& nFailures);
-};
+
+static void ShowMsg(GXemul& gxemul, const string& msg)
+{
+	if (gxemul.GetUI() != NULL)
+		gxemul.GetUI()->ShowDebugMessage(msg);
+}
 
 
-#endif	// VERSIONCOMMAND_H
+void RedoCommand::Execute(GXemul& gxemul, const vector<string>& arguments)
+{
+	ActionStack& actionStack = gxemul.GetActionStack();
+
+	if (actionStack.IsRedoPossible())
+		actionStack.Redo();
+	else
+		ShowMsg(gxemul, "Redo is not possible.\n");
+}
+
+
+string RedoCommand::GetShortDescription() const
+{
+	return "Redoes the next action, if possible.";
+}
+
+
+string RedoCommand::GetLongDescription() const
+{
+	return "Redoes the next action on the action stack, if possible.\n"
+	    "See also:  undo";
+}
+

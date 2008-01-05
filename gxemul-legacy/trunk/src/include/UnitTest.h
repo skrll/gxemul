@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: UnitTest.h,v 1.9 2008-01-02 11:31:24 debug Exp $
+ *  $Id: UnitTest.h,v 1.10 2008-01-05 13:13:49 debug Exp $
  */
 
 #include "misc.h"
@@ -131,6 +131,36 @@ public:
 	static void Assert(const string& strFailMessage, bool bCondition);
 
 	/**
+	 * \brief Asserts that two size_t values are equal.
+	 *
+	 * If the values are not equal, Fail is called with the failure message.
+	 *
+	 * The failure message can be something like "expected xyz",
+	 * or "the list should be empty at this point".
+	 *
+	 * @param strFailMessage Failure message to print to std::cerr.
+	 * @param actualValue The actual value.
+	 * @param expectedValue The expected value.
+	 */
+	static void Assert(const string& strFailMessage,
+	    size_t actualValue, size_t expectedValue);
+
+	/**
+	 * \brief Asserts that two string values are equal.
+	 *
+	 * If the values are not equal, Fail is called with the failure message.
+	 *
+	 * The failure message can be something like "expected xyz",
+	 * or "the list should be empty at this point".
+	 *
+	 * @param strFailMessage Failure message to print to std::cerr.
+	 * @param actualValue The actual value.
+	 * @param expectedValue The expected value.
+	 */
+	static void Assert(const string& strFailMessage,
+	    const string& actualValue, const string& expectedValue);
+
+	/**
 	 * \brief Fails a unit test unconditionally, by throwing a
 	 * UnitTestFailedException.
 	 *
@@ -142,6 +172,14 @@ public:
 
 #ifndef WITHOUTUNITTESTS
 #include <iostream>
+/**
+ * \brief Helper for unit test case execution.
+ *
+ * See the comment for UNITTEST for details.
+ */
+#define UNITTESTS(class) \
+	void class::RunUnitTests(int& nSucceeded, int& nFailures)
+
 /**
  * \brief Helper for unit test case execution.
  *
@@ -160,7 +198,7 @@ public:
  *
  * ...
  *
- * void MyClass::RunUnitTests(int& nSucceeded, int& nFailures)
+ * UNITTESTS(MyClass)
  * {
  *     UNITTEST(Test_MyClass_SomeTest);
  *     UNITTEST(Test_MyClass_AnotherTest);
@@ -181,6 +219,7 @@ public:
 		"    > " << ex.GetMessage() << "\n";			\
 	++ (nFailures);   						\
 }
+
 #endif
 
 

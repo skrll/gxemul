@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: CommandInterpreter.h,v 1.4 2008-01-02 12:39:13 debug Exp $
+ *  $Id: CommandInterpreter.h,v 1.5 2008-01-05 13:13:49 debug Exp $
  */
 
 #include "misc.h"
@@ -65,6 +65,8 @@ public:
 	 * Most normal keys are added at the end of the buffer. Some exceptions
 	 * are:
 	 * <ul>
+	 *	<li>nul char: does not change the input line buffer,
+	 *		but forces it to be visually redrawn/updated
 	 *	<li>backspace: removes the last character (if any)
 	 *	<li>tab: attempts TAB completion of the last word
 	 *	<li>newline or cr: calls RunCommand, and then clears
@@ -115,25 +117,74 @@ public:
 	 */
 	void AddCommand(refcount_ptr<Command> command);
 
+	/**
+	 * \brief Gets a collection of all commands.
+	 *
+	 * @return A const reference to the collection of commands.
+	 */
+	const Commands& GetCommands() const;
+
+	/**
+	 * \brief Adds a command line to the command history.
+	 *
+	 * If the command is empty, or the same as the last command in the
+	 * command history, it is ignored.
+	 *
+	 * The command history buffer only holds a small fixed number of
+	 * entries.
+	 *
+	 * @param command The command line to add to the command history.
+	 * @return The next insert position in the command history. Useful
+	 *	for unit testing purposes; should otherwise be ignored.
+	 */
+	int AddLineToCommandHistory(const string& command);
+
+	/**
+	 * \brief Retrieves a line from the command history.
+	 *
+	 * @param nStepsBack The number of steps back into the history. 0
+	 *	means return an empty line, 1 means the last history line,
+	 *	2 means the second last, and so on.
+	 * @return The line from the history, or an empty string if
+	 *	nStepsBack was zero.
+	 */
+	string GetHistoryLine(int nStepsBack) const;
+
 private:
 	/**
-	 * \brief Shows a character on the command input line, using the
-	 *	GXemul instance' UI.
-	 *
-	 * @param key The character to show.
+	 * \brief Internal helper which clears a line by outputting spaces.
 	 */
-	void ShowInputLineCharacter(stringchar key);
+	void ClearCurrentInputLineVisually();
+
+	/**
+	 * \brief Completes the word at the current position in the input line.
+	 */
+	void TabComplete();
 
 
 	/********************************************************************/
 public:
 	static void RunUnitTests(int& nSucceeded, int& nFailures);
 
-private:
-	GXemul*		m_GXemul;
-	Commands	m_commands;
 
-	string		m_currentCommandString;
+private:
+	// Pointer to the owning GXemul instance:
+	GXemul*			m_GXemul;
+
+	// A collection of all available commands that can be executed:
+	Commands		m_commands;
+
+	// The current input line:
+	string			m_currentCommandString;
+	size_t			m_currentCommandCursorPosition;
+	bool			m_inEscapeSequence;
+	string			m_escapeSequence;
+	int			m_historyEntryToCopyFrom;
+	
+	// Command history (usually accessed by cursor up/down keys):
+	vector<string>		m_commandHistory;
+	size_t			m_commandHistoryInsertPosition;
+	size_t			m_commandHistoryMaxSize;
 };
 
 

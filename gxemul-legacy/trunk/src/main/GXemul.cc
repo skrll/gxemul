@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemul.cc,v 1.18 2008-01-02 11:31:24 debug Exp $
+ *  $Id: GXemul.cc,v 1.19 2008-01-05 13:13:50 debug Exp $
  *
  *  This file contains three things:
  *
@@ -47,6 +47,12 @@
  *
  * This is the automatically generated Doxygen documentation, built from
  * comments throughout the source code.
+ *
+ * <ul><li><b>NOTE:</b> %GXemul 0.5.0 is a work in progress. Nothing is really
+ * emulated yet, I am working on infrastructural things that are needed first,
+ * before delving into actual emulation. If you are interested about the current
+ * state of development, please see the <a href="../../../TODO">TODO</a> file.
+ * </ul>
  *
  * See the <a href="../../index.html">main documentation</a> for more
  * information about this version of %GXemul.
@@ -87,6 +93,11 @@
  * when running via a text-only terminal. If an action is incapable of
  * providing undo information, then the undo stack is automatically cleared when
  * the action is performed.
+ *
+ * It is required that, in order to let the undo/redo functionality work
+ * properly, any modification of the component tree (this includes adding or
+ * removing components, changing the state of components etc) is done through
+ * Actions.
  *
  * The stack is implemented by the ActionStack class. A GXemul instance
  * has one such stack.
@@ -203,9 +214,12 @@
 #endif
 
 #include "GXemul.h"
+#include "components/DummyComponent.h"
 #include "UnitTest.h"
 
 #include <unistd.h>
+
+/// For command line parsing using getopt().
 extern char *optarg;
 
 
@@ -213,6 +227,7 @@ GXemul::GXemul(bool bWithGUI)
 	: m_runState(Paused)
 	, m_bWithGUI(bWithGUI)
 	, m_bRunUnitTests(false)
+	, m_rootComponent(new DummyComponent)
 	, m_commandInterpreter(this)
 {
 }
@@ -296,9 +311,21 @@ CommandInterpreter& GXemul::GetCommandInterpreter()
 }
 
 
+ActionStack& GXemul::GetActionStack()
+{
+	return m_actionStack;
+}
+
+
 UI* GXemul::GetUI()
 {
 	return m_ui;
+}
+
+
+refcount_ptr<Component> GXemul::GetRootComponent()
+{
+	return m_rootComponent;
 }
 
 
@@ -314,11 +341,27 @@ GXemul::RunState GXemul::GetRunState() const
 }
 
 
+string GXemul::GetRunStateAsString() const
+{
+	switch (m_runState) {
+	case Paused:
+		return "Paused";
+	case Running:
+		return "Running";
+	case Quitting:
+		return "Quitting";
+	}
+
+	return "Unknown";
+}
+
+
 /*****************************************************************************/
 
 
 /**
- * Checks whether GXemul was launched using the command "gxemul-gui" or not.
+ * \brief Checks whether GXemul was launched using the command
+ *		"gxemul-gui" or not.
  *
  * @param progname argv[0] as seen from main()
  * @return true if GXemul was launched using the command name "gxemul-gui",
@@ -340,7 +383,7 @@ static bool WithGUI(const char *progname)
 
 
 /**
- * Program entry point.
+ * \brief Program entry point.
  */
 int main(int argc, char *argv[])
 {

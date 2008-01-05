@@ -1,5 +1,5 @@
-#ifndef VERSIONCOMMAND_H
-#define	VERSIONCOMMAND_H
+#ifndef UNDOCOMMAND_H
+#define	UNDOCOMMAND_H
 
 /*
  *  Copyright (C) 2008  Anders Gavare.  All rights reserved.
@@ -28,31 +28,32 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: VersionCommand.h,v 1.2 2008-01-05 13:13:50 debug Exp $
+ *  $Id: UndoCommand.h,v 1.1 2008-01-05 13:13:50 debug Exp $
  */
 
 #include "misc.h"
 
 #include "Command.h"
-#include "UnitTest.h"
 
 
 /**
- * \brief A Command which prints the version of the application.
+ * \brief A Command which Un-does the last action in a GXemul instance'
+ *	ActionStack.
  */
-class VersionCommand
+class UndoCommand
 	: public Command
 {
 public:
 	/**
-	 * \brief Constructs a %VersionCommand.
+	 * \brief Constructs an %UndoCommand.
 	 */
-	VersionCommand();
+	UndoCommand();
 
-	virtual ~VersionCommand();
+	virtual ~UndoCommand();
 
 	/**
-	 * \brief Executes the command: Prints the application version.
+	 * \brief Executes the command: Undoes the last action performed
+	 *	in a GXemul instance.
 	 *
 	 * @param gxemul A reference to the GXemul instance.
 	 * @param arguments A vector of zero or more string arguments.
@@ -62,12 +63,7 @@ public:
 	virtual string GetShortDescription() const;
 
 	virtual string GetLongDescription() const;
-
-
-	/********************************************************************/
-
-	static void RunUnitTests(int& nSucceeded, int& nFailures);
 };
 
 
-#endif	// VERSIONCOMMAND_H
+#endif	// UNDOCOMMAND_H

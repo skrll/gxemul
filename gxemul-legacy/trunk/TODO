@@ -1,62 +1,103 @@
-$Id: TODO,v 1.585 2008-01-02 12:39:13 debug Exp $
+<html>
+<head>
+  <title>GXemul: TODO</title>
+  <meta name="robots" content="noarchive,nofollow,noindex">
+</head>
+<body>
+<h2>GXemul: TODO</h2>
+<pre><font color="#b0b0b0">$Id: TODO,v 1.586 2008-01-05 13:13:49 debug Exp $</font></pre>
 
-Some things, in approximate Time order, that I'd like to implement or fix.
+<p>Some things, in approximate Time order, that I'd like to implement or fix.
 (Things at the top need to be fixed before those at the bottom.)
-
 Some items in this list are perhaps already fixed. This is just a place
 for me to do brain-storming.
 
-Please note that GXemul 0.5.0 will be a complete rewrite of GXemul, from
+<p>Please note that GXemul 0.5.0 will be a complete rewrite of GXemul, from
 scratch. This file has nothing to do with the TODO files from previous versions
 of GXemul.
 
--------------------------------------------------------------------------------
+<p><hr><pre>
+
+Actions for Components
+----------------------
+
+	[X] AddComponentAction
+	[X] RemoveComponentAction
+	[ ] ModifyStateAction
+	[ ] MoveComponentAction?
+
+
+State variable values
+---------------------
+
+	Think about, solve, and then test the following :-)
+
+	[ ]  References from e.g. Components that need fast runtime access.
+	     Will the state variables stay put in memory? Or the other way
+	     around, with state variables referencing the value in the
+	     Component?
+
+	[ ]  Large memory arrays, e.g. for RAM and framebuffer emulation.
+		Serialization/Deserialization?
+		Cloning?
+		Undo?
+		Handles with copy-on-write?
+		While in memory, handles point to copy-on-write memory, while
+		when being saved, the handles' contents is stored to a file?
+
+	[ ]  Expand suitable unit tests to include tests for these large state
+	     variables!
+
 
 CommandInterpreter
-	* Automatic generation of documentation for all commands,
-		brief section with href links to full descriptions of each
-		command.
-		Generate by calling a "generate HTML help" function
-		on the command interpreter; all default commands will
-		then be included. (Think about this.)
-		These should probably be checked into CVS.
+------------------
 
-	* Tab completion for everything:
-		command names
-		component names
-		components' state variables
-		TAB+TAB = show available names, both commands, components,
-			and variables!
+	[ ]  Paths to components in the component tree.
+	     All components must have a "name" state variable, which must
+	     be unique among children of the same parent?
 
-	* Built-in commands:
+	[/]  Tab completion for everything:
+		[X]  command names
+		[ ]  component names
+		[ ]  components' state variables
+		[ ]  "" + TAB = show available names, both commands, components,
+		     and variables!
+		[ ]  syntax based completion? e.g.:
+			help [cmd]   tab completes the first argument as a
+				     command
+
 	[X]	quit		Sets RunState to Quitting.
-		help		Prints help message [for a command]
+	[X]	help		Prints help message [for a command]
 	[X]	version		Prints the GXemul version (string)
-		undo
-		redo
-		clearundo	Clears the undo/redo stack
-		tree    Look at current configuration tree of components.
-		focus   Set focus to somewhere in the tree (given a "path").
-		add     Add a component somewhere in the tree.
-		remove  Remove a component (including recursively
+	[X]	undo		Undo last Action
+	[X]	redo		Redo last Action
+	[/]	tree  		Look at current configuration tree
+				of components.  TODO: ShowTree.
+--->	[ ]	add     	Add a component somewhere in the tree.
+	[ ]	remove  	Remove a component (including recursively
 				removing all its children)
-		save    Save configuration.
-		load    Load configuration.
-		close	Close current emulation.
-		copy	copy a component (and its children) to the clipboard
-		paste	paste a component from the clipboard
-		reset   Reset configuration (i.e. reset all components).
-		print expr  	Prints expression (gets a state variable).
-		expr = value	Sets a state variable
-
-	* Emulation-related commands:
-		c
-		continue
-		s
-		step
-		trace		toggle function call tracing
-		r
-		registers	dump registers of a cpu
+	[ ]	move  		Move a component from one path to another.
+	[ ]	save    	Save configuration.
+	[ ]	load    	Load configuration.
+	[ ]	close		Close current emulation. (Resets to just a
+				dummy root component).
+	[ ]	clearundo	Clears the undo/redo stack
+	[ ]	focus   	Set focus to somewhere in the tree (given
+				a "path").
+	[ ]	copy		copy a component (and its children)
+				to the clipboard
+	[ ]	paste		paste a component from the clipboard
+	[ ]	reset  		Reset configuration (i.e. reset all components).
+	[ ]	print expr  	Prints expression (gets a state variable).
+	[ ]	expr = value	Sets a state variable
+	[ ]	c
+	[ ]	continue	sets RunState to Running
+	[ ]	pause		sets RunState to Paused
+	[ ]	s
+	[ ]	step		single-step
+	[ ]	trace		toggle function call tracing
+	[ ]	r
+	[ ]	registers	dump registers of a cpu
 
 	x)  "Object oriented" hierarchy, so that e.g.
 		print machine0.mainbus0.pcibus0.dc0.register_this_and_that
@@ -66,7 +107,7 @@ CommandInterpreter
 	    object oriented extensions / variable names / etc.
 	    INCLUDING tab completion inside sub components.
 	    This might feel odd, but that would allow one to
-	    type pci<TAB> to expand to machine.pci0  (if there
+	    type pci+TAB to expand to machine.pci0  (if there
 	    only is one pci bus), or if there are, say, three
 	    machines with pci busses, that would give a
 	    tab completion list, similar to this:
@@ -86,25 +127,24 @@ CommandInterpreter
 GXemul command line argument
 ----------------------------
 
-	* Configuration file (.gxemul).
-	* Directory, containing exactly one .gxemul file.
-	* => initial "load" command. if it fails, gxemul quits.
+	* Backward compatible with previous versions. I.e.:
+		[ ]  no arguments should show short help message.
+		[ ]  a new option could start gxemul with no configuration
+		     file (like a "blank" mode).
+
+	* Configuration file (.gxemul)
+		[ ]  => initial "load" command. if it fails, gxemul quits.
+		[ ]  Directory, containing exactly one .gxemul file, should
+		     also be allowed.
 
 
 Components
 ----------
 
-LARGE state? Memory contents, disk images, ... these need to be
-saved on disk, or at least not into a string as is currently done.
-Perhaps a stringstream? Or perhaps a type "rawdata" which, instead
-of being stored in the serialized stream, is stored as a "handle"?
-While in memory, handles point to copy-on-write memory, while when
-being saved, the handles' contents is stored to a file?
+TODO: Reset!
 
-Actions for adding components to a GXemul instance, removing them...
-Write UNIT TESTS for these actions.
+Start implementing suitable components (src/components/):
 
-New component source code tree, src/components/:
 	busses/			mainbus, TurboChannel, ISA, PCI, ...
 	cpus/
 		CPU		class CPU : public Component, etc
@@ -140,9 +180,7 @@ Error handling
 --------------
 
 	x) Stack of errors? With human readable (i18n'd) messages.
-	x) if loading a component tree fails
-	x) if parsing a command fails
-	x) if executing a command fails
+	   (e.g. Exception with possibility to add sub-exception-messages...)
 
 
 GTKMM GUI
@@ -271,6 +309,9 @@ Think about
 	    I.e. F1 (and Help->Contents) can cause a web browser to be
 	    launched.
 
+	x)  Prepare for / investigate native code generation.
+		(amd64 only, to begin with, to save time.)
+
 	x)  Userland emulation! (Only from the command line.)
 
 	x)  Command-line options compatible with pre-0.5.0! Start e.g.
@@ -290,18 +331,18 @@ Think about
 		...
 
 	x)  Architectures to concentrate on, from the beginning:
-		MIPS (since that's what works best in GXemul < 0.5.)
+		MIPS (since that's what works best in GXemul before 0.5.)
 			testmips, then pmax and others?
 		M88K (so that the work so far isn't lost)
 		amd64 (since there's more software to test that way, and
 			it will be fun/interesting to devle into
 			emulation of variable-length ISAs :-)
 		some simple AVR microcontroller? for demos
+		and all others... :)
 
 
-
-Preparation for release 0.5.0:
-------------------------------
+Preparation for release 0.5.0
+-----------------------------
 
  x) Not meaningful until enough functionality from the 0.4.x series have
     been duplicated.
@@ -320,7 +361,11 @@ Preparation for release 0.5.0:
 	x) Mention in the documentation the recommended way to do customized
 	   distributions of gxemul (by naming the directory gxemul-MyVer-1.2.3
 	   etc, and supplying all source code). + SECONDARY_MSG in misc.h.
-	x) Automated build of Commands as HTML?
+	x) Automated build of list of Commands + long description as HTML?
+	x) Automated build of lists of Components too?
+	x) If documentation is automatically built, only include STABLE
+	   features in the documentation!
+	x) User guide with screenshots of the new GUI.
 
  x) Carefully check that the man page reflects the correct
     command line options etc.
@@ -331,4 +376,7 @@ Preparation for release 0.5.0:
  x) Make sure that the web page looks reasonable. There should be
     clear ways to download the old 0.4.x version in addition to
     the 0.5.0 release, even when 0.5.0 has been released.
+
+</pre>
+</body></html>
 

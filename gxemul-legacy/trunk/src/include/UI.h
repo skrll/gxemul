@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: UI.h,v 1.3 2008-01-02 10:56:41 debug Exp $
+ *  $Id: UI.h,v 1.4 2008-01-05 13:13:49 debug Exp $
  */
 
 #include "misc.h"
@@ -75,11 +75,27 @@ public:
 	virtual void ShowDebugMessage(const string& msg) = 0;
 
 	/**
-	 * \brief Echoes a character to the command input line.
+	 * \brief Redisplays the interactive command input line.
 	 *
-	 * @param ch The character to output.
+	 * This function generally displays a prompt (e.g. "GXemul> ")
+	 * followed by the input line, placing the cursor position at
+	 * the correct position on the input line.
+	 *
+	 * @param inputline The entire input line.
+	 * @param cursorPosition The current cursor position. 0 is at the
+	 *	leftmost position.
 	 */
-	virtual void ShowInputLineCharacter(stringchar ch) = 0;
+	virtual void RedisplayInputLine(const string& inputline,
+	    size_t cursorPosition) = 0;
+
+	/**
+	 * \brief Executed by the CommandInterpreter when a line has been
+	 * completed (with a newline).
+	 *
+	 * Usually this clears the current line, and (if possible) moves
+	 * down to a new line.
+	 */
+	virtual void InputLineDone() = 0;
 
 	/**
 	 * \brief Runs the UI's main loop.

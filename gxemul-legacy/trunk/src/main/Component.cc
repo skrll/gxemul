@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Component.cc,v 1.5 2007-12-29 16:18:51 debug Exp $
+ *  $Id: Component.cc,v 1.6 2008-01-05 13:13:50 debug Exp $
  */
 
 #include "assert.h"
@@ -48,23 +48,36 @@ Component::~Component()
 }
 
 
-bool Component::CreateComponent(const string& className,
-	refcount_ptr<Component>& pComponent)
+refcount_ptr<Component> Component::CreateComponent(const string& className)
 {
-	pComponent = NULL;
+	refcount_ptr<Component> component = NULL;
 
-	if (className == "dummy") {
-		pComponent = new DummyComponent;
-		return true;
-	}
+	if (className == "dummy")
+		component = new DummyComponent;
 	
-	return false;
+	return component;
 }
 
 
 string Component::GetClassName() const
 {
 	return m_className;
+}
+
+
+refcount_ptr<Component> Component::Clone() const
+{
+	refcount_ptr<Component> clone = CreateComponent(m_className);
+	if (clone.IsNULL())
+		return clone;
+
+	clone->m_stateVariables = m_stateVariables;
+
+	for (Components::const_iterator it = m_childComponents.begin();
+	    it != m_childComponents.end(); ++it)
+		clone->AddChild((*it)->Clone());
+
+	return clone;
 }
 
 
@@ -96,9 +109,15 @@ Component* Component::GetParent()
 }
 
 
-void Component::AddChild(refcount_ptr<Component> childComponent)
+void Component::AddChild(refcount_ptr<Component> childComponent,
+	size_t insertPosition)
 {
-	m_childComponents.push_back(childComponent);
+	if (insertPosition == (size_t) -1)
+		m_childComponents.push_back(childComponent);
+	else
+		m_childComponents.insert(
+		    m_childComponents.begin() + insertPosition,
+		    childComponent);
 
 	// A component cannot have two parents.	
 	assert(childComponent->GetParent() == NULL);
@@ -107,32 +126,22 @@ void Component::AddChild(refcount_ptr<Component> childComponent)
 }
 
 
-void Component::RemoveChild(Component* childToRemove)
+size_t Component::RemoveChild(Component* childToRemove)
 {
-	const size_t n = m_childComponents.size();
-	
-	for (size_t i = 0; i < n; ++ i) {
-		if (childToRemove == m_childComponents[i]) {
+	size_t index = 0;
+	for (Components::iterator it = m_childComponents.begin();
+	     it != m_childComponents.end(); ++it, ++index) {
+		if (childToRemove == (*it)) {
 			childToRemove->SetParent(NULL);
-			
-			// Unless the item we are removing is the last in the
-			// vector...
-			if (i != n - 1) {
-				// ... remove item i by moving every item after
-				// it back one step:
-				for (size_t j = i; j < n - 1; ++j)
-					m_childComponents[j] =
-					    m_childComponents[j+1];
-			}
-			
-			m_childComponents.pop_back();
-
-			return;
+			m_childComponents.erase(it);
+			return index;
 		}
 	}
-
+	
 	// Child not found? Should not happen.
 	assert(false);
+
+	return (size_t) -1;
 }
 
 
@@ -227,24 +236,24 @@ static bool GetNextToken(const string& str, size_t& pos, string& token)
 }
 
 
-bool Component::Deserialize(const string& str, size_t& pos,
-	refcount_ptr<Component>& deserializedTree)
+refcount_ptr<Component> Component::Deserialize(const string& str, size_t& pos)
 {
-	deserializedTree = NULL;
+	refcount_ptr<Component> deserializedTree = NULL;
 	string token;
 
 	if (!GetNextToken(str, pos, token) || token != "component")
-		return false;
+		return deserializedTree;
 
 	string className;
 	if (!GetNextToken(str, pos, className))
-		return false;
+		return deserializedTree;
 
 	if (!GetNextToken(str, pos, token) || token != "{")
-		return false;
+		return deserializedTree;
 
-	if (!Component::CreateComponent(className, deserializedTree))
-		return false;
+	deserializedTree = Component::CreateComponent(className);
+	if (deserializedTree.IsNULL())
+		return deserializedTree;
 
 	while (pos < str.length()) {
 		size_t savedPos = pos;
@@ -253,38 +262,51 @@ bool Component::Deserialize(const string& str, size_t& pos,
 		// or     2)   component name { ...
 		// or     3)   variableType name "value"
 
-		if (!GetNextToken(str, pos, token))
-			return false;
+		if (!GetNextToken(str, pos, token)) {
+			// Failure.
+			deserializedTree = NULL;
+			break;
+		}
 
 		// Case 1:
 		if (token == "}")
-			return true;
+			break;
 
 		string name;
-		if (!GetNextToken(str, pos, name))
-			return false;
+		if (!GetNextToken(str, pos, name)) {
+			// Failure.
+			deserializedTree = NULL;
+			break;
+		}
 
 		if (token == "component") {
 			// Case 2:
-			refcount_ptr<Component> child;
-			if (!Component::Deserialize(str, savedPos, child))
-				return false;
-
+			refcount_ptr<Component> child =
+			    Component::Deserialize(str, savedPos);
+			if (child.IsNULL()) {
+				// Failure.
+				deserializedTree = NULL;
+				break;
+			}
+			
 			deserializedTree->AddChild(child);
 			pos = savedPos;
 		} else {
 			// Case 3:
 			string varType = token;
 			string varValue;
-			if (!GetNextToken(str, pos, varValue))
-				return false;
-
+			if (!GetNextToken(str, pos, varValue)) {
+				// Failure.
+				deserializedTree = NULL;
+				break;
+			}
+			
 			deserializedTree->SetVariable(name,
 			    StateVariableValue(varType, varValue));
 		}
 	}
 
-	return true;
+	return deserializedTree;
 }
 
 
@@ -298,10 +320,9 @@ bool Component::CheckConsistency() const
 	AddChecksum(checksumOriginal);
 
 	// Deserialize
-	refcount_ptr<Component> tmpDeserializedTree;
 	size_t pos = 0;
-	if (!Deserialize(result, pos, tmpDeserializedTree) ||
-	    tmpDeserializedTree.IsNULL())
+	refcount_ptr<Component> tmpDeserializedTree = Deserialize(result, pos);
+	if (tmpDeserializedTree.IsNULL())
 		return false;
 
 	Checksum checksumDeserialized;
@@ -334,7 +355,7 @@ void Component::AddChecksum(Checksum& checksum) const
 	
 	// Add all child components.
 	for (size_t i = 0; i < m_childComponents.size(); ++ i) {
-		checksum.Add(0xf98a7c7c109f0000LL + i);
+		checksum.Add(0xf98a7c7c109f0000LL + i * 0x98127417);
 		m_childComponents[i]->AddChecksum(checksum);
 	}
 

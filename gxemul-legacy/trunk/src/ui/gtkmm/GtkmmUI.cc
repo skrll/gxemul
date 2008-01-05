@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GtkmmUI.cc,v 1.3 2008-01-02 10:56:41 debug Exp $
+ *  $Id: GtkmmUI.cc,v 1.4 2008-01-05 13:13:50 debug Exp $
  */
 
 #ifdef WITH_GTKMM
@@ -64,7 +64,14 @@ void GtkmmUI::ShowDebugMessage(const string& msg)
 }
 
 
-void GtkmmUI::ShowInputLineCharacter(stringchar ch)
+void GtkmmUI::InputLineDone()
+{
+	// TODO
+}
+
+
+void GtkmmUI::RedisplayInputLine(const string& inputline,
+    size_t cursorPosition)
 {
 	// TODO
 }

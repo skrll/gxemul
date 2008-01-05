@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GtkmmUI.h,v 1.3 2008-01-02 10:56:41 debug Exp $
+ *  $Id: GtkmmUI.h,v 1.4 2008-01-05 13:13:50 debug Exp $
  */
 
 #include "UI.h"
@@ -51,7 +51,10 @@ public:
 
 	virtual void ShowDebugMessage(const string& msg);
 
-	virtual void ShowInputLineCharacter(stringchar ch);
+	virtual void RedisplayInputLine(const string& inputline,
+	    size_t cursorPosition);
+
+	virtual void InputLineDone();
 
 	virtual int MainLoop();
 };

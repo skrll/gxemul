@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ConsoleUI.cc,v 1.4 2008-01-02 10:59:36 debug Exp $
+ *  $Id: ConsoleUI.cc,v 1.5 2008-01-05 13:13:50 debug Exp $
  */
 
 #include <signal.h>
@@ -133,9 +133,14 @@ void ConsoleUI::ShowDebugMessage(const string& msg)
 }
 
 
-void ConsoleUI::ShowInputLineCharacter(stringchar ch)
+void ConsoleUI::RedisplayInputLine(const string& inputline,
+    size_t cursorPosition)
 {
-	std::cout << (string() + ch);
+	std::cout << "\rGXemul> " << inputline << " \rGXemul> ";
+
+	for (size_t pos = 0; pos < cursorPosition; pos++)
+		std::cout << (string() + inputline[pos]);
+
 	std::cout.flush();
 }
 
@@ -153,11 +158,18 @@ static stringchar ReadKey()
 
 void ConsoleUI::ReadAndExecuteCommand()
 {
-	std::cout << "GXemul> ";
-	std::cout.flush();
+	// Initial dummy addkey, to show the input line with the prompt, etc.:
+	m_gxemul->GetCommandInterpreter().AddKey('\0');
 
 	while (!m_gxemul->GetCommandInterpreter().AddKey(ReadKey()))
 		;
+}
+
+
+void ConsoleUI::InputLineDone()
+{
+	std::cout << "\n";
+	std::cout.flush();
 }
 
 

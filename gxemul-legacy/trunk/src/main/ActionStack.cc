@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ActionStack.cc,v 1.7 2008-01-02 10:56:41 debug Exp $
+ *  $Id: ActionStack.cc,v 1.8 2008-01-05 13:13:50 debug Exp $
  */
 
 #include "ActionStack.h"
@@ -125,7 +125,7 @@ class DummyAction : public Action
 {
 public:
 	DummyAction(int& valueRef)
-		: Action("dummyName", "dummyDescription")
+		: Action("dummy action")
 		, m_value(valueRef)
 	{
 	}
@@ -153,7 +153,7 @@ class DummyNonUndoableAction : public Action
 {
 public:
 	DummyNonUndoableAction(int& valueRef)
-		: Action("dummyName", "dummyDescription", false)
+		: Action("dummy non-undoable action", false)
 		, m_value(valueRef)
 	{
 	}
@@ -382,7 +382,7 @@ static void Test_ActionStack_ExecuteAndUndo()
 	UnitTest::Assert("D: dummyInt should be 3", dummyInt == 3);
 }
 
-void ActionStack::RunUnitTests(int& nSucceeded, int& nFailures)
+UNITTESTS(ActionStack)
 {
 	// Tests for number of elements on the undo and redo stacks:
 	UNITTEST(Test_ActionStack_IsInitiallyEmpty);

@@ -1,5 +1,5 @@
-#ifndef VERSIONCOMMAND_H
-#define	VERSIONCOMMAND_H
+#ifndef REMOVECOMPONENTACTION_H
+#define	REMOVECOMPONENTACTION_H
 
 /*
  *  Copyright (C) 2008  Anders Gavare.  All rights reserved.
@@ -28,46 +28,67 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: VersionCommand.h,v 1.2 2008-01-05 13:13:50 debug Exp $
+ *  $Id: RemoveComponentAction.h,v 1.1 2008-01-05 13:13:49 debug Exp $
  */
 
 #include "misc.h"
 
-#include "Command.h"
+#include "Action.h"
+#include "Component.h"
 #include "UnitTest.h"
+
+class GXemul;
 
 
 /**
- * \brief A Command which prints the version of the application.
+ * \brief An Action which removes a child Component from another %Component.
+ *
+ * The action is undoable. Undoing the action means adding the child
+ * %Component again.
  */
-class VersionCommand
-	: public Command
+class RemoveComponentAction
+	: public Action
+	, public UnitTestable
 {
 public:
 	/**
-	 * \brief Constructs a %VersionCommand.
+	 * \brief Constructs an %RemoveComponentAction.
+	 *
+	 * @param componentToRemove A reference counted pointer to the
+	 *	Component to remove.
+	 * @param whereToRemoveItFrom A reference counted pointer to the
+	 *	Component which is the parent of the %Component.
 	 */
-	VersionCommand();
+	RemoveComponentAction(refcount_ptr<Component> componentToRemove,
+			   refcount_ptr<Component> whereToRemoveItFrom);
 
-	virtual ~VersionCommand();
+	virtual ~RemoveComponentAction();
 
 	/**
-	 * \brief Executes the command: Prints the application version.
+	 * \brief When called, removes the specified Component.
 	 *
-	 * @param gxemul A reference to the GXemul instance.
-	 * @param arguments A vector of zero or more string arguments.
+	 * The position in the child vector where the %Component was is
+	 * remembered, in order to allow Undo to work.
 	 */
-	virtual void Execute(GXemul& gxemul, const vector<string>& arguments);
+	void Execute();
 
-	virtual string GetShortDescription() const;
-
-	virtual string GetLongDescription() const;
+	/**
+	 * \brief When called, restores the state to what it was before
+	 *	removing the Component, by re-adding the component (inserting
+	 *	it at the position where it was before it was removed).
+	 */
+	void Undo();
 
 
 	/********************************************************************/
 
 	static void RunUnitTests(int& nSucceeded, int& nFailures);
+
+private:
+	refcount_ptr<Component>		m_componentToRemove;
+	refcount_ptr<Component>		m_whereToRemoveItFrom;
+	size_t				m_insertPositionForUndo;
 };
 
 
-#endif	// VERSIONCOMMAND_H
+#endif	// REMOVECOMPONENTACTION_H

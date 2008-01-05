@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Component.h,v 1.7 2007-12-29 16:18:51 debug Exp $
+ *  $Id: Component.h,v 1.8 2008-01-05 13:13:49 debug Exp $
  */
 
 #include "misc.h"
@@ -68,14 +68,11 @@ public:
 	 * \brief Creates a component given a short component class name.
 	 *
 	 * @param className	The component class name, e.g. "pcibus".
-	 * @param pComponent	A reference counted Component pointer. This
-	 *			is set to the newly created component on
-	 *			success. On failure it is set to NULL.
-	 * @return true if the component was created, false if the component
-	 *		name was unknown
+	 * @return A reference counted Component pointer. This is set to the
+	 *	newly created component on success. On failure it is set to
+	 *	NULL.
 	 */
-	static bool CreateComponent(const string& className,
-		refcount_ptr<Component>& pComponent);
+	static refcount_ptr<Component> CreateComponent(const string& className);
 
 	/**
 	 * \brief Gets the class name of the component.
@@ -84,6 +81,16 @@ public:
 	 *	bus component class
 	 */
 	string GetClassName() const;
+
+	/**
+	 * \brief Clones the component and all its children.
+	 *
+	 * The new copy is a complete copy; modifying either the copy or the
+	 * original will not affect the other.
+	 *
+	 * @return A reference counted pointer to the clone.
+	 */
+	refcount_ptr<Component> Clone() const;
 
 	/**
 	 * \brief Resets the state of this component and all its children.
@@ -127,16 +134,25 @@ public:
 	/**
 	 * \brief Adds a reference to a child component.
 	 *
-	 * @param childComponent	a pointer to the child component to add
+	 * @param childComponent  A reference counted pointer to the child
+	 *	component to add.
+	 * @param insertPosition  If specified, this is the position in the
+	 *	vector of child components where the child will be inserted.
+	 *	If not specified (or -1), then the child will be added to
+	 *	the end of the vector.
 	 */
-	void AddChild(refcount_ptr<Component> childComponent);
+	void AddChild(refcount_ptr<Component> childComponent,
+		size_t insertPosition = (size_t) -1);
 
 	/**
 	 * \brief Removes a reference to a child component.
 	 *
-	 * @param childToRemove		the child to remove
+	 * @param childToRemove  A pointer to the child to remove.
+	 * @return  A zero-based index, which is the position in the vector
+	 *	of children where the child was. (Needed for e.g. Undo
+	 *	functionality.)
 	 */
-	void RemoveChild(Component* childToRemove);
+	size_t RemoveChild(Component* childToRemove);
 
 	/**
 	 * \brief Gets pointers to child components.
@@ -175,16 +191,16 @@ public:
 	/**
 	 * \brief Deserializes a string into a component tree.
 	 *
-	 * @param str the string to deserialize
-	 * @param pos initial deserialization position in the string; should
-	 *	be 0 when invoked manually. (used for recursion)
-	 * @param deserializedTree if deserialization was successful, this
+	 * @param str The string to deserialize.
+	 * @param pos Initial deserialization position in the string; should
+	 *	be 0 when invoked manually. (Used for recursion, to avoid
+	 *	copying.)
+	 * @return If deserialization was successful, the
 	 *	reference counted pointer will point to a component tree;
 	 *	on error, it will be set to NULL
-	 * @return true if the string was deserializable, false otherwise.
 	 */
-	static bool Deserialize(const string& str, size_t& pos,
-		refcount_ptr<Component>& deserializedTree);
+	static refcount_ptr<Component> Deserialize(
+	    const string& str, size_t& pos);
 
 	/**
 	 * \brief Checks consistency by serializing and deserializing the

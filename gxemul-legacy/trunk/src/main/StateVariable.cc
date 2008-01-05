@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: StateVariable.cc,v 1.2 2008-01-02 10:56:41 debug Exp $
+ *  $Id: StateVariable.cc,v 1.3 2008-01-05 13:13:50 debug Exp $
  */
 
 #include "EscapedString.h"
@@ -128,7 +128,7 @@ static void Test_StateVariable_Serialize_StringWithEscapes()
 	    "string hello " + EscapedString(s).Generate() + "\n");
 }
 
-void StateVariable::RunUnitTests(int& nSucceeded, int& nFailures)
+UNITTESTS(StateVariable)
 {
 	UNITTEST(Test_StateVariable_Default);
 	UNITTEST(Test_StateVariable_Serialize_String);

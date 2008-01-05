@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile.skel,v 1.12 2008-01-02 10:56:41 debug Exp $
+#  $Id: Makefile.skel,v 1.13 2008-01-05 13:13:50 debug Exp $
 #
 #  Makefile for GXemul src/main
 #
@@ -12,18 +12,23 @@ OBJS=Action.o ActionStack.o Checksum.o \
 	debug_new.o EscapedString.o GXemul.o \
 	StateVariable.o StateVariableValue.o UnitTest.o
 
-all: $(OBJS) do_commands
+all: $(OBJS) do_actions do_commands
 
 $(OBJS): Makefile
+
+do_actions:
+	cd actions; $(MAKE); cd ..
 
 do_commands:
 	cd commands; $(MAKE); cd ..
 
 clean:
+	cd actions; $(MAKE) clean; cd ..
 	cd commands; $(MAKE) clean; cd ..
 	rm -f $(OBJS) *core _test
 
 clean_all: clean
+	cd actions; $(MAKE) clean_all; cd ..
 	cd commands; $(MAKE) clean_all; cd ..
 	rm -f Makefile
 

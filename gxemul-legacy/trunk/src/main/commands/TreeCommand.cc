@@ -1,6 +1,3 @@
-#ifndef VERSIONCOMMAND_H
-#define	VERSIONCOMMAND_H
-
 /*
  *  Copyright (C) 2008  Anders Gavare.  All rights reserved.
  *
@@ -28,46 +25,52 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: VersionCommand.h,v 1.2 2008-01-05 13:13:50 debug Exp $
+ *  $Id: TreeCommand.cc,v 1.1 2008-01-05 13:13:50 debug Exp $
  */
 
-#include "misc.h"
-
-#include "Command.h"
-#include "UnitTest.h"
+#include "commands/TreeCommand.h"
+#include "GXemul.h"
 
 
-/**
- * \brief A Command which prints the version of the application.
- */
-class VersionCommand
-	: public Command
+TreeCommand::TreeCommand()
+	: Command("tree", "")
 {
-public:
-	/**
-	 * \brief Constructs a %VersionCommand.
-	 */
-	VersionCommand();
-
-	virtual ~VersionCommand();
-
-	/**
-	 * \brief Executes the command: Prints the application version.
-	 *
-	 * @param gxemul A reference to the GXemul instance.
-	 * @param arguments A vector of zero or more string arguments.
-	 */
-	virtual void Execute(GXemul& gxemul, const vector<string>& arguments);
-
-	virtual string GetShortDescription() const;
-
-	virtual string GetLongDescription() const;
+}
 
 
-	/********************************************************************/
+TreeCommand::~TreeCommand()
+{
+}
 
-	static void RunUnitTests(int& nSucceeded, int& nFailures);
-};
+
+static void ShowMsg(GXemul& gxemul, const string& msg)
+{
+	if (gxemul.GetUI() != NULL)
+		gxemul.GetUI()->ShowDebugMessage(msg);
+}
 
 
-#endif	// VERSIONCOMMAND_H
+static void ShowTree(GXemul& gxemul, refcount_ptr<Component> node,
+	const string& branch)
+{
+	ShowMsg(gxemul, "ShowTree: TODO\n");
+}
+
+
+void TreeCommand::Execute(GXemul& gxemul, const vector<string>& arguments)
+{
+	ShowTree(gxemul, gxemul.GetRootComponent(), "");
+}
+
+
+string TreeCommand::GetShortDescription() const
+{
+	return "Dumps the current component configuration tree.";
+}
+
+
+string TreeCommand::GetLongDescription() const
+{
+	return "Dumps the current component configuration tree.";
+}
+

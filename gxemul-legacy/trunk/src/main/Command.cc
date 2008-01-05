@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Command.cc,v 1.2 2008-01-02 12:39:13 debug Exp $
+ *  $Id: Command.cc,v 1.3 2008-01-05 13:13:50 debug Exp $
  */
 
 #include "Command.h"
@@ -66,17 +66,17 @@ public:
 	{
 	}
 
-	void Execute(GXemul& gxemul, vector<string>& arguments)
+	void Execute(GXemul& gxemul, const vector<string>& arguments)
 	{
 		m_value ++;
 	}
 
-	string GetShortDescription()
+	string GetShortDescription() const
 	{
 		return "A dummy command used for unit testing.";
 	}
 
-	string GetLongDescription()
+	string GetLongDescription() const
 	{
 		return "This is just a dummy command used for unit testing.";
 	}
@@ -103,7 +103,7 @@ static void Test_Command_DummyCommand()
 
 }
 
-void Command::RunUnitTests(int& nSucceeded, int& nFailures)
+UNITTESTS(Command)
 {
 	UNITTEST(Test_Command_DummyCommand);
 }

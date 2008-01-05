@@ -1,5 +1,5 @@
-#ifndef VERSIONCOMMAND_H
-#define	VERSIONCOMMAND_H
+#ifndef TREECOMMAND_H
+#define	TREECOMMAND_H
 
 /*
  *  Copyright (C) 2008  Anders Gavare.  All rights reserved.
@@ -28,31 +28,32 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: VersionCommand.h,v 1.2 2008-01-05 13:13:50 debug Exp $
+ *  $Id: TreeCommand.h,v 1.1 2008-01-05 13:13:49 debug Exp $
  */
 
 #include "misc.h"
 
 #include "Command.h"
-#include "UnitTest.h"
 
 
 /**
- * \brief A Command which prints the version of the application.
+ * \brief A Command which prints the tree that makes up the current
+ *	emulation setup.
  */
-class VersionCommand
+class TreeCommand
 	: public Command
 {
 public:
 	/**
-	 * \brief Constructs a %VersionCommand.
+	 * \brief Constructs a %TreeCommand.
 	 */
-	VersionCommand();
+	TreeCommand();
 
-	virtual ~VersionCommand();
+	virtual ~TreeCommand();
 
 	/**
-	 * \brief Executes the command: Prints the application version.
+	 * \brief Executes the command: Dumps the current emulation setup
+	 *	configuration tree.
 	 *
 	 * @param gxemul A reference to the GXemul instance.
 	 * @param arguments A vector of zero or more string arguments.
@@ -62,12 +63,7 @@ public:
 	virtual string GetShortDescription() const;
 
 	virtual string GetLongDescription() const;
-
-
-	/********************************************************************/
-
-	static void RunUnitTests(int& nSucceeded, int& nFailures);
 };
 
 
-#endif	// VERSIONCOMMAND_H
+#endif	// TREECOMMAND_H

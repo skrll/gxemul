@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: QuitCommand.h,v 1.2 2008-01-02 12:39:13 debug Exp $
+ *  $Id: QuitCommand.h,v 1.3 2008-01-05 13:13:49 debug Exp $
  */
 
 #include "misc.h"
@@ -58,11 +58,12 @@ public:
 	 * @param gxemul A reference to the GXemul instance.
 	 * @param arguments A vector of zero or more string arguments.
 	 */
-	virtual void Execute(GXemul& gxemul, vector<string>& arguments);
+	virtual void Execute(GXemul& gxemul,
+		const vector<string>& arguments);
 
-	virtual string GetShortDescription();
+	virtual string GetShortDescription() const;
 
-	virtual string GetLongDescription();
+	virtual string GetLongDescription() const;
 
 
 	/********************************************************************/

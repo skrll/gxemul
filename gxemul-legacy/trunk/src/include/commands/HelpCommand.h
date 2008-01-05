@@ -1,5 +1,5 @@
-#ifndef VERSIONCOMMAND_H
-#define	VERSIONCOMMAND_H
+#ifndef HELPCOMMAND_H
+#define	HELPCOMMAND_H
 
 /*
  *  Copyright (C) 2008  Anders Gavare.  All rights reserved.
@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: VersionCommand.h,v 1.2 2008-01-05 13:13:50 debug Exp $
+ *  $Id: HelpCommand.h,v 1.1 2008-01-05 13:13:49 debug Exp $
  */
 
 #include "misc.h"
@@ -38,36 +38,32 @@
 
 
 /**
- * \brief A Command which prints the version of the application.
+ * \brief A Command which prints help messages for commands.
  */
-class VersionCommand
+class HelpCommand
 	: public Command
 {
 public:
 	/**
-	 * \brief Constructs a %VersionCommand.
+	 * \brief Constructs a %HelpCommand.
 	 */
-	VersionCommand();
+	HelpCommand();
 
-	virtual ~VersionCommand();
+	virtual ~HelpCommand();
 
 	/**
-	 * \brief Executes the command: Prints the application version.
+	 * \brief Executes the help command.
 	 *
 	 * @param gxemul A reference to the GXemul instance.
 	 * @param arguments A vector of zero or more string arguments.
 	 */
-	virtual void Execute(GXemul& gxemul, const vector<string>& arguments);
+	virtual void Execute(GXemul& gxemul,
+		const vector<string>& arguments);
 
 	virtual string GetShortDescription() const;
 
 	virtual string GetLongDescription() const;
-
-
-	/********************************************************************/
-
-	static void RunUnitTests(int& nSucceeded, int& nFailures);
 };
 
 
-#endif	// VERSIONCOMMAND_H
+#endif	// HELPCOMMAND_H

@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: VersionCommand.cc,v 1.1 2008-01-02 12:39:13 debug Exp $
+ *  $Id: VersionCommand.cc,v 1.2 2008-01-05 13:13:50 debug Exp $
  */
 
 #include "commands/VersionCommand.h"
@@ -43,7 +43,7 @@ VersionCommand::~VersionCommand()
 }
 
 
-void VersionCommand::Execute(GXemul& gxemul, vector<string>& arguments)
+void VersionCommand::Execute(GXemul& gxemul, const vector<string>& arguments)
 {
 	if (gxemul.GetUI() != NULL)
 		gxemul.GetUI()->ShowDebugMessage(
@@ -52,13 +52,13 @@ void VersionCommand::Execute(GXemul& gxemul, vector<string>& arguments)
 }
 
 
-string VersionCommand::GetShortDescription()
+string VersionCommand::GetShortDescription() const
 {
 	return "Prints version information.";
 }
 
 
-string VersionCommand::GetLongDescription()
+string VersionCommand::GetLongDescription() const
 {
 	return "Prints version information.";
 }
@@ -78,7 +78,7 @@ static void Test_VersionCommand_DontAcceptArgs()
 	    cmd->GetArgumentFormat() == "");
 }
 
-void VersionCommand::RunUnitTests(int& nSucceeded, int& nFailures)
+UNITTESTS(VersionCommand)
 {
 	UNITTEST(Test_VersionCommand_DontAcceptArgs);
 }

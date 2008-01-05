@@ -1,4 +1,4 @@
-$Id: HISTORY,v 1.1675 2008-01-02 12:39:13 debug Exp $
+$Id: HISTORY,v 1.1676 2008-01-05 13:13:49 debug Exp $
 
 Changelog for GXemul:
 ---------------------
@@ -3773,5 +3773,26 @@ Changelog for GXemul:
 		Adding a Command base class, and adding the first command,
 		which is "quit" :-).
 		Simplifying the syntax of the UNITTEST macro.
-20080102	Implementing CommandInterpreter::RunCommand, so that commands
-		can be executed. "quit" and "version" work interactively :)
+20080102	Adding a section about GXemul being Free Software to intro.html
+		(same as in previous versions of GXemul).
+		Implementing CommandInterpreter::RunCommand, so that commands
+		can be executed. "help", "quit", and "version" work
+		interactively now :)
+20080103	CTRL-A/E (for start/end of line) and CTRL-B/F (for back/
+		forward cursor movement) now work in the console UI.
+		Mapping ANSI/VTxxx/xterm cursor keys (escape + [ + misc) to
+		CTRL-A/E/B/F/N/P.
+		Adding command history support to the CommandInterpreter.
+		Classes that perform unit tests using the UNITTESTS(classname)
+		macro are now tested (almost) automagically by
+		UnitTest::RunTests(). (.h files must still be included.)
+20080104	Connecting cursor up/down keys to the command history.
+		Adding Component::Clone. (Not really used yet.)
+		Adding CTRL-D support to the command interpreter (remove
+		character to the right).
+		Actions will now be placed in src/main/actions/.
+		Implementing an AddComponentAction.
+20080105	Beginning on TAB completion in the CommandInterpreter.
+		Implementing the UndoCommand and the RedoCommand.
+		Adding CTRL-K (kill end of line) to the command interpreter.
+		Implementing RemoveComponentAction.

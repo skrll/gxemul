@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Checksum.cc,v 1.2 2008-01-02 10:56:41 debug Exp $
+ *  $Id: Checksum.cc,v 1.3 2008-01-05 13:13:50 debug Exp $
  */
 
 #include "Checksum.h"
@@ -45,9 +45,8 @@ uint64_t Checksum::Value() const
 
 void Checksum::Add(uint64_t x)
 {
-	m_value = (m_value << 3) * (x + 0x0151429517851bfaLL)
-		+ (m_value >> 2) * (x - 0x1ffa97251258fa9aLL);
-	m_value += (m_value * 0xf89247) ^ 0x339faa9010900f57LL;
+	m_value += x * 0xc151429517851bfbLL;
+	m_value ^= 0x9183bfec01921947ULL;
 }
 
 
@@ -145,6 +144,20 @@ static void Test_Checksum_OrderIsSignificant_String()
 	UnitTest::Assert("valueA and valueB should differ", valueA != valueB);
 }
 
+static void Test_Checksum_OrderIsSignificant_String_1()
+{
+	Checksum checksumA;
+	Checksum checksumB;
+
+	checksumA.Add("abcdef");
+	uint64_t valueA = checksumA.Value();
+	
+	checksumB.Add("abdcef");
+	uint64_t valueB = checksumB.Value();
+
+	UnitTest::Assert("valueA and valueB should differ", valueA != valueB);
+}
+
 static void Test_Checksum_OrderIsSignificant_String_2()
 {
 	Checksum checksumA;
@@ -156,6 +169,24 @@ static void Test_Checksum_OrderIsSignificant_String_2()
 	
 	checksumB.Add("hello");
 	checksumB.Add(" world");
+	uint64_t valueB = checksumB.Value();
+
+	UnitTest::Assert("valueA and valueB should differ", valueA != valueB);
+}
+
+static void Test_Checksum_OrderIsSignificant_String_3()
+{
+	Checksum checksumA;
+	Checksum checksumB;
+
+	checksumA.Add("string x \"modified\"\n");
+	checksumA.Add("string y \"value 2\"\n");
+	checksumA.Add("string x \"value\\nhello\"\n");
+	uint64_t valueA = checksumA.Value();
+
+	checksumB.Add("string x \"value 1\"\n");
+	checksumB.Add("string y \"value 2\"\n");
+	checksumB.Add("string x \"value\\nhello\"\n");
 	uint64_t valueB = checksumB.Value();
 
 	UnitTest::Assert("valueA and valueB should differ", valueA != valueB);
@@ -176,14 +207,16 @@ static void Test_Checksum_String_Concatenation()
 	UnitTest::Assert("valueA and valueB should differ", valueA != valueB);
 }
 
-void Checksum::RunUnitTests(int& nSucceeded, int& nFailures)
+UNITTESTS(Checksum)
 {
 	UNITTEST(Test_Checksum_DefaultValue);
 	UNITTEST(Test_Checksum_Add);
 	UNITTEST(Test_Checksum_SameChecksum);
 	UNITTEST(Test_Checksum_OrderIsSignificant_Numeric);
 	UNITTEST(Test_Checksum_OrderIsSignificant_String);
+	UNITTEST(Test_Checksum_OrderIsSignificant_String_1);
 	UNITTEST(Test_Checksum_OrderIsSignificant_String_2);
+	UNITTEST(Test_Checksum_OrderIsSignificant_String_3);
 	UNITTEST(Test_Checksum_String_Concatenation);
 }
 

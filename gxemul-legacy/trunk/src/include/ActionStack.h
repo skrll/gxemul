@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ActionStack.h,v 1.8 2008-01-02 10:56:40 debug Exp $
+ *  $Id: ActionStack.h,v 1.9 2008-01-05 13:13:49 debug Exp $
  */
 
 #include "misc.h"
@@ -40,12 +40,17 @@
 /**
  * \brief A stack of Action objects, for implementing undo/redo functionality.
  *
- * Technically, the ActionStack consists of two stacks, one undo stack and
- * one redo stack.
- *
  * The main purpose of this class, together with the Action class, is to 
  * enable undo/redo functionality for the end user via the GUI, but the
  * functionality is also available from the text-only interface.
+ *
+ * Technically, the %ActionStack consists of two lists, one for Undo, and one
+ * for Redo. By using lists, the time required for pushing and poping is
+ * O(1).
+ *
+ * All modifications to the GXemul instance' Component tree should be done
+ * using Actions, which are executed only using the ActionStack's
+ * PushActionAndExecute function, or by the Undo/Redo functions.
  */
 class ActionStack
 	: public UnitTestable
@@ -115,7 +120,7 @@ public:
 	 * time by using undo/redo. As soon as the user issues a new action,
 	 * this breaks the possibility to go forward in the old redo history.
 	 *
-	 * If the Action is not undoable, the undo stack is cleared.
+	 * If the %Action is not undoable, the undo stack is cleared.
 	 * Otherwise, the undo stack is kept, and the action is pushed
 	 * onto the stack.
 	 *
@@ -130,7 +135,7 @@ public:
 	/**
 	 * \brief Undoes the last pushed Action, if any.
 	 *
-	 * The Action's Undo function is executed, and the Action is moved
+	 * The Action's Undo function is executed, and the %Action is moved
 	 * to the redo stack from the undo stack.
 	 *
 	 * @return true if an action was undone, false if the undo stack
@@ -141,7 +146,7 @@ public:
 	/**
 	 * \brief Redoes an Action from the redo stack, if any is available.
 	 *
-	 * The Action's Execute function is executed, and the Action is moved
+	 * The Action's Execute function is executed, and the %Action is moved
 	 * to the undo stack from the redo stack.
 	 *
 	 * @return true if an action was redone, false if the redo stack

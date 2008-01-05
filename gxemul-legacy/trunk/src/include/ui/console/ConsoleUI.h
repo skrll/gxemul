@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ConsoleUI.h,v 1.3 2008-01-02 10:56:41 debug Exp $
+ *  $Id: ConsoleUI.h,v 1.4 2008-01-05 13:13:50 debug Exp $
  */
 
 #include <termios.h>
@@ -70,11 +70,26 @@ public:
 	virtual void ShowDebugMessage(const string& msg);
 
 	/**
-	 * \brief Echoes a character to the command line input field.
+	 * \brief Redisplays the interactive command input line.
 	 *
-	 * @param ch The character to output.
+	 * For the %ConsoleUI, this function displays a prompt ("GXemul> ")
+	 * followed by the input line, placing the cursor position at
+	 * the correct position on the input line.
+	 *
+	 * @param inputline The entire input line.
+	 * @param cursorPosition The current cursor position. 0 is at the
+	 *	leftmost position.
 	 */
-	virtual void ShowInputLineCharacter(stringchar ch);
+	virtual void RedisplayInputLine(const string& inputline,
+	    size_t cursorPosition);
+
+	/**
+	 * \brief Executed by the CommandInterpreter when a line has been
+	 * completed (with a newline).
+	 *
+	 * For the %ConsoleUI, this simply outputs a newline character.
+	 */
+	virtual void InputLineDone();
 
 	/**
 	 * \brief Runs the text console main loop.

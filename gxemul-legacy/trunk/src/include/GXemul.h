@@ -27,7 +27,7 @@
  *  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *  SUCH DAMAGE.
  *
- *  $Id: GXemul.h,v 1.11 2008-01-02 10:56:41 debug Exp $
+ *  $Id: GXemul.h,v 1.12 2008-01-05 13:13:49 debug Exp $
  */
 
 #include "misc.h"
@@ -44,14 +44,19 @@
  * Its main purpose is to run the GUI main loop, or the text terminal
  * main loop.
  *
- * A GXemul instance basically has the following member variables:
+ * A %GXemul instance basically has the following member variables:
  *
  * <ol>
  *	<li>a tree of components, which make up the full
  *		state of the current emulation setup
  *	<li>an ActionStack, for undo/redo functionality
  *	<li>a CommandInterpreter
+ *	<li>a RunState
  * </ol>
+ *
+ * The implementation file, GXemul.cc, contains both the class implementation
+ * and the main() function of the application. The %GXemul class is also
+ * responsible for starting execution of unit tests.
  */
 class GXemul
 {
@@ -99,6 +104,13 @@ public:
 	CommandInterpreter& GetCommandInterpreter();
 
 	/**
+	 * \brief Gets a reference to the ActionStack.
+	 *
+	 * @return a reference to the %GXemul instance' ActionStack
+	 */
+	ActionStack& GetActionStack();
+
+	/**
 	 * \brief Gets a pointer to the %GXemul instance' active UI.
 	 *
 	 * Note: May return NULL if no UI has been initialized.
@@ -106,6 +118,15 @@ public:
 	 * @return A pointer to the UI in use.
 	 */
 	UI* GetUI();
+
+	/**
+	 * \brief Gets a pointer to the root configuration component.
+	 *
+	 * @return A pointer to the root component. If no configuration tree
+	 *	is loaded, then this is at least an empty dummy component.
+	 *	(The return value is never NULL.)
+	 */
+	refcount_ptr<Component> GetRootComponent();
 
 	/**
 	 * \brief Sets the RunState.
@@ -120,6 +141,13 @@ public:
 	 * @return The current RunState.
 	 */
 	RunState GetRunState() const;
+
+	/**
+	 * \brief Gets the current RunState as a string.
+	 *
+	 * @return The current RunState, formatted as a string.
+	 */
+	string GetRunStateAsString() const;
 
 
 private:

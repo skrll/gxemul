@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Action.h,v 1.5 2007-12-28 19:08:44 debug Exp $
+ *  $Id: Action.h,v 1.6 2008-01-05 13:13:49 debug Exp $
  */
 
 #include "misc.h"
@@ -48,35 +48,29 @@ public:
 	/**
 	 * \brief Base constructor for an Action.
 	 *
-	 * @param strClassName		The name of the action class.
-	 *				It should be a short, descriptive name,
-	 *				e.g. "add component".
-	 * @param strDescription	A short description describing the
-	 *				action. For e.g. the "add component"
-	 *				action, it can be "Adds a component to
-	 *				the current configuration tree."
-	 * @param undoable		True if the action is undoable, false
-	 *				if it should clear the undo stack on
-	 *				execution.
+	 * @param description	A short description describing the
+	 *			action. For e.g. the "add component"
+	 *			action, it can be "add component".
+	 * @param undoable	True if the action is undoable, false
+	 *			if it should clear the undo stack on
+	 *			execution.
 	 */
-	Action(const string& strClassName,
-		const string& strDescription,
-		bool undoable = true);
+	Action(const string& description, bool undoable = true);
 
 	virtual ~Action();
 
 	/**
-	 * \brief Called to execute the Action.
+	 * \brief Called to execute the %Action.
 	 */
 	virtual void Execute() = 0;
 
 	/**
-	 * \brief Called to execute the Action in reverse, i.e. undo it.
+	 * \brief Called to execute the %Action in reverse, i.e. undo it.
 	 */
 	virtual void Undo() = 0;
 
 	/**
-	 * \brief Checks if the Action is undoable.
+	 * \brief Checks if the %Action is undoable.
 	 *
 	 * @return true if the action is undoable (i.e. if the Undo
 	 *		function is implemented in a meaningful way),
@@ -84,9 +78,15 @@ public:
 	 */
 	bool IsUndoable() const;
 
+	/**
+	 * \brief Retrieves the description of the %Action.
+	 *
+	 * @return The description of the %Action.
+	 */
+	const string& GetDescription() const;
+
 private:
-	string	m_strClassName;
-	string	m_strDescription;
+	string	m_description;
 	bool	m_undoable;
 };
 

@@ -25,17 +25,14 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Action.cc,v 1.3 2007-12-28 19:08:44 debug Exp $
+ *  $Id: Action.cc,v 1.4 2008-01-05 13:13:50 debug Exp $
  */
 
 #include "Action.h"
 
 
-Action::Action(const string& strClassName,
-		const string& strDescription,
-		bool undoable)
-	: m_strClassName(strClassName)
-	, m_strDescription(strDescription)
+Action::Action(const string& description, bool undoable)
+	: m_description(description)
 	, m_undoable(undoable)
 {
 }
@@ -49,5 +46,11 @@ Action::~Action()
 bool Action::IsUndoable() const
 {
 	return m_undoable;
+}
+
+
+const string& Action::GetDescription() const
+{
+	return m_description;
 }
 

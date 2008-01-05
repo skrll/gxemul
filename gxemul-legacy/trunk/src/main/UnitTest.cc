@@ -25,18 +25,26 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: UnitTest.cc,v 1.8 2008-01-02 12:39:13 debug Exp $
+ *  $Id: UnitTest.cc,v 1.9 2008-01-05 13:13:50 debug Exp $
  */
 
 #include <iostream>
+#include <sstream>
 
 #include "misc.h"
 #include "UnitTest.h"
 
-// Classes to test:
+// The list of classes to test is detected by the configure script, and
+// placed in unittest.h, but we still need to include header files.
+//
+// TODO: Solve this in a nicer way.
+//
 #include "ActionStack.h"
+#include "actions/AddComponentAction.h"
+#include "actions/RemoveComponentAction.h"
 #include "Checksum.h"
 #include "Command.h"
+#include "commands/HelpCommand.h"
 #include "commands/QuitCommand.h"
 #include "commands/VersionCommand.h"
 #include "CommandInterpreter.h"
@@ -50,6 +58,29 @@ void UnitTest::Assert(const string& strFailMessage, bool bCondition)
 {
 	if (!bCondition)
 		Fail(strFailMessage);
+}
+
+
+void UnitTest::Assert(const string& strFailMessage,
+	size_t actualValue, size_t expectedValue)
+{
+	if (actualValue != expectedValue) {
+		std::stringstream ss;
+		ss << strFailMessage <<
+		    "\n\tExpected: " << expectedValue <<
+		    "\n\tbut was:  " << actualValue;
+		Fail(ss.str());
+	}
+}
+
+
+void UnitTest::Assert(const string& strFailMessage,
+	const string& actualValue, const string& expectedValue)
+{
+	if (actualValue != expectedValue)
+		Fail(strFailMessage +
+		    "\n\tExpected: " + expectedValue +
+		    "\n\tbut was:  " + actualValue);
 }
 
 
@@ -78,19 +109,7 @@ int UnitTest::RunTests()
 {
 	int nSucceeded = 0, nFailed = 0;
 
-	// Misc.:
-	ActionStack::RunUnitTests(nSucceeded, nFailed);
-	Checksum::RunUnitTests(nSucceeded, nFailed);
-	Command::RunUnitTests(nSucceeded, nFailed);
-	CommandInterpreter::RunUnitTests(nSucceeded, nFailed);
-	DummyComponent::RunUnitTests(nSucceeded, nFailed);
-	EscapedString::RunUnitTests(nSucceeded, nFailed);
-	StateVariable::RunUnitTests(nSucceeded, nFailed);
-	StateVariableValue::RunUnitTests(nSucceeded, nFailed);
-
-	// Commands:
-	QuitCommand::RunUnitTests(nSucceeded, nFailed);
-	VersionCommand::RunUnitTests(nSucceeded, nFailed);
+#include "../../unittest.h"
 
 	if (nFailed == 0)
 		std::cerr << nSucceeded << " (all) tests passed.\n";
