@@ -25,11 +25,10 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: StateVariableValue.cc,v 1.3 2008-01-05 13:13:50 debug Exp $
+ *  $Id: StateVariableValue.cc,v 1.4 2008-01-12 08:29:56 debug Exp $
  */
 
 #include "assert.h"
-#include <sstream>
 
 #include "EscapedString.h"
 #include "StateVariableValue.h"
@@ -140,7 +139,7 @@ string StateVariableValue::GetTypeString() const
 
 string StateVariableValue::ToString() const
 {
-	std::stringstream sstr;
+	stringstream sstr;
 
 	switch (m_type) {
 	case Empty:

@@ -1,4 +1,4 @@
-$Id: HISTORY,v 1.1676 2008-01-05 13:13:49 debug Exp $
+$Id: HISTORY,v 1.1677 2008-01-12 08:29:55 debug Exp $
 
 Changelog for GXemul:
 ---------------------
@@ -3796,3 +3796,46 @@ Changelog for GXemul:
 		Implementing the UndoCommand and the RedoCommand.
 		Adding CTRL-K (kill end of line) to the command interpreter.
 		Implementing RemoveComponentAction.
+20080106	Classes that use UNITTESTS(classname) are now fully auto
+		tested, no need to manually include .h files anymore. (This
+		relies on the fact that .h files have names that are exactly
+		the same as the class name they represent, otherwise it would
+		not work that well.) Updating some Doxygen comments to reflect
+		the current state of automagic unit testing.
+		Renaming TODO to doc/TODO.html.
+		Changing the Doxyfile to include full .cc source code in
+		the built documentation.
+20080107	The "tree" command now shows a fancy ASCII tree of components.
+		Beginning on the "add" command (AddComponentCommand).
+		Components now get names based on their class name, followed
+		by a zero-based increasing integer, e.g. dummy0, dummy1, etc.
+		when added (if they don't already have a unique name).
+20080108	TAB complete of empty string now shows all available commands.
+		Implementing Component helpers: GeneratePath and LookupPath.
+		The "add" command now takes path into account, but it must be
+		a complete path from the root component (i.e. "root.blahblah").
+		Component::Serialize now serializes into a std::stringstream
+		instead of returning a plain string.
+20080109	Implementing Component::FindPathByPartialMatch (helper func.).
+		The "add" command now uses FindPathByPartialMatch for the
+		where-to-add argument.
+		Tab completion now expands component names :)  also using
+		FindPathByPartialMatch. (Syntax of different parts of a
+		command line are not taken into account yet, though, so it
+		also for example tries to expand the argument of the "help"
+		command as a component name.)
+		Component::Serialize now serializes into an ostream instead
+		of a stringstream.
+		Implementing the "save" command.
+		CTRL-T now runs a "status" command (not yet implemented),
+		instead of using a status line hack of its own.
+		Implementing ClearEmulationAction and LoadEmulationAction.
+		Implementing the "close" and "load" commands.
+20080110	Making the LoadEmulationAction undo-able (in the case the new
+		component was added to the tree, and did not entierly
+		replace the root component).
+20080112	The gxemul binary can now be started with a config file as
+		an argument, which causes it to be loaded. The default RunState
+		is now Running on startup, and -V is used to set it to Paused.
+		Adding a NullUI, so that the result of GXemul::GetUI() does
+		not have to be checked all the time.

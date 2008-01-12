@@ -25,66 +25,75 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: QuitCommand.cc,v 1.4 2008-01-12 08:29:56 debug Exp $
+ *  $Id: LoadCommand.cc,v 1.1 2008-01-12 08:29:56 debug Exp $
  */
 
-#include "commands/QuitCommand.h"
+#include "actions/LoadEmulationAction.h"
+#include "commands/LoadCommand.h"
 #include "GXemul.h"
 
 
-QuitCommand::QuitCommand()
-	: Command("quit", "")
+LoadCommand::LoadCommand()
+	: Command("load", "[filename [component-path]]")
 {
 }
 
 
-QuitCommand::~QuitCommand()
+LoadCommand::~LoadCommand()
 {
 }
 
 
-void QuitCommand::Execute(GXemul& gxemul, const vector<string>& arguments)
+static void ShowMsg(GXemul& gxemul, const string& msg)
 {
-	gxemul.SetRunState(GXemul::Quitting);
+	gxemul.GetUI()->ShowDebugMessage(msg);
 }
 
 
-string QuitCommand::GetShortDescription() const
+void LoadCommand::Execute(GXemul& gxemul, const vector<string>& arguments)
 {
-	return "Quits the application.";
+	string filename = gxemul.GetEmulationFilename();
+	string path = "";
+
+	if (arguments.size() > 2) {
+		ShowMsg(gxemul, "Too many arguments.\n");
+		return;
+	}
+
+	if (arguments.size() > 0)
+		filename = arguments[0];
+
+	if (filename == "") {
+		ShowMsg(gxemul, "No filename given.\n");
+		return;
+	}
+
+	if (arguments.size() > 1)
+		path = arguments[1];
+
+	refcount_ptr<Action> loadAction = new LoadEmulationAction(gxemul,
+	    filename, path);
+	gxemul.GetActionStack().PushActionAndExecute(loadAction);
 }
 
 
-string QuitCommand::GetLongDescription() const
+string LoadCommand::GetShortDescription() const
 {
-	return "Quits the application.";
+	return "Loads an emulation from a file.";
 }
 
 
-/*****************************************************************************/
-
-
-#ifndef WITHOUTUNITTESTS
-
-static void Test_QuitCommand_Affect_RunState()
+string LoadCommand::GetLongDescription() const
 {
-	refcount_ptr<Command> cmd = new QuitCommand;
-	vector<string> dummyArguments;
-	
-	GXemul gxemul(false);
-
-	UnitTest::Assert("the default GXemul instance should be Running",
-	    gxemul.GetRunState() == GXemul::Running);
-
-	cmd->Execute(gxemul, dummyArguments);
-
-	UnitTest::Assert("runstate should have been changed to Quitting",
-	    gxemul.GetRunState() == GXemul::Quitting);
+	return "Loads an entire emulation setup, or a part of it, from a "
+	    "file in the filesystem.\n"
+	    "The filename may be omitted, if it is known from an"
+	    " earlier save or load\n"
+	    "command. If the component path is omitted, the loaded "
+	    "emulation replaces any\n"
+	    "currently loaded emulation. If a component path is specified, "
+	    "the new\ncomponent is added as a child to that path.\n"
+	    "\n"
+	    "See also:  save    (to save an emulation to a file)\n";
 }
 
-UNITTESTS(QuitCommand)
-{
-	UNITTEST(Test_QuitCommand_Affect_RunState);
-}
-
-#endif

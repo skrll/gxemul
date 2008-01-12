@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Command.h,v 1.3 2008-01-05 13:13:49 debug Exp $
+ *  $Id: Command.h,v 1.4 2008-01-12 08:29:56 debug Exp $
  */
 
 #include "misc.h"
@@ -40,6 +40,13 @@ class GXemul;
 
 /**
  * \brief A %Command is a named function, executed by the CommandInterpreter.
+ *
+ * To implement a new %Command, simply create the corresponding .h file
+ * in src/include/commands/ and a .cc file in src/main/commands/ (e.g. by
+ * copying from a similar command), and add the name of the command's .o
+ * file to src/main/commands/Makefile.skel. (The configure script takes care
+ * of adding all commands to the CommandInterpreter, so there is no need
+ * to manually "register" the command anywhere.)
  */
 class Command
 	: public ReferenceCountable

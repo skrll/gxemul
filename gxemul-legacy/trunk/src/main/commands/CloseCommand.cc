@@ -25,66 +25,46 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: QuitCommand.cc,v 1.4 2008-01-12 08:29:56 debug Exp $
+ *  $Id: CloseCommand.cc,v 1.1 2008-01-12 08:29:56 debug Exp $
  */
 
-#include "commands/QuitCommand.h"
+#include "actions/ClearEmulationAction.h"
+#include "commands/CloseCommand.h"
 #include "GXemul.h"
 
 
-QuitCommand::QuitCommand()
-	: Command("quit", "")
+CloseCommand::CloseCommand()
+	: Command("close", "")
 {
 }
 
 
-QuitCommand::~QuitCommand()
+CloseCommand::~CloseCommand()
 {
 }
 
 
-void QuitCommand::Execute(GXemul& gxemul, const vector<string>& arguments)
+void CloseCommand::Execute(GXemul& gxemul, const vector<string>& arguments)
 {
-	gxemul.SetRunState(GXemul::Quitting);
+	// TODO: Confirmation? ("Are you sure you wish to close...")
+
+	refcount_ptr<Action> clearEmulationAction =
+	    new ClearEmulationAction(gxemul);
+
+	gxemul.GetActionStack().PushActionAndExecute(clearEmulationAction);
 }
 
 
-string QuitCommand::GetShortDescription() const
+string CloseCommand::GetShortDescription() const
 {
-	return "Quits the application.";
+	return "Discards (closes) the current emulation.";
 }
 
 
-string QuitCommand::GetLongDescription() const
+string CloseCommand::GetLongDescription() const
 {
-	return "Quits the application.";
+	return "Closes (discards) the current emulation.\n"
+	    "\n"
+	    "See also:  load    (to load an existing emulation)\n";
 }
 
-
-/*****************************************************************************/
-
-
-#ifndef WITHOUTUNITTESTS
-
-static void Test_QuitCommand_Affect_RunState()
-{
-	refcount_ptr<Command> cmd = new QuitCommand;
-	vector<string> dummyArguments;
-	
-	GXemul gxemul(false);
-
-	UnitTest::Assert("the default GXemul instance should be Running",
-	    gxemul.GetRunState() == GXemul::Running);
-
-	cmd->Execute(gxemul, dummyArguments);
-
-	UnitTest::Assert("runstate should have been changed to Quitting",
-	    gxemul.GetRunState() == GXemul::Quitting);
-}
-
-UNITTESTS(QuitCommand)
-{
-	UNITTEST(Test_QuitCommand_Affect_RunState);
-}
-
-#endif

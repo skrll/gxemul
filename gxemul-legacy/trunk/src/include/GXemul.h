@@ -27,7 +27,7 @@
  *  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *  SUCH DAMAGE.
  *
- *  $Id: GXemul.h,v 1.12 2008-01-05 13:13:49 debug Exp $
+ *  $Id: GXemul.h,v 1.13 2008-01-12 08:29:56 debug Exp $
  */
 
 #include "misc.h"
@@ -87,6 +87,12 @@ public:
 	bool ParseOptions(int argc, char *argv[]);
 
 	/**
+	 * \brief Discards the current emulation, and starts anew with just
+	 *	an empty root component.
+	 */
+	void ClearEmulation();
+
+	/**
 	 * \brief Runs GXemul's main loop.
 	 *
 	 * This can be either a GUI main loop, or
@@ -95,6 +101,22 @@ public:
 	 * @return Zero on success, non-zero on error.
 	 */
 	int Run();
+
+	/**
+	 * \brief Gets the current emulation setup's filename.
+	 *
+	 * @return The name of the file that is used for the current emulation
+	 *	setup. If no filename is defined yet, this is an empty string.
+	 */
+	const string& GetEmulationFilename() const;
+
+	/**
+	 * \brief Sets the current emulation setup's filename.
+	 *
+	 * @param filename This is the name of the file that is used
+	 *	for the current emulation setup.
+	 */
+	void SetEmulationFilename(const string& filename);
 
 	/**
 	 * \brief Gets a reference to the CommandInterpreter.
@@ -129,6 +151,17 @@ public:
 	refcount_ptr<Component> GetRootComponent();
 
 	/**
+	 * \brief Sets the root component, discarding the previous one.
+	 *
+	 * This function should not be used to set the root component
+	 * to NULL. Use ClearEmulation() instead.
+	 *
+	 * @param newRootComponent A reference counted pointer to the new
+	 *	root component. It may not be a NULL pointer.
+	 */
+	void SetRootComponent(refcount_ptr<Component> newRootComponent);
+
+	/**
 	 * \brief Sets the RunState.
 	 *
 	 * @param newState The new RunState.
@@ -154,12 +187,13 @@ private:
 	/**
 	 * \brief Prints help message to std::cout.
 	 *
-	 * @param bLong true if the long help message should be printed,
+	 * @param longUsage True if the long help message should be printed,
 	 *		false to only print a short message.
 	 */
-	void PrintUsage(bool bLong) const;
+	void PrintUsage(bool longUsage) const;
 
 private:
+	string			m_emulationFileName;
 	RunState		m_runState;
 	bool			m_bWithGUI;
 	bool			m_bRunUnitTests;

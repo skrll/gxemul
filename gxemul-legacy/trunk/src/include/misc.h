@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: misc.h,v 1.270 2008-01-02 10:56:41 debug Exp $
+ *  $Id: misc.h,v 1.271 2008-01-12 08:29:56 debug Exp $
  *
  *  Misc. definitions for GXemul.
  */
@@ -70,12 +70,16 @@ typedef char stringchar;
 
 #include <list>
 #include <map>
+#include <ostream>
 #include <set>
+#include <sstream>
 #include <vector>
 using std::auto_ptr;
 using std::list;
 using std::map;
+using std::ostream;
 using std::set;
+using std::stringstream;
 using std::vector;
 
 

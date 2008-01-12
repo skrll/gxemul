@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ConsoleUI.cc,v 1.5 2008-01-05 13:13:50 debug Exp $
+ *  $Id: ConsoleUI.cc,v 1.6 2008-01-12 08:29:57 debug Exp $
  */
 
 #include <signal.h>
@@ -60,7 +60,6 @@ static void ReshowCurrentCommandBuffer()
 {
 	if (g_GXemul->GetRunState() == GXemul::Paused) {
 		// Reshow the prompt and the current command line:
-		std::cout << "GXemul> ";
 		g_GXemul->GetCommandInterpreter().ReshowCurrentCommandBuffer();
 		std::cout.flush();
 	}

@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ActionStack.cc,v 1.8 2008-01-05 13:13:50 debug Exp $
+ *  $Id: ActionStack.cc,v 1.9 2008-01-12 08:29:56 debug Exp $
  */
 
 #include "ActionStack.h"
@@ -77,6 +77,9 @@ void ActionStack::PushActionAndExecute(refcount_ptr<Action>& pAction)
 		Clear();
 	}
 
+	// Note that the action is executed after any modification to the
+	// stack itself is done. This is because the Execute function may
+	// modify the stack too (e.g. by calling Clear()).
 	pAction->Execute();
 }
 

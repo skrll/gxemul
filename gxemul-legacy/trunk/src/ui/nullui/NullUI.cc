@@ -25,66 +25,51 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: QuitCommand.cc,v 1.4 2008-01-12 08:29:56 debug Exp $
+ *  $Id: NullUI.cc,v 1.1 2008-01-12 08:29:57 debug Exp $
  */
 
-#include "commands/QuitCommand.h"
+#include "ui/nullui/NullUI.h"
 #include "GXemul.h"
 
 
-QuitCommand::QuitCommand()
-	: Command("quit", "")
+NullUI::NullUI(GXemul *gxemul)
+	: UI(gxemul)
 {
 }
 
 
-QuitCommand::~QuitCommand()
+NullUI::~NullUI()
 {
 }
 
 
-void QuitCommand::Execute(GXemul& gxemul, const vector<string>& arguments)
+void NullUI::Initialize()
 {
-	gxemul.SetRunState(GXemul::Quitting);
 }
 
 
-string QuitCommand::GetShortDescription() const
+void NullUI::ShowStartupBanner()
 {
-	return "Quits the application.";
 }
 
 
-string QuitCommand::GetLongDescription() const
+void NullUI::ShowDebugMessage(const string& msg)
 {
-	return "Quits the application.";
 }
 
 
-/*****************************************************************************/
-
-
-#ifndef WITHOUTUNITTESTS
-
-static void Test_QuitCommand_Affect_RunState()
+void NullUI::RedisplayInputLine(const string& inputline, size_t cursorPosition)
 {
-	refcount_ptr<Command> cmd = new QuitCommand;
-	vector<string> dummyArguments;
-	
-	GXemul gxemul(false);
-
-	UnitTest::Assert("the default GXemul instance should be Running",
-	    gxemul.GetRunState() == GXemul::Running);
-
-	cmd->Execute(gxemul, dummyArguments);
-
-	UnitTest::Assert("runstate should have been changed to Quitting",
-	    gxemul.GetRunState() == GXemul::Quitting);
 }
 
-UNITTESTS(QuitCommand)
+
+void NullUI::InputLineDone()
 {
-	UNITTEST(Test_QuitCommand_Affect_RunState);
 }
 
-#endif
+
+int NullUI::MainLoop()
+{
+	return 0;
+}
+

@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: CommandInterpreter.h,v 1.5 2008-01-05 13:13:49 debug Exp $
+ *  $Id: CommandInterpreter.h,v 1.6 2008-01-12 08:29:56 debug Exp $
  */
 
 #include "misc.h"
@@ -160,6 +160,13 @@ private:
 	 * \brief Completes the word at the current position in the input line.
 	 */
 	void TabComplete();
+
+	/**
+	 * \brief Prints a list of available words (for tab completion).
+	 *
+	 * @param words A vector of all available words.
+	 */
+	void ShowAvailableWords(const vector<string>& words);
 
 
 	/********************************************************************/

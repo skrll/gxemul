@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile.skel,v 1.1 2008-01-05 13:13:50 debug Exp $
+#  $Id: Makefile.skel,v 1.2 2008-01-12 08:29:56 debug Exp $
 #
 #  Makefile for GXemul src/main/actions
 #
@@ -7,7 +7,8 @@
 CFLAGS=$(CWARNINGS) $(COPTIM) $(XINCLUDE) $(INCLUDE2)
 LIBS=$(XLIB) $(OTHERLIBS)
 
-OBJS=AddComponentAction.o RemoveComponentAction.o
+OBJS=AddComponentAction.o ClearEmulationAction.o LoadEmulationAction.o \
+	RemoveComponentAction.o
 
 all: $(OBJS)
 

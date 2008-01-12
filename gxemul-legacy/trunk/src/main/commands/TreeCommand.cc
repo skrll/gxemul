@@ -25,9 +25,10 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: TreeCommand.cc,v 1.1 2008-01-05 13:13:50 debug Exp $
+ *  $Id: TreeCommand.cc,v 1.2 2008-01-12 08:29:56 debug Exp $
  */
 
+#include "components/DummyComponent.h"
 #include "commands/TreeCommand.h"
 #include "GXemul.h"
 
@@ -45,32 +46,91 @@ TreeCommand::~TreeCommand()
 
 static void ShowMsg(GXemul& gxemul, const string& msg)
 {
-	if (gxemul.GetUI() != NULL)
-		gxemul.GetUI()->ShowDebugMessage(msg);
+	gxemul.GetUI()->ShowDebugMessage(msg);
 }
 
 
 static void ShowTree(GXemul& gxemul, refcount_ptr<Component> node,
-	const string& branch)
+	const string& branchTemplate)
 {
-	ShowMsg(gxemul, "ShowTree: TODO\n");
+	// Basically, this shows a tree which looks like:
+	//
+	//	root
+	//	|-- child1
+	//	|   |-- child1's child1
+	//	|   \-- child1's child2
+	//	\-- child2
+	//	    \-- child2's child
+	//
+	// TODO: Comment this better.
+
+	string branch;
+	for (size_t pos=0; pos<branchTemplate.length(); pos++) {
+		stringchar ch = branchTemplate[pos];
+		if (ch == '\\') {
+			if (pos < branchTemplate.length() - 4)
+				branch += ' ';
+			else
+				branch += ch;
+		} else {
+			if (pos == branchTemplate.length() - 3 ||
+			    pos == branchTemplate.length() - 2)
+				ch = '-';
+			branch += ch;
+		}
+	}
+
+	// Fallback to showing the component's class name in parentheses...
+	string name = "(unnamed " + node->GetClassName() + ")";
+
+	// ... but prefer the state variable "name" if it is available:
+	StateVariableValue value;
+	if (node->GetVariable("name", &value))
+		name = value.ToString();
+
+	string str = branch + name;
+
+	// If this component was created by a template, then show the template
+	// type in [ ].
+	StateVariableValue templateName;
+	if (node->GetVariable("template", &templateName))
+		str += "  [" + templateName.ToString() + "]";
+
+	// Show the branch of the tree...
+	ShowMsg(gxemul, "  " + str + "\n");
+
+	// ... and recurse to show children, if there are any:
+	const Components& children = node->GetChildren();
+	for (size_t i=0, n=children.size(); i<n; ++i) {
+		string subBranch = branchTemplate;
+		if (i == n-1)
+			subBranch += "\\   ";
+		else
+			subBranch += "|   ";
+
+		ShowTree(gxemul, children[i], subBranch);
+	}
 }
 
 
 void TreeCommand::Execute(GXemul& gxemul, const vector<string>& arguments)
 {
-	ShowTree(gxemul, gxemul.GetRootComponent(), "");
+	if (gxemul.GetRootComponent()->GetChildren().size() == 0)
+		ShowMsg(gxemul, "The emulation is empty; no components have"
+		    " been added yet.\n");
+	else
+		ShowTree(gxemul, gxemul.GetRootComponent(), "");
 }
 
 
 string TreeCommand::GetShortDescription() const
 {
-	return "Dumps the current component configuration tree.";
+	return "Shows the component configuration tree.";
 }
 
 
 string TreeCommand::GetLongDescription() const
 {
-	return "Dumps the current component configuration tree.";
+	return "Shows the component configuration tree.";
 }
 

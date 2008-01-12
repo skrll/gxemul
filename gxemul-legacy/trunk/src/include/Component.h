@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Component.h,v 1.8 2008-01-05 13:13:49 debug Exp $
+ *  $Id: Component.h,v 1.9 2008-01-12 08:29:56 debug Exp $
  */
 
 #include "misc.h"
@@ -104,7 +104,7 @@ public:
 	 * traversed.
 	 *
 	 * Note 2: After a component's state variables have been reset, the
-	 * parent's ResetVariables should be called.
+	 * base class' ResetVariables function should be called.
 	 *
 	 * The implementation of this function ususally takes the form of a
 	 * list of calls to Component::SetVariable.
@@ -130,7 +130,72 @@ public:
 	 * @return the pointer to the parent component, or NULL
 	 */
 	Component* GetParent();
-	
+
+	/**
+	 * \brief Generates a string representation of the path to the
+	 *	%Component.
+	 *
+	 * The path consists of "name.name...name.name" where the last name
+	 * is the name of this component, and the preceding names are names
+	 * of parents.
+	 *
+	 * If a component does not have a "name" state variable, then the
+	 * class name in parentheses is used instead (which may make the path
+	 * non-unique).
+	 *
+	 * @return A path to the component, as a string.
+	 */
+	string GeneratePath() const;
+
+	/**
+	 * \brief Looks up a path from this %Component,
+	 *	and returns a pointer to the found %Component, if any
+	 *
+	 * The first name in the path should match the name of this component.
+	 * If so, this function moves on to the next part of the path (if there
+	 * are more parts) and looks up a child with that name, and so on.
+	 *
+	 * @param path The path to the component, consisting of names with
+	 *	"." (period) between names.
+	 * @return A reference counted pointer to the looked up component,
+	 *	which is set to NULL if the path was not found.
+	 */
+	refcount_ptr<Component> LookupPath(const string& path);
+
+	/**
+	 * \brief Finds complete component paths, given a partial path.
+	 *
+	 * E.g. if the following components are available:<pre>
+	 *	root.machine0.isabus0
+	 *	root.machine1.pcibus0
+	 *	root.machine1.pcibus1
+	 *	root.machine2.pcibus0
+ 	 *	root.machine3.otherpci
+	 * </pre>
+	 *
+	 * then a search for "pci" would return<pre>
+	 *	root.machine1.pcibus0
+	 *	root.machine1.pcibus1
+	 *	root.machine2.pcibus0
+	 * </pre>
+	 * (note: not otherpci)
+	 *
+	 * A search for machine1 would return<pre>
+	 *	root.machine1
+	 * </pre>
+	 *
+	 * Multiple words separated by "." should also be possible, so
+	 * "machine2.pcibus" will find "root.machine2.pcibus0", but
+	 * "machine.pcibus" will <i>not</i> match anything.
+	 *
+	 * Searching for an empty string ("") returns a vector of <i>all</i>
+	 * component paths.
+	 *
+	 * @param partialPath The partial path to complete.
+	 * @return A vector of possible complete paths.
+	 */
+	vector<string> FindPathByPartialMatch(const string& partialPath) const;
+
 	/**
 	 * \brief Adds a reference to a child component.
 	 *
@@ -181,12 +246,12 @@ public:
 		const StateVariableValue& newValue);
 
 	/**
-	 * \brief Serializes the component into a string.
+	 * \brief Serializes the %Component into a string stream.
 	 *
-	 * @return a string, representing the current state of the component,
-	 *	including all its child components
+	 * @param ss An ostream which the %Component will be serialized to.
+	 * @param context A serialization context (used for TAB indentation).
 	 */
-	string Serialize(SerializationContext& context) const;
+	void Serialize(ostream& ss, SerializationContext& context) const;
 
 	/**
 	 * \brief Deserializes a string into a component tree.
@@ -221,6 +286,32 @@ public:
 	void AddChecksum(Checksum& checksum) const;
 	
 private:
+	/**
+	 * \brief Looks up a path from this %Component,
+	 *	and returns a pointer to the found %Component, if any
+	 *
+	 * The first name in the path should match the name of this component.
+	 * If so, this function moves on to the next part of the path (if there
+	 * are more parts) and looks up a child with that name, and so on.
+	 *
+	 * @param path The path to the component, split into separate names.
+	 *	This vector should contain at least 1 element.
+	 * @param index The index into the path vector, where the current
+	 *	lookup should start. (This is to avoid copying.)
+	 * @return A reference counted pointer to the looked up component,
+	 *	which is set to NULL if the path was not found.
+	 */
+	refcount_ptr<Component> LookupPath(const vector<string>& path,
+		size_t index);
+
+	/**
+	 * \brief Internal helper, which gathers a list of all component paths.
+	 *
+	 * @param allComponentPaths A vector which will be filled with all
+	 *	components' paths.
+	 */
+	void AddAllComponentPaths(vector<string>& allComponentPaths) const;
+
 	/**
 	 * \brief Disallow creation of %Component objects using the
 	 * default constructor.

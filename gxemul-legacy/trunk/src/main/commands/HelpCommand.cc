@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: HelpCommand.cc,v 1.1 2008-01-05 13:13:50 debug Exp $
+ *  $Id: HelpCommand.cc,v 1.2 2008-01-12 08:29:56 debug Exp $
  */
 
 #include "commands/HelpCommand.h"
@@ -33,7 +33,7 @@
 
 
 HelpCommand::HelpCommand()
-	: Command("help", "[cmd]")
+	: Command("help", "[command-name]")
 {
 }
 
@@ -49,29 +49,39 @@ void HelpCommand::Execute(GXemul& gxemul, const vector<string>& arguments)
 	Commands::const_iterator it;
 
 	if (arguments.size() > 1) {
-		if (gxemul.GetUI() != NULL)
-			gxemul.GetUI()->ShowDebugMessage("usage: help [cmd]\n");
+		gxemul.GetUI()->ShowDebugMessage("usage: help [cmd]\n");
 		return;
 	}
 
 	if (arguments.size() == 1) {
 		it = commands.find(arguments[0]);
 		if (it == commands.end()) {
-			if (gxemul.GetUI() != NULL)
-				gxemul.GetUI()->ShowDebugMessage(
-				    "Command \"" + arguments[0] +
-				    "\" unknown.\n");
+			gxemul.GetUI()->ShowDebugMessage(
+			    "Command \"" + arguments[0] + "\" unknown.\n");
 			return;
 		}
 		
-		string longhelp = arguments[0] + ":\n" +
-		    it->second->GetLongDescription();
+		// command name + " " + argument format
+		// ------------------------------------
+		//
+		// Long description.
+
+		string longhelp = arguments[0];
+		const string& argumentFormat = it->second->GetArgumentFormat();
+		if (argumentFormat != "")
+			longhelp += " " + argumentFormat;
+		int len = longhelp.length();
+
+		longhelp += "\n";
+		for (int i=0; i<len; i++)
+			longhelp += "-";
+		
+		longhelp += "\n\n" + it->second->GetLongDescription();
 		if (longhelp[longhelp.length() - 1] != '\n')
 			longhelp += '\n';
 		
-		if (gxemul.GetUI() != NULL)
-			gxemul.GetUI()->ShowDebugMessage(longhelp);
-		
+		gxemul.GetUI()->ShowDebugMessage("\n" + longhelp + "\n");
+
 		return;
 	}
 
@@ -104,8 +114,7 @@ void HelpCommand::Execute(GXemul& gxemul, const vector<string>& arguments)
 		
 		str += "    " + command.GetShortDescription();
 
-		if (gxemul.GetUI() != NULL)
-			gxemul.GetUI()->ShowDebugMessage(str + "\n");
+		gxemul.GetUI()->ShowDebugMessage(str + "\n");
 	}
 }
 

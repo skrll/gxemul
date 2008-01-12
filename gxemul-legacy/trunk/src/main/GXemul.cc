@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemul.cc,v 1.19 2008-01-05 13:13:50 debug Exp $
+ *  $Id: GXemul.cc,v 1.20 2008-01-12 08:29:56 debug Exp $
  *
  *  This file contains three things:
  *
@@ -49,16 +49,22 @@
  * comments throughout the source code.
  *
  * <ul><li><b>NOTE:</b> %GXemul 0.5.0 is a work in progress. Nothing is really
- * emulated yet, I am working on infrastructural things that are needed first,
- * before delving into actual emulation. If you are interested about the current
- * state of development, please see the <a href="../../../TODO">TODO</a> file.
- * </ul>
+ * emulated yet, I am working on core infrastructural things that are needed
+ * first, before delving into actual emulation. If you are interested about
+ * the current state of development, please see the
+ * <a href="../../TODO.html">TODO</a> file.</ul>
  *
  * See the <a href="../../index.html">main documentation</a> for more
  * information about this version of %GXemul.
  *
  * See GXemul's home page for more information about %GXemul in general:
  * <a href="http://gavare.se/gxemul/">http://gavare.se/gxemul/</a>
+ *
+ * Some people perhaps get a nice warm fuzzy feeling by knowing how a program
+ * starts up. In %GXemul's case, the main() function creates a GXemul instance,
+ * and after letting it parse command line options, calls GXemul::Run().
+ * This is the main loop. It doesn't really do much, it simply calls the UI's
+ * main loop, e.g. ConsoleUI::MainLoop().
  *
  * Most of the source code in %GXemul centers around a few core concepts.
  * An overview of these concepts are given below. Anyone who wishes to
@@ -82,7 +88,7 @@
  * Individual components are implemented in <tt>src/components/</tt>, with
  * header files in <tt>src/include/components/</tt>.
  *
- * \subsection undostack_subsec Undo stack of Actions
+ * \subsection undostack_subsec Actions, and the Undo stack
  *
  * Most actions that the user performs in %GXemul can be seen as reversible.
  * For example, adding a new Component to the configuration tree is a reversible
@@ -127,11 +133,11 @@
  *
  * Wherever it makes sense, unit tests should be written to make sure
  * that the code is correct. The UnitTest class contains static helper
- * functions for writing unit tests. To add unit tests to a class, the
- * class should be UnitTestable, and in particular, it should implement
- * UnitTestable::RunUnitTests. The exact way tests are performed may
- * differ between different classes, but using the UNITTEST(testname) macro
- * in src/include/UnitTest.h is preferable.
+ * functions for writing unit tests, such as UnitTest::Assert. To add unit
+ * tests to a class, the class should be UnitTestable, and in particular, it
+ * should implement UnitTestable::RunUnitTests by using the
+ * UNITTESTS macro. Individual test cases are then called, as static
+ * non-member functions, using the UNITTEST(testname) macro.
  *
  * Unit tests are normally executed by <tt>make test</tt>. This is implicitly
  * done when doing <tt>make install</tt> as well, for non-release builds.
@@ -184,9 +190,15 @@
  *		Do not use <tt>char</tt> for characters, use <tt>stringchar</tt>
  *		instead (typedeffed to <tt>gunichar</tt> if unicode is used).
  *	<li>Use i18n macros for user-visible strings, where it makes sense.
+ *	<li>.cc and .h files should be named exactly what the class name is,
+ *		not only for consistency for humans, but also because the
+ *		<tt>configure</tt> script relies on this when building a list
+ *		of classes that have the UNITTESTS macro in them.
  *	<li>Simple and easy-to-read code is preferable; only optimize after
  *		profiling, when it is known which code paths are in need
  *		of optimization.
+ *	<li>Use several different compilers; try to build often on as many
+ *		different systems as possible, to spot compatibility issues.
  *	<li>Insert uppercase <tt>TODO</tt> if something is unclear at the time
  *		of implementation. Periodically do a <tt>grep -R TODO src</tt>
  *		to hunt down these TODOs and fix them permanently.
@@ -202,6 +214,7 @@
 /*****************************************************************************/
 
 
+#include <assert.h>
 #include <iostream>
 
 #include "misc.h"
@@ -212,8 +225,10 @@
 #include <gtkmm.h>
 #include "ui/gtkmm/GtkmmUI.h"
 #endif
+#include "ui/nullui/NullUI.h"
 
 #include "GXemul.h"
+#include "actions/LoadEmulationAction.h"
 #include "components/DummyComponent.h"
 #include "UnitTest.h"
 
@@ -222,28 +237,56 @@
 /// For command line parsing using getopt().
 extern char *optarg;
 
+/// For command line parsing using getopt().
+extern int optind;
+
 
 GXemul::GXemul(bool bWithGUI)
-	: m_runState(Paused)
+	: m_runState(Running)
 	, m_bWithGUI(bWithGUI)
 	, m_bRunUnitTests(false)
+	, m_ui(new NullUI(this))
 	, m_rootComponent(new DummyComponent)
 	, m_commandInterpreter(this)
 {
+	ClearEmulation();
+}
+
+
+void GXemul::ClearEmulation()
+{
+	m_rootComponent = new DummyComponent;
+	m_rootComponent->SetVariable("name", StateVariableValue("root"));
+	m_emulationFileName = "";
 }
 
 
 bool GXemul::ParseOptions(int argc, char *argv[])
 {
+	bool optionsEnoughToStartRunning = false;
 	int ch;
-	const char *opts = "W:";
+
+	// REMEMBER to keep the following things in synch:
+	//	1. The help message.
+	//	2. The option parsing in ParseOptions.
+	//	3. The man page.
+
+	const char *opts = "hVW:";
 
 	while ((ch = getopt(argc, argv, opts)) != -1) {
 		switch (ch) {
+		case 'V':
+			SetRunState(Paused);
+
+			// Note: -V allows the user to start the console version
+			// of gxemul without an initial emulation setup.
+			optionsEnoughToStartRunning = true;
+			break;
 		case 'W':
-			if (string(optarg) == "unittest")
+			if (string(optarg) == "unittest") {
 				m_bRunUnitTests = true;
-			else {
+				optionsEnoughToStartRunning = true;
+			} else {
 				PrintUsage(false);
 				return false;
 			}
@@ -257,21 +300,90 @@ bool GXemul::ParseOptions(int argc, char *argv[])
 		}
 	}
 
-	return true;
+	// Any remaining arguments?
+	//  1. If a machine template has been selected, then treat the following
+	//     arguments as files to load. (Legacy compatibility with previous
+	//     versions of GXemul.)
+	//  2. Otherwise, treat the argument as a configuration file.
+	argc -= optind;
+	argv += optind;
+
+	if (argc > 0) {
+		// TODO: Machine templates.
+		
+		// Config file:
+		if (argc == 1) {
+			string configfileName = argv[0];
+
+			optionsEnoughToStartRunning = true;
+			
+			refcount_ptr<Action> loadAction =
+			    new LoadEmulationAction(*this, configfileName, "");
+			GetActionStack().PushActionAndExecute(loadAction);
+			
+			if (GetRootComponent()->GetChildren().size() == 0) {
+				std::cerr << "Failed to load configuration from"
+				    " " << argv[1] << ". Aborting.\n";
+				return false;
+			}
+		} else {
+			std::cerr << "More than one configfile name supplied?"
+			    " Aborting.\n";
+			return false;
+		}
+	}
+
+	// gxemul-gui can always start without an initial emulation:
+	if (m_bWithGUI)
+		optionsEnoughToStartRunning = true;
+
+	if (optionsEnoughToStartRunning) {
+		return true;
+	} else {
+		PrintUsage(false);
+		return false;
+	}
 }
 
 
-void GXemul::PrintUsage(bool bLong) const
+void GXemul::PrintUsage(bool longUsage) const
 {
-	std::cout << "Usage: gxemul [options]\n"
-		     "   or  gxemul-gui [options]\n\n"
+	if (!longUsage) {
+		std::cout << "Insufficient command line arguments given to"
+		    " start an emulation. You have\n"
+		    "the following alternatives:\n"
+		    "\n"
+		    "1. Run  gxemul  with a configuration file (.gxemul).\n"
+		    "2. Run  gxemul  with machine selection options, which "
+		    "creates an emulation\n"
+		    "   from a template machine.\n"
+		    "3. Run  gxemul -V  with no other options, which causes"
+		    " gxemul to be started\n"
+		    "   with no emulation loaded at all.\n"
+		    "4. Run  gxemul-gui  which starts the GUI"
+		    " version of GXemul.\n"
+		    "\n"
+		    "Run  gxemul -h  for help on command line options.\n\n";
+		return;
+	}
+
+	std::cout << "Usage: gxemul [options] [configfile]\n"
+		     "   or  gxemul-gui [options] [configfile]\n\n"
 		     "where options may be:\n\n";
 
+	// REMEMBER to keep the following things in synch:
+	//	1. The help message.
+	//	2. The option parsing in ParseOptions.
+	//	3. The man page.
+
 	std::cout <<
-		"  -h             display help message\n"
-#ifndef WITHOUTUNITTESTS
-		"  -W unittest    run unit tests\n"
-#endif
+		"  -h             Displays this help message.\n"
+		"  -V             Starts in the Paused state. (Can also be used"
+			" to start\n"
+		"                 without loading an emulation at all.)\n"
+		// -W is undocumented. It is only used internally.
+		"\n"
+		"and configfile is a file with the .gxemul extension.\n" 
 		"\n";
 }
 
@@ -305,6 +417,18 @@ int GXemul::Run()
 }
 
 
+const string& GXemul::GetEmulationFilename() const
+{
+	return m_emulationFileName;
+}
+
+
+void GXemul::SetEmulationFilename(const string& filename)
+{
+	m_emulationFileName = filename;
+}
+
+
 CommandInterpreter& GXemul::GetCommandInterpreter()
 {
 	return m_commandInterpreter;
@@ -326,6 +450,13 @@ UI* GXemul::GetUI()
 refcount_ptr<Component> GXemul::GetRootComponent()
 {
 	return m_rootComponent;
+}
+
+
+void GXemul::SetRootComponent(refcount_ptr<Component> newRootComponent)
+{
+	assert(!newRootComponent.IsNULL());
+	m_rootComponent = newRootComponent;
 }
 
 

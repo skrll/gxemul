@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: VersionCommand.cc,v 1.2 2008-01-05 13:13:50 debug Exp $
+ *  $Id: VersionCommand.cc,v 1.3 2008-01-12 08:29:57 debug Exp $
  */
 
 #include "commands/VersionCommand.h"
@@ -45,10 +45,8 @@ VersionCommand::~VersionCommand()
 
 void VersionCommand::Execute(GXemul& gxemul, const vector<string>& arguments)
 {
-	if (gxemul.GetUI() != NULL)
-		gxemul.GetUI()->ShowDebugMessage(
-		    "GXemul "VERSION"     "COPYRIGHT_MSG"\n"
-		    SECONDARY_MSG);
+	gxemul.GetUI()->ShowDebugMessage(
+	    "GXemul "VERSION"     "COPYRIGHT_MSG"\n"SECONDARY_MSG);
 }
 
 

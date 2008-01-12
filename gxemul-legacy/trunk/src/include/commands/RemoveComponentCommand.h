@@ -1,3 +1,6 @@
+#ifndef REMOVECOMPONENTCOMMAND_H
+#define	REMOVECOMPONENTCOMMAND_H
+
 /*
  *  Copyright (C) 2008  Anders Gavare.  All rights reserved.
  *
@@ -25,66 +28,43 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: QuitCommand.cc,v 1.4 2008-01-12 08:29:56 debug Exp $
+ *  $Id: RemoveComponentCommand.h,v 1.1 2008-01-12 08:29:56 debug Exp $
  */
 
-#include "commands/QuitCommand.h"
-#include "GXemul.h"
+#include "misc.h"
+
+#include "Command.h"
+#include "UnitTest.h"
 
 
-QuitCommand::QuitCommand()
-	: Command("quit", "")
+/**
+ * \brief A Command which removes a Component from a GXemul instance'
+ *	component tree.
+ */
+class RemoveComponentCommand
+	: public Command
 {
-}
+public:
+	/**
+	 * \brief Constructs a %RemoveComponentCommand.
+	 */
+	RemoveComponentCommand();
+
+	virtual ~RemoveComponentCommand();
+
+	/**
+	 * \brief Executes the remove command.
+	 *
+	 * @param gxemul A reference to the GXemul instance.
+	 * @param arguments A vector of zero or more string arguments.
+	 */
+	virtual void Execute(GXemul& gxemul,
+		const vector<string>& arguments);
+
+	virtual string GetShortDescription() const;
+
+	virtual string GetLongDescription() const;
+};
 
 
-QuitCommand::~QuitCommand()
-{
-}
-
-
-void QuitCommand::Execute(GXemul& gxemul, const vector<string>& arguments)
-{
-	gxemul.SetRunState(GXemul::Quitting);
-}
-
-
-string QuitCommand::GetShortDescription() const
-{
-	return "Quits the application.";
-}
-
-
-string QuitCommand::GetLongDescription() const
-{
-	return "Quits the application.";
-}
-
-
-/*****************************************************************************/
-
-
-#ifndef WITHOUTUNITTESTS
-
-static void Test_QuitCommand_Affect_RunState()
-{
-	refcount_ptr<Command> cmd = new QuitCommand;
-	vector<string> dummyArguments;
-	
-	GXemul gxemul(false);
-
-	UnitTest::Assert("the default GXemul instance should be Running",
-	    gxemul.GetRunState() == GXemul::Running);
-
-	cmd->Execute(gxemul, dummyArguments);
-
-	UnitTest::Assert("runstate should have been changed to Quitting",
-	    gxemul.GetRunState() == GXemul::Quitting);
-}
-
-UNITTESTS(QuitCommand)
-{
-	UNITTEST(Test_QuitCommand_Affect_RunState);
-}
-
-#endif
+#endif	// REMOVECOMPONENTCOMMAND_H

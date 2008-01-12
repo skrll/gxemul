@@ -25,7 +25,9 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Component.cc,v 1.6 2008-01-05 13:13:50 debug Exp $
+ *  $Id: Component.cc,v 1.7 2008-01-12 08:29:56 debug Exp $
+ *
+ *  Note: See DummyComponent.cc for unit tests of the component framework.
  */
 
 #include "assert.h"
@@ -112,17 +114,57 @@ Component* Component::GetParent()
 void Component::AddChild(refcount_ptr<Component> childComponent,
 	size_t insertPosition)
 {
-	if (insertPosition == (size_t) -1)
+	if (insertPosition == (size_t) -1) {
+		insertPosition = m_childComponents.size();
 		m_childComponents.push_back(childComponent);
-	else
+	} else {
 		m_childComponents.insert(
 		    m_childComponents.begin() + insertPosition,
 		    childComponent);
+	}
 
 	// A component cannot have two parents.	
 	assert(childComponent->GetParent() == NULL);
 
 	childComponent->SetParent(this);
+
+	// Make sure that the child's "name" state variable is unique among
+	// all children of this component. (Yes, this is O(n^2) and it may
+	// need to be rewritten to cope with _lots_ of components.)
+	size_t postfix = 0;
+	bool collision = false;
+	do {
+		StateVariableValue name;
+		if (!childComponent->GetVariable("name", &name) || collision) {
+			// Set the default name:  classname + postfix number
+			stringstream ss;
+			ss << childComponent->GetClassName() << postfix;
+			childComponent->SetVariable("name",
+			    StateVariableValue(ss.str()));
+
+			childComponent->GetVariable("name", &name);
+		}
+
+		collision = false;
+		for (size_t i=0; i<m_childComponents.size(); ++i) {
+			if (i == insertPosition)
+				continue;
+
+			// Collision?
+			StateVariableValue otherName;
+			if (m_childComponents[i]->GetVariable(
+			    "name", &otherName)) {
+				if (name.ToString() == otherName.ToString()) {
+					collision = true;
+					++ postfix;
+					break;
+				}
+			} else {
+				// Hm. All components should have a "name".
+				assert(false);
+			}
+		}
+	} while (collision);
 }
 
 
@@ -151,6 +193,160 @@ Components& Component::GetChildren()
 }
 
 
+string Component::GeneratePath() const
+{
+	string path;
+
+	StateVariableMap::const_iterator it = m_stateVariables.find("name");
+	if (it == m_stateVariables.end())
+		path = "(" + GetClassName() + ")";
+	else
+		path = (it->second).GetValue().ToString();
+
+	if (m_parentComponent != NULL)
+		path = m_parentComponent->GeneratePath() + "." + path;
+
+	return path;
+}
+
+
+static vector<string> SplitPathStringIntoVector(const string &path)
+{
+	// Split the path into a vector. This is slow and hackish, but works.
+	vector<string> pathStrings;
+	string word;
+
+	for (size_t i=0, n=path.length(); i<n; i++) {
+		stringchar ch = path[i];
+		if (ch == '.') {
+			pathStrings.push_back(word);
+			word = "";
+		} else {
+			word += ch;
+		}
+	}
+
+	pathStrings.push_back(word);
+
+	return pathStrings;
+}
+
+
+refcount_ptr<Component> Component::LookupPath(const string& path)
+{
+	return LookupPath(SplitPathStringIntoVector(path), 0);
+}
+
+
+refcount_ptr<Component> Component::LookupPath(const vector<string>& path,
+	size_t index)
+{
+	refcount_ptr<Component> component;
+
+	if (index > path.size()) {
+		// Huh? Lookup of empty path? Should not usually happen.
+		assert(false);
+		return component;
+	}
+
+	StateVariableMap::const_iterator it = m_stateVariables.find("name");
+	if (it == m_stateVariables.end()) {
+		// Failure (return NULL) if we don't have a name.
+		return component;
+	}
+
+	string nameOfThisComponent = (it->second).GetValue().ToString();
+	bool match = (path[index] == nameOfThisComponent);
+
+	// No match? Or was it the last part of the path? Then return.
+	if (!match || index == path.size() - 1) {
+		// (Successfully, if there was a match.)
+		if (match)
+			component = this;
+		return component;
+	}
+
+	// If there are still parts left to check, look among all the children:
+	const string& pathPartToLookup = path[index+1];
+	for (size_t i=0, n=m_childComponents.size(); i<n; i++) {
+		StateVariableValue childName;
+		if (m_childComponents[i]->GetVariable("name", &childName)) {
+			if (childName.ToString() == pathPartToLookup) {
+				component = m_childComponents[i]->
+				    LookupPath(path, index+1);
+				break;
+			}
+		}
+	}
+
+	return component;
+}
+
+
+void Component::AddAllComponentPaths(vector<string>& allComponentPaths) const
+{
+	// Add the component itself first:
+	allComponentPaths.push_back(GeneratePath());
+
+	// Then all children:
+	for (size_t i=0, n=m_childComponents.size(); i<n; i++)
+		m_childComponents[i]->AddAllComponentPaths(allComponentPaths);
+}
+
+
+static bool PartialMatch(const string& partialPath, const string& path)
+{
+	if (partialPath.empty())
+		return true;
+
+	const size_t partialPathLength = partialPath.length();
+	const size_t pathLength = path.length();
+	size_t pathPos = 0;
+
+	do {
+		// Partial path too long? Then abort immediately.
+		if (partialPathLength + pathPos > pathLength)
+			break;
+
+		// A substring match? Then we might have found it.
+		if (path.substr(pathPos, partialPathLength) == partialPath) {
+			// If the path has no tail (".subcomponent"), then
+			// we found it:
+			if (path.find('.', pathPos + partialPathLength) ==
+			    string::npos)
+				return true;
+		}
+
+		// Find next place in path to test:
+		do {
+			pathPos ++;
+		} while (pathPos < pathLength && path[pathPos] != '.');
+
+		if (pathPos < pathLength)
+			pathPos ++;
+
+	} while (pathPos < pathLength);
+
+	return false;
+}
+
+
+vector<string> Component::FindPathByPartialMatch(
+	const string& partialPath) const
+{
+	vector<string> allComponentPaths;
+	vector<string> matches;
+
+	AddAllComponentPaths(allComponentPaths);
+
+	for (size_t i=0, n=allComponentPaths.size(); i<n; i++)
+		if (PartialMatch(partialPath, allComponentPaths[i]))
+			matches.push_back(allComponentPaths[i]);
+
+	return matches;
+}
+
+
 bool Component::GetVariable(const string& name, StateVariableValue* valuePtr)
 {
 	StateVariableMap::const_iterator it = m_stateVariables.find(name);
@@ -171,26 +367,21 @@ void Component::SetVariable(const string& name,
 }
 
 
-string Component::Serialize(SerializationContext& context) const
+void Component::Serialize(ostream& ss, SerializationContext& context) const
 {
 	SerializationContext subContext = context.Indented();
-	string tabs, variables, children;
+	string tabs = context.Tabs();
 
-	tabs = context.Tabs();
-
+	ss << tabs << "component " << m_className << "\n" << tabs << "{\n";
+	    
 	for (StateVariableMap::const_iterator it = m_stateVariables.begin();
 	    it != m_stateVariables.end(); ++it)
-		variables += (it->second).Serialize(subContext);
+		ss << (it->second).Serialize(subContext);
 
-	for (size_t i = 0; i < m_childComponents.size(); ++ i)
-		children += "\n" + m_childComponents[i]->Serialize(subContext);
-	
-	return
-	    tabs + "component " + m_className + "\n" +
-	    tabs + "{\n" +
-	    variables +
-	    children +
-	    tabs + "}\n";
+	for (size_t i = 0, n = m_childComponents.size(); i < n; ++ i)
+		m_childComponents[i]->Serialize(ss, subContext);
+
+	ss << tabs << "}\n";
 }
 
 
@@ -314,7 +505,10 @@ bool Component::CheckConsistency() const
 {
 	// Serialize
 	SerializationContext context;
-	string result = Serialize(context);
+	stringstream ss;
+	Serialize(ss, context);
+
+	string result = ss.str();
 
 	Checksum checksumOriginal;
 	AddChecksum(checksumOriginal);

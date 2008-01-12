@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: UnitTest.h,v 1.10 2008-01-05 13:13:49 debug Exp $
+ *  $Id: UnitTest.h,v 1.11 2008-01-12 08:29:56 debug Exp $
  */
 
 #include "misc.h"
@@ -101,12 +101,12 @@ public:
 	 * If WITHOUTUNITTESTS was defined in config.h, nothing is tested,
 	 * and zero is returned.
 	 *
-	 * Otherwise, unit tests for all UnitTestable classes listed in
-	 * src/main/UnitTest.cc are executed.
+	 * Otherwise, unit tests for all classes that the <tt>configure</tt>
+	 * script detected as using UNITTESTS(classname) are executed.
 	 *
-	 * Debug output is allowed to std::cout, but not to std::cerr.
-	 * If a test fails, the UNITTEST macro in the unit testing framework
-	 * takes care of outputting a line identifying that test to std::cerr.
+	 * If a test fails, the UNITTEST(testname) macro in the unit testing
+	 * framework takes care of outputting a line identifying that test to
+	 * std::cerr.
 	 *
 	 * @return zero if no unit tests failed, 1 otherwise.
 	 */
@@ -175,7 +175,13 @@ public:
 /**
  * \brief Helper for unit test case execution.
  *
- * See the comment for UNITTEST for details.
+ * The main purpose, appart from making the code look more compact,
+ * of having a macro for this is that the <tt>configure</tt> script finds
+ * all .cc files that use this macro, and generates lists of header files
+ * to include and lists of RunUnitTests functions to call. These are then
+ * included and run from UnitTest::RunTests.
+ *
+ * See the comment for UNITTEST for details on how to use it.
  */
 #define UNITTESTS(class) \
 	void class::RunUnitTests(int& nSucceeded, int& nFailures)
@@ -188,21 +194,22 @@ public:
  * of successful test cases is increased instead.
  *
  * Usage: (usually at the end of a class implementation file)<pre>
- * \#ifndef WITHOUTUNITTESTS
+ *	\#ifndef WITHOUTUNITTESTS
  *
- * static void MyClass::Test_MyClass_SomeTest()
- * {
- *     UnitTest::Assert("expected blah blah", bool_condition);
- *     ...
- * }
+ *	static void MyClass::Test_MyClass_SomeTest()
+ *	{
+ *		UnitTest::Assert("expected blah blah", bool_condition);
+ *		... more asserts here ...
+ *	}
  *
- * ...
+ *	...
  *
- * UNITTESTS(MyClass)
- * {
- *     UNITTEST(Test_MyClass_SomeTest);
- *     UNITTEST(Test_MyClass_AnotherTest);
- * }
+ *	UNITTESTS(MyClass)
+ *	{
+ *		UNITTEST(Test_MyClass_SomeTest);
+ *		UNITTEST(Test_MyClass_AnotherTest);
+ *		... more test cases here ...
+ *	}
  *
  * \#endif // WITHOUTUNITTESTS</pre>
  *

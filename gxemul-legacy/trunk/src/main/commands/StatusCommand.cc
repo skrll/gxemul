@@ -25,66 +25,40 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: QuitCommand.cc,v 1.4 2008-01-12 08:29:56 debug Exp $
+ *  $Id: StatusCommand.cc,v 1.1 2008-01-12 08:29:56 debug Exp $
  */
 
-#include "commands/QuitCommand.h"
+#include "commands/StatusCommand.h"
 #include "GXemul.h"
 
 
-QuitCommand::QuitCommand()
-	: Command("quit", "")
+StatusCommand::StatusCommand()
+	: Command("status", "")
 {
 }
 
 
-QuitCommand::~QuitCommand()
+StatusCommand::~StatusCommand()
 {
 }
 
 
-void QuitCommand::Execute(GXemul& gxemul, const vector<string>& arguments)
+void StatusCommand::Execute(GXemul& gxemul, const vector<string>& arguments)
 {
-	gxemul.SetRunState(GXemul::Quitting);
+	gxemul.GetUI()->ShowDebugMessage(
+	    "Runstate: " + gxemul.GetRunStateAsString() + "\n");
 }
 
 
-string QuitCommand::GetShortDescription() const
+string StatusCommand::GetShortDescription() const
 {
-	return "Quits the application.";
+	return "Shows the current status (runstate etc).";
 }
 
 
-string QuitCommand::GetLongDescription() const
+string StatusCommand::GetLongDescription() const
 {
-	return "Quits the application.";
+	return "Shows the current status. This currently includes:\n"
+	    "  o)  Runstate (Running or Paused)\n";
 }
 
-
-/*****************************************************************************/
-
-
-#ifndef WITHOUTUNITTESTS
-
-static void Test_QuitCommand_Affect_RunState()
-{
-	refcount_ptr<Command> cmd = new QuitCommand;
-	vector<string> dummyArguments;
-	
-	GXemul gxemul(false);
-
-	UnitTest::Assert("the default GXemul instance should be Running",
-	    gxemul.GetRunState() == GXemul::Running);
-
-	cmd->Execute(gxemul, dummyArguments);
-
-	UnitTest::Assert("runstate should have been changed to Quitting",
-	    gxemul.GetRunState() == GXemul::Quitting);
-}
-
-UNITTESTS(QuitCommand)
-{
-	UNITTEST(Test_QuitCommand_Affect_RunState);
-}
-
-#endif

@@ -1,3 +1,6 @@
+#ifndef NULLUI_H
+#define	NULLUI_H
+
 /*
  *  Copyright (C) 2008  Anders Gavare.  All rights reserved.
  *
@@ -25,66 +28,70 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: QuitCommand.cc,v 1.4 2008-01-12 08:29:56 debug Exp $
+ *  $Id: NullUI.h,v 1.1 2008-01-12 08:29:56 debug Exp $
  */
 
-#include "commands/QuitCommand.h"
-#include "GXemul.h"
+#include "UI.h"
 
 
-QuitCommand::QuitCommand()
-	: Command("quit", "")
+/**
+ * \brief Dummy UI, which does not do anything.
+ */
+class NullUI
+	: public UI
 {
-}
+public:
+	/**
+	 * \brief Constructs a %NullUI.
+	 *
+	 * @param gxemul Pointer to the owning GXemul instance.
+	 */
+	NullUI(GXemul *gxemul);
+
+	virtual ~NullUI();
+
+	/**
+	 * \brief Does nothing, for the dummy UI.
+	 */
+	virtual void Initialize();
+
+	/**
+	 * \brief Does nothing, for the dummy UI.
+	 */
+	virtual void ShowStartupBanner();
+
+	/**
+	 * \brief Does nothing, for the dummy UI.
+	 *
+	 * @param msg The message to show. (Ignored.)
+	 */
+	virtual void ShowDebugMessage(const string& msg);
+
+	/**
+	 * \brief Does nothing, for the dummy UI.
+	 *
+	 * @param inputline The entire input line. (Ignored.)
+	 * @param cursorPosition The current cursor position. 0 is at the
+	 *	leftmost position. (Ignored.)
+	 */
+	virtual void RedisplayInputLine(const string& inputline,
+	    size_t cursorPosition);
+
+	/**
+	 * \brief Executed by the CommandInterpreter when a line has been
+	 * completed (with a newline).
+	 *
+	 * For the %NullUI, this is ignored.
+	 */
+	virtual void InputLineDone();
+
+	/**
+	 * \brief Runs the main loop. Ignored by the NullUI.
+	 *
+	 * The NullUI returns 0 immediately.
+	 */
+	virtual int MainLoop();
+};
 
 
-QuitCommand::~QuitCommand()
-{
-}
-
-
-void QuitCommand::Execute(GXemul& gxemul, const vector<string>& arguments)
-{
-	gxemul.SetRunState(GXemul::Quitting);
-}
-
-
-string QuitCommand::GetShortDescription() const
-{
-	return "Quits the application.";
-}
-
-
-string QuitCommand::GetLongDescription() const
-{
-	return "Quits the application.";
-}
-
-
-/*****************************************************************************/
-
-
-#ifndef WITHOUTUNITTESTS
-
-static void Test_QuitCommand_Affect_RunState()
-{
-	refcount_ptr<Command> cmd = new QuitCommand;
-	vector<string> dummyArguments;
-	
-	GXemul gxemul(false);
-
-	UnitTest::Assert("the default GXemul instance should be Running",
-	    gxemul.GetRunState() == GXemul::Running);
-
-	cmd->Execute(gxemul, dummyArguments);
-
-	UnitTest::Assert("runstate should have been changed to Quitting",
-	    gxemul.GetRunState() == GXemul::Quitting);
-}
-
-UNITTESTS(QuitCommand)
-{
-	UNITTEST(Test_QuitCommand_Affect_RunState);
-}
-
-#endif
+#endif	// NULLUI_H

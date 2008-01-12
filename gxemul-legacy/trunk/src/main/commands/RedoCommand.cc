@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: RedoCommand.cc,v 1.1 2008-01-05 13:13:50 debug Exp $
+ *  $Id: RedoCommand.cc,v 1.2 2008-01-12 08:29:56 debug Exp $
  */
 
 #include "commands/RedoCommand.h"
@@ -43,13 +43,6 @@ RedoCommand::~RedoCommand()
 }
 
 
-static void ShowMsg(GXemul& gxemul, const string& msg)
-{
-	if (gxemul.GetUI() != NULL)
-		gxemul.GetUI()->ShowDebugMessage(msg);
-}
-
-
 void RedoCommand::Execute(GXemul& gxemul, const vector<string>& arguments)
 {
 	ActionStack& actionStack = gxemul.GetActionStack();
@@ -57,7 +50,7 @@ void RedoCommand::Execute(GXemul& gxemul, const vector<string>& arguments)
 	if (actionStack.IsRedoPossible())
 		actionStack.Redo();
 	else
-		ShowMsg(gxemul, "Redo is not possible.\n");
+		gxemul.GetUI()->ShowDebugMessage("Redo is not possible.\n");
 }
 
 
@@ -70,6 +63,7 @@ string RedoCommand::GetShortDescription() const
 string RedoCommand::GetLongDescription() const
 {
 	return "Redoes the next action on the action stack, if possible.\n"
+	    "\n"
 	    "See also:  undo";
 }
 

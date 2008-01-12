@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: UndoCommand.cc,v 1.1 2008-01-05 13:13:50 debug Exp $
+ *  $Id: UndoCommand.cc,v 1.2 2008-01-12 08:29:57 debug Exp $
  */
 
 #include "commands/UndoCommand.h"
@@ -43,13 +43,6 @@ UndoCommand::~UndoCommand()
 }
 
 
-static void ShowMsg(GXemul& gxemul, const string& msg)
-{
-	if (gxemul.GetUI() != NULL)
-		gxemul.GetUI()->ShowDebugMessage(msg);
-}
-
-
 void UndoCommand::Execute(GXemul& gxemul, const vector<string>& arguments)
 {
 	ActionStack& actionStack = gxemul.GetActionStack();
@@ -57,7 +50,7 @@ void UndoCommand::Execute(GXemul& gxemul, const vector<string>& arguments)
 	if (actionStack.IsUndoPossible())
 		actionStack.Undo();
 	else
-		ShowMsg(gxemul, "Undo is not possible.\n");
+		gxemul.GetUI()->ShowDebugMessage("Undo is not possible.\n");
 }
 
 
@@ -70,6 +63,7 @@ string UndoCommand::GetShortDescription() const
 string UndoCommand::GetLongDescription() const
 {
 	return "Undoes the last action, if possible.\n"
+	    "\n"
 	    "See also:  redo";
 }
 

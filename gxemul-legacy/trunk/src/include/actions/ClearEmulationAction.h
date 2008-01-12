@@ -1,3 +1,6 @@
+#ifndef CLEAREMULATIONACTION_H
+#define	CLEAREMULATIONACTION_H
+
 /*
  *  Copyright (C) 2008  Anders Gavare.  All rights reserved.
  *
@@ -25,66 +28,58 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: QuitCommand.cc,v 1.4 2008-01-12 08:29:56 debug Exp $
+ *  $Id: ClearEmulationAction.h,v 1.1 2008-01-12 08:29:56 debug Exp $
  */
 
-#include "commands/QuitCommand.h"
-#include "GXemul.h"
+#include "misc.h"
+
+#include "Action.h"
+#include "UnitTest.h"
+
+class GXemul;
 
 
-QuitCommand::QuitCommand()
-	: Command("quit", "")
+/**
+ * \brief An Action which discards a GXemul instance' current emulation setup.
+ *
+ * The action is not undoable.
+ *
+ * The GXemul instance' root component will be reset to a dummy root node,
+ * and the current emulation's filename will be reset to an empty string.
+ */
+class ClearEmulationAction
+	: public Action
+	, public UnitTestable
 {
-}
+public:
+	/**
+	 * \brief Constructs an %ClearEmulationAction.
+	 *
+	 * @param gxemul The GXemul instance.
+	 */
+	ClearEmulationAction(GXemul& gxemul);
+
+	virtual ~ClearEmulationAction();
+
+	/**
+	 * \brief When called, discards the GXemul instance' current
+	 *	emulation setup.
+	 */
+	void Execute();
+
+	/**
+	 * \brief Should never be called.
+	 */
+	void Undo();
 
 
-QuitCommand::~QuitCommand()
-{
-}
+	/********************************************************************/
+
+	static void RunUnitTests(int& nSucceeded, int& nFailures);
+
+private:
+	GXemul&		m_gxemul;
+};
 
 
-void QuitCommand::Execute(GXemul& gxemul, const vector<string>& arguments)
-{
-	gxemul.SetRunState(GXemul::Quitting);
-}
-
-
-string QuitCommand::GetShortDescription() const
-{
-	return "Quits the application.";
-}
-
-
-string QuitCommand::GetLongDescription() const
-{
-	return "Quits the application.";
-}
-
-
-/*****************************************************************************/
-
-
-#ifndef WITHOUTUNITTESTS
-
-static void Test_QuitCommand_Affect_RunState()
-{
-	refcount_ptr<Command> cmd = new QuitCommand;
-	vector<string> dummyArguments;
-	
-	GXemul gxemul(false);
-
-	UnitTest::Assert("the default GXemul instance should be Running",
-	    gxemul.GetRunState() == GXemul::Running);
-
-	cmd->Execute(gxemul, dummyArguments);
-
-	UnitTest::Assert("runstate should have been changed to Quitting",
-	    gxemul.GetRunState() == GXemul::Quitting);
-}
-
-UNITTESTS(QuitCommand)
-{
-	UNITTEST(Test_QuitCommand_Affect_RunState);
-}
-
-#endif
+#endif	// CLEAREMULATIONACTION_H
