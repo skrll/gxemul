@@ -6,7 +6,7 @@
   <meta name="robots" content="noarchive,nofollow,noindex">
 </head>
 <body>
-<!--  $Id: intro.html,v 1.137 2008-01-02 12:38:24 debug Exp $  -->
+<!--  $Id: intro.html,v 1.138 2008-01-12 08:28:33 debug Exp $  -->
 <!-- 10 lines header.  -->
 
 <h1>GXemul: Introduction</h1>
@@ -16,6 +16,8 @@
 
 
 <h2>Introduction</h2>
+
+<p><br><h3><a name="whatisgxemul">What is GXemul?</a></h3>
 
 <p>GXemul is an experimental framework for
 <a href="http://en.wikipedia.org/wiki/Full_virtualization">full-system</a>
@@ -42,36 +44,51 @@ with feedback on previous versions of GXemul.
 comments or feedback in general, then mail me at&nbsp;&nbsp;<tt>anders <i>(at)</i> gavare.se</tt>.
 
 
-<p><br><h3><a name="build">How to build GXemul</a></h3>
+
+<p><br><h3><a name="build">How to build/install GXemul</a></h3>
 
 <p>If you are lucky, your OS vendor has already packaged GXemul for your
 particular platform. If so, then please refer to your OS on how to
 download/install GXemul. E.g. on <a href="http://www.freebsd.org/">FreeBSD</a>,
 you would usually execute<pre>
 	<a href="http://www.freebsd.org/cgi/man.cgi?query=pkg_add&apropos=0&sektion=0&format=html">pkg_add</a> -r <a href="http://www.freshports.org/emulators/gxemul/">gxemul</a>
-</pre>
-as root. That will install GXemul as a binary package.
 
-<p>Another example is on Debian GNU/Linux, where the corresponding command
-line is:<pre>
+	or
+
+	cd /usr/<a href="http://www.freebsd.org/cgi/cvsweb.cgi/ports/emulators/gxemul/">ports/emulators/gxemul</a>; make install
+</pre>
+as root. That will install GXemul, either as a pre-build binary package,
+or from the <a href="http://www.freebsd.org/ports/">FreeBSD Ports system</a>.
+
+<p>Another example is on <a href="http://www.debian.org/">Debian GNU/Linux</a>,
+where the corresponding command line is:<pre>
 	apt-get install <a href="http://packages.debian.org/gxemul">gxemul</a>
 </pre>
 
-<p>In case GXemul is not available as a pre-built package for your OS,
-or it is available but only an older version, or if you feel like
-compiling from source code directly, or if you do not have root 
-access on your system, simply download the GXemul distribution and run:<pre>
+<p>However, there are several reasons why you might want to build
+directly from source code:
+<ul>
+	<li>GXemul may not be available as a pre-built package for your OS.
+	<li>GXemul may be available for your OS, but only an older version.
+	<li>You simply feel like compiling from source code directly, perhaps
+		because you want to modify the source code.
+	<li>You may not have root access on your machine, so you cannot
+		install the GXemul package from the OS vendor system-wide.
+</ul>
+
+<p>If you want to build from source code, you should
+<a href="http://gavare.se/gxemul/download.html">download the GXemul 
+distribution from the home page</a> and run:<pre>
 	./configure
 	make
 </pre>
 
-<p>This should work on most Unix-like platforms. (If it does 
+<p>This should work on most Unix-like platforms. If it does 
 not work for you, then please mail me a detailed bug report, including
 the output of <tt>uname -a</tt>, the <tt>configure</tt> and <tt>make</tt>
-output, and any other useful information.)
-
-<p>(Using <a href="http://en.wikipedia.org/wiki/Cygwin">Cygwin</a>
- might work as well, but this is not really supported.)
+output, and any other useful information.
+(Using <a href="http://en.wikipedia.org/wiki/Cygwin">Cygwin</a>
+might work as well, but this is not really supported.)
 
 <p>GXemul depends on the following external libraries and tools:
 <ul>
@@ -89,11 +106,17 @@ text-only variant, <tt>gxemul</tt>. If Doxygen is missing, the
 installed documentation will not include the
 <a href="doxygen/html/index.html">source code reference</a>.
 
+<p>If the build succeeded, there will be two binaries, <tt>gxemul</tt> and
+<tt>gxemul-gui</tt>. These should work as they are, they do not have to be
+installed anywhere, but for convenience, there is a makefile target which
+installs binaries and other files:
+
 <p>To install, type <tt>make install</tt>. This installs binaries,
 man pages, and documentation under <tt>/usr/local</tt>, unless the
 <tt>PREFIX</tt> environment variable was set prior to running
 <tt>configure</tt>. (You need to have write permission to the 
 corresponding directories to do this.)
+
 
 
 
