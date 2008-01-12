@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: misc.h,v 1.271 2008-01-12 08:29:56 debug Exp $
+ *  $Id: misc.h,v 1.272 2008-01-12 08:55:52 debug Exp $
  *
  *  Misc. definitions for GXemul.
  */
@@ -68,9 +68,9 @@ typedef char stringchar;
 #define	_(x)	(x)
 #endif
 
+#include <iostream>
 #include <list>
 #include <map>
-#include <ostream>
 #include <set>
 #include <sstream>
 #include <vector>

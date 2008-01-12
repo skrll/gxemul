@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: SaveCommand.cc,v 1.1 2008-01-12 08:29:56 debug Exp $
+ *  $Id: SaveCommand.cc,v 1.2 2008-01-12 08:55:52 debug Exp $
  */
 
 #include "commands/SaveCommand.h"
@@ -101,7 +101,7 @@ void SaveCommand::Execute(GXemul& gxemul, const vector<string>& arguments)
 	// Write to the file:
 	{
 		std::fstream outputstream(filename.c_str(),
-		    std::ios_base::out | std::ios_base::trunc);
+		    std::ios::out | std::ios::trunc);
 		if (outputstream.fail()) {
 			ShowMsg(gxemul, "Error: Could not open " + filename +
 			    " for writing.\n");
@@ -114,7 +114,7 @@ void SaveCommand::Execute(GXemul& gxemul, const vector<string>& arguments)
 
 	// Check that the file exists:
 	{
-		std::fstream inputstream(filename.c_str(), std::ios_base::in);
+		std::fstream inputstream(filename.c_str(), std::ios::in);
 		if (inputstream.fail()) {
 			ShowMsg(gxemul, "Error: Could not open " + filename +
 			    " for reading after writing to it; saving "

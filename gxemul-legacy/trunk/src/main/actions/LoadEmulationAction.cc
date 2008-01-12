@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: LoadEmulationAction.cc,v 1.1 2008-01-12 08:29:56 debug Exp $
+ *  $Id: LoadEmulationAction.cc,v 1.2 2008-01-12 08:55:52 debug Exp $
  */
 
 #include <assert.h>
@@ -104,9 +104,9 @@ void LoadEmulationAction::Execute()
 	}
 
 	// Figure out the file's size:
-	file.seekg(0, std::ios_base::end);
+	file.seekg(0, std::ios::end);
 	std::streampos fileSize = file.tellg();
-	file.seekg(0, std::ios_base::beg);
+	file.seekg(0, std::ios::beg);
 
 	// Read the entire file into a string.
 	// TODO: This is wasteful, of course. It actually takes twice the
