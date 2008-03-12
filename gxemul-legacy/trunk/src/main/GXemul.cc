@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemul.cc,v 1.20 2008-01-12 08:29:56 debug Exp $
+ *  $Id: GXemul.cc,v 1.21 2008-03-12 11:45:41 debug Exp $
  *
  *  This file contains three things:
  *
@@ -45,14 +45,8 @@
  *
  * \section intro_sec Introduction
  *
- * This is the automatically generated Doxygen documentation, built from
- * comments throughout the source code.
- *
- * <ul><li><b>NOTE:</b> %GXemul 0.5.0 is a work in progress. Nothing is really
- * emulated yet, I am working on core infrastructural things that are needed
- * first, before delving into actual emulation. If you are interested about
- * the current state of development, please see the
- * <a href="../../TODO.html">TODO</a> file.</ul>
+ * This is the automatically generated Doxygen documentation for %GXemul,
+ * built from comments throughout the source code.
  *
  * See the <a href="../../index.html">main documentation</a> for more
  * information about this version of %GXemul.
@@ -62,9 +56,10 @@
  *
  * Some people perhaps get a nice warm fuzzy feeling by knowing how a program
  * starts up. In %GXemul's case, the main() function creates a GXemul instance,
- * and after letting it parse command line options, calls GXemul::Run().
+ * and after letting it parse command line options (which may create an
+ * initial emulation configuration), calls GXemul::Run().
  * This is the main loop. It doesn't really do much, it simply calls the UI's
- * main loop, e.g. ConsoleUI::MainLoop().
+ * main loop, e.g. ConsoleUI::MainLoop() or GtkmmUI::MainLoop().
  *
  * Most of the source code in %GXemul centers around a few core concepts.
  * An overview of these concepts are given below. Anyone who wishes to
@@ -80,13 +75,25 @@
  * interrupt controllers, and all other kinds of devices.
  *
  * Each component has a parent, so the full set of components in an emulation
- * are in fact a tree. A GXemul instance has one such tree. The state of each
- * component is stored within that component. (The root component is a dummy
- * container, which contains zero or more sub-components, but it doesn't
- * actually do anything else.)
+ * are in fact a tree. A GXemul instance has one such tree. (The root
+ * component is a dummy container, which contains zero or more sub-components,
+ * but it doesn't actually do anything else.)
+ *
+ * The state of each component is stored within that component. The state
+ * consists of a number of variables (see StateVariable) such as strings,
+ * integers, bools, and generic memory arrays. (Memory arrays can be used to
+ * e.g. emulate RAM or video framebuffer memory.)
  *
  * Individual components are implemented in <tt>src/components/</tt>, with
- * header files in <tt>src/include/components/</tt>.
+ * header files in <tt>src/include/components/</tt>. The <tt>configure</tt>
+ * script looks for the string <tt>COMPONENT(name)</tt> in the header files,
+ * and automagically adds those to the list of components that will be
+ * available at runtime. In addition, <tt>make documentation</tt> also builds
+ * HTML pages with lists of available
+ * <a href="../../components.html">components</a>, and as a special case,
+ * a list of available
+ * <a href="../../machines.html">template machines</a> (because they have
+ * special meaning to the end-user).
  *
  * \subsection undostack_subsec Actions, and the Undo stack
  *
@@ -98,12 +105,14 @@
  * undo/redo functionality. This is available both via the GUI, and
  * when running via a text-only terminal. If an action is incapable of
  * providing undo information, then the undo stack is automatically cleared when
- * the action is performed.
+ * the action is performed. It is also allowed that an %Action clears the
+ * stack as its last step, if it notices during execution that what it did
+ * was not undo-able.
  *
  * It is required that, in order to let the undo/redo functionality work
- * properly, any modification of the component tree (this includes adding or
- * removing components, changing the state of components etc) is done through
- * Actions.
+ * properly, <i>any</i> modification of the component tree (this includes
+ * adding or removing components, changing the state of components etc) is
+ * done through Actions.
  *
  * The stack is implemented by the ActionStack class. A GXemul instance
  * has one such stack.
@@ -139,12 +148,20 @@
  * UNITTESTS macro. Individual test cases are then called, as static
  * non-member functions, using the UNITTEST(testname) macro.
  *
+ * Since test cases are non-member functions, they need to create instances
+ * of the class they wish to test, and they can only call public member
+ * functions on those objects, not private ones. Thus, the unit tests only
+ * test the "public API" of all classes. (If the internal API needs to be
+ * tested, then a workaround can be to add a ConsistencyCheck member function
+ * which is public, but mentioning in the documentation for that function
+ * that it is only meant for internal use and debugging.)
+ *
  * Unit tests are normally executed by <tt>make test</tt>. This is implicitly
  * done when doing <tt>make install</tt> as well, for non-release builds.
- * It is recommended to run the configure script with the <tt>--debug</tt>
- * option; this enables Wu Yongwei's new/debug memory leak detector. (It does
- * not seem to work too well with GTKMM, so adding <tt>--without-gtkmm</tt> is
- * also useful.)
+ * It is recommended to run the <tt>configure</tt> script with the
+ * <tt>--debug</tt> option; this enables Wu Yongwei's new/debug memory leak
+ * detector. (It does not seem to work too well with GTKMM, so adding
+ * <tt>--without-gtkmm</tt> is also useful.)
  *
  *
  * \section codeguidelines_sec Coding guidelines
@@ -164,14 +181,17 @@
  *		to build and run the emulator inside an emulated guest
  *		operating system. If dependencies need to be installed before
  *		being able to do such a test build, it severely increases the
- *		cost (in time) to do such a regression test.
+ *		cost (in time) to perform such a regression test.
  *	<li>Write <a href="http://en.wikipedia.org/wiki/Doxygen">
  *		Doxygen</a> documentation for everything.
  *		<ul>
  *			<li>Run <tt>make documentation</tt> often to check
  *				that the generated documentation is correct.
- *			<li>In general, the documentation should be in the .h
- *				file only, not in the .cc file.
+ *			<li>In general, the documentation for classes and
+ *				functions should be in the .h
+ *				file only, not in the .cc file. (Comments
+ *				<i>inside</i> function bodies should not be
+ *				Doxygen-ified.)
  *			<li>Keep the Main page (this page) updated with
  *				clear descriptions of the core concepts.
  *		</ul>
@@ -199,6 +219,8 @@
  *		of optimization.
  *	<li>Use several different compilers; try to build often on as many
  *		different systems as possible, to spot compatibility issues.
+ *	<li>Build and run with --debug, and do not accept any memory leaks
+ *		or other debug warnings.
  *	<li>Insert uppercase <tt>TODO</tt> if something is unclear at the time
  *		of implementation. Periodically do a <tt>grep -R TODO src</tt>
  *		to hunt down these TODOs and fix them permanently.
@@ -215,7 +237,7 @@
 
 
 #include <assert.h>
-#include <iostream>
+#include <fstream>
 
 #include "misc.h"
 
@@ -230,6 +252,7 @@
 #include "GXemul.h"
 #include "actions/LoadEmulationAction.h"
 #include "components/DummyComponent.h"
+#include "ComponentFactory.h"
 #include "UnitTest.h"
 
 #include <unistd.h>
@@ -245,6 +268,7 @@ GXemul::GXemul(bool bWithGUI)
 	: m_runState(Running)
 	, m_bWithGUI(bWithGUI)
 	, m_bRunUnitTests(false)
+	, m_quietMode(false)
 	, m_ui(new NullUI(this))
 	, m_rootComponent(new DummyComponent)
 	, m_commandInterpreter(this)
@@ -256,13 +280,173 @@ GXemul::GXemul(bool bWithGUI)
 void GXemul::ClearEmulation()
 {
 	m_rootComponent = new DummyComponent;
-	m_rootComponent->SetVariable("name", StateVariableValue("root"));
+	m_rootComponent->SetVariableValue("name", "root");
 	m_emulationFileName = "";
+}
+
+
+bool GXemul::CreateEmulationFromTemplateMachine(const string& templateName)
+{
+	if (!ComponentFactory::HasAttribute(templateName, "template")) {
+		std::cerr << templateName << " is not a known template name.\n"
+		    "Use gxemul -H to get a list of valid machine templates.\n";
+		return false;
+	}
+
+	if (!ComponentFactory::HasAttribute(templateName, "machine")) {
+		std::cerr << templateName << " is not a machine template.\n"
+		    "Use gxemul -H to get a list of valid machine templates.\n";
+		return false;
+	}
+
+	refcount_ptr<Component> machine =
+	    ComponentFactory::CreateComponent(templateName);
+	if (machine.IsNULL())
+		return false;
+
+	GetRootComponent()->AddChild(machine);
+	return true;
+}
+
+
+static void ListTemplates()
+{
+	std::cout << "Available template machines:\n\n";
+
+	vector<string> names = ComponentFactory::GetAllComponentNames(true);
+
+	size_t maxNameLen = 0;
+	for (size_t i=0; i<names.size(); ++i)
+		if (names[i].length() > maxNameLen)
+			maxNameLen = names[i].length();
+
+	for (size_t i=0; i<names.size(); ++i) {
+		string name = names[i];
+		
+		std::cout << "  " << name;
+		for (size_t j=0; j<maxNameLen - name.length() + 6; ++j)
+			std::cout << " ";
+
+		std::cout << ComponentFactory::GetAttribute(
+		    name, "description");
+		std::cout << "\n";
+	}
+
+	std::cout << "\n";
+}
+
+
+static void GenerateHTMLListOfComponents(bool machines)
+{
+	std::cout <<
+		"Available " <<
+		(machines? "template machines" : "components") << ":\n"
+		"<p><table border=0>\n"
+		"<tr>\n"
+		" <td><b><u>" <<
+		(machines? "Machine&nbsp;name" : "Component&nbsp;name") << ":"
+		"</u></b>&nbsp;&nbsp;&nbsp;</td>\n"
+#ifdef UNSTABLE_DEVEL
+		" <td><b><u>Status:</u></b>&nbsp;&nbsp;&nbsp;</td>\n"
+#endif
+		" <td><b><u>Description:</u></b>&nbsp;&nbsp;&nbsp;</td>\n"
+		" <td><b><u>Contributors:</u></b>&nbsp;&nbsp;&nbsp;</td>\n"
+		"</tr>\n";
+
+	bool everyOther = false;
+	vector<string> names = ComponentFactory::GetAllComponentNames(false);
+	for (size_t i=0; i<names.size(); ++i) {
+		const string& componentName = names[i];
+		string treeDump;
+		
+		bool isTemplateMachine = !ComponentFactory::GetAttribute(
+		    componentName, "machine").empty() &&
+		    !ComponentFactory::GetAttribute(
+		    componentName, "template").empty();
+
+		if (machines) {
+			if (!isTemplateMachine)
+				continue;
+		} else {
+			// Other components:  Don't include template machines.
+			if (isTemplateMachine)
+			    	continue;
+		}
+
+		// Include an ASCII tree dump for template components that
+		// have children:
+		if (!ComponentFactory::GetAttribute(
+		    componentName, "template").empty()) {
+			refcount_ptr<Component> component =
+			    ComponentFactory::CreateComponent(componentName);
+
+			if (!component.IsNULL() &&
+			    component->GetChildren().size() != 0)
+				treeDump = "<pre>" +
+				    component->GenerateTreeDump("") + "</pre>";
+		}
+
+		// Some distance between table entries:
+		std::cout <<
+			"<tr>\n"
+			" <td></td>"
+			"</tr>\n";
+
+		std::cout <<
+			"<tr bgcolor=" <<
+			(everyOther? "#f0f0f0" : "#e0e0e0") << ">\n";
+
+		// Include a href link to a "full html page" for a component,
+		// if it exists:
+		std::ifstream documentationComponentFile((
+		    "doc/components/component_"
+		    + componentName + ".html").c_str());
+		std::ifstream documentationMachineFile((
+		    "doc/machines/machine_"
+		    + componentName + ".html").c_str());
+
+		if (documentationComponentFile.is_open())
+			std::cout <<
+				" <td valign=top>"
+				"<a href=\"components/component_" <<
+				componentName
+				<< ".html\"><tt>" << componentName <<
+				"</tt></a></td>\n";
+		else if (documentationMachineFile.is_open())
+			std::cout <<
+				" <td valign=top>"
+				"<a href=\"machines/machine_" <<
+				componentName
+				<< ".html\"><tt>" << componentName <<
+				"</tt></a></td>\n";
+		else
+			std::cout <<
+				" <td valign=top><tt>" << componentName
+				<< "</tt></td>\n";
+
+		std::cout <<
+#ifdef UNSTABLE_DEVEL
+			" <td valign=top>" << (ComponentFactory::HasAttribute(
+				componentName, "stable")? "stable" :
+				"experimental") << "</td>\n"
+#endif
+			" <td valign=top>" << ComponentFactory::GetAttribute(
+				componentName, "description") <<
+				treeDump << "</td>\n"
+			" <td valign=top>" << ComponentFactory::GetAttribute(
+				componentName, "contributors") << "</td>\n"
+			"</tr>\n";
+
+		everyOther = !everyOther;
+	}
+
+	std::cout << "</table><p>\n";
 }
 
 
 bool GXemul::ParseOptions(int argc, char *argv[])
 {
+	string templateMachine = "";
 	bool optionsEnoughToStartRunning = false;
 	int ch;
 
@@ -271,10 +455,32 @@ bool GXemul::ParseOptions(int argc, char *argv[])
 	//	2. The option parsing in ParseOptions.
 	//	3. The man page.
 
-	const char *opts = "hVW:";
+	const char *opts = "E:eHhqVW:";
 
 	while ((ch = getopt(argc, argv, opts)) != -1) {
 		switch (ch) {
+
+		case 'E':
+			templateMachine = optarg;
+			break;
+
+		case 'e':
+			std::cerr << "The -e option is deprecated. "
+			    "Use -E instead.\n";
+			return false;
+
+		case 'H':
+			ListTemplates();
+			return false;
+
+		case 'h':
+			PrintUsage(true);
+			return false;
+
+		case 'q':
+			SetQuietMode(true);
+			break;
+
 		case 'V':
 			SetRunState(Paused);
 
@@ -282,20 +488,43 @@ bool GXemul::ParseOptions(int argc, char *argv[])
 			// of gxemul without an initial emulation setup.
 			optionsEnoughToStartRunning = true;
 			break;
+
 		case 'W':
 			if (string(optarg) == "unittest") {
 				m_bRunUnitTests = true;
 				optionsEnoughToStartRunning = true;
+			} else if (string(optarg) == "machines") {
+				GenerateHTMLListOfComponents(true);
+				return false;
+			} else if (string(optarg) == "components") {
+				GenerateHTMLListOfComponents(false);
+				return false;
 			} else {
 				PrintUsage(false);
 				return false;
 			}
 			break;
-		case 'h':
-			PrintUsage(true);
-			return false;
+
 		default:
+			std::cout << "\n"
+				"It is possible that you are attempting to use"
+				    " an option which was available\n"
+				"in older versions of GXemul, but has not been"
+				    " reimplemented in GXemul 0.5.x.\n"
+				"Please see the man page or the  gxemul -h "
+				    " help message for available options.\n\n";
 			PrintUsage(false);
+			return false;
+		}
+	}
+
+	if (templateMachine != "") {
+		if (CreateEmulationFromTemplateMachine(templateMachine)) {
+			// A template is now being used.
+			optionsEnoughToStartRunning = true;
+		} else {
+			std::cerr << "Failed to create configuration from "
+			    "template " << templateMachine << ". Aborting.\n";
 			return false;
 		}
 	}
@@ -309,27 +538,32 @@ bool GXemul::ParseOptions(int argc, char *argv[])
 	argv += optind;
 
 	if (argc > 0) {
-		// TODO: Machine templates.
-		
-		// Config file:
-		if (argc == 1) {
-			string configfileName = argv[0];
+		if (templateMachine != "") {
+			// Machine template:
+		} else {
+			// Config file:
+			if (argc == 1) {
+				string configfileName = argv[0];
+				optionsEnoughToStartRunning = true;
 
-			optionsEnoughToStartRunning = true;
-			
-			refcount_ptr<Action> loadAction =
-			    new LoadEmulationAction(*this, configfileName, "");
-			GetActionStack().PushActionAndExecute(loadAction);
-			
-			if (GetRootComponent()->GetChildren().size() == 0) {
-				std::cerr << "Failed to load configuration from"
-				    " " << argv[1] << ". Aborting.\n";
+				refcount_ptr<Action> loadAction =
+				    new LoadEmulationAction(*this,
+				    configfileName, "");
+				GetActionStack().PushActionAndExecute(
+				    loadAction);
+
+				if (GetRootComponent()->GetChildren().size()
+				    == 0) {
+					std::cerr << "Failed to load "
+					    "configuration from " <<
+					    configfileName << ". Aborting.\n";
+					return false;
+				}
+			} else {
+				std::cerr << "More than one configfile name "
+				    "supplied? Aborting.\n";
 				return false;
 			}
-		} else {
-			std::cerr << "More than one configfile name supplied?"
-			    " Aborting.\n";
-			return false;
 		}
 	}
 
@@ -348,42 +582,64 @@ bool GXemul::ParseOptions(int argc, char *argv[])
 
 void GXemul::PrintUsage(bool longUsage) const
 {
+	std::cout << "GXemul "VERSION"     "COPYRIGHT_MSG"\n"SECONDARY_MSG"\n";
+
 	if (!longUsage) {
 		std::cout << "Insufficient command line arguments given to"
 		    " start an emulation. You have\n"
 		    "the following alternatives:\n"
 		    "\n"
-		    "1. Run  gxemul  with a configuration file (.gxemul).\n"
-		    "2. Run  gxemul  with machine selection options, which "
-		    "creates an emulation\n"
-		    "   from a template machine.\n"
-		    "3. Run  gxemul -V  with no other options, which causes"
+		    "  1. Run  gxemul  with machine selection options (-E),"
+		    " which creates a\n"
+		    "     default emulation from a template machine.\n"
+		    "  2. Run  gxemul  with a configuration file (.gxemul).\n"
+		    "  3. Run  gxemul -V  with no other options, which causes"
 		    " gxemul to be started\n"
-		    "   with no emulation loaded at all.\n"
-		    "4. Run  gxemul-gui  which starts the GUI"
+		    "     with no emulation loaded at all.\n"
+		    "  4. Run  gxemul-gui  which starts the GUI"
 		    " version of GXemul.\n"
 		    "\n"
 		    "Run  gxemul -h  for help on command line options.\n\n";
 		return;
 	}
 
-	std::cout << "Usage: gxemul [options] [configfile]\n"
-		     "   or  gxemul-gui [options] [configfile]\n\n"
-		     "where options may be:\n\n";
+	std::cout <<
+		"Usage: gxemul [general options] [configfile]\n"
+		"       gxemul [general options] [machine selection"
+			" options] [binary...]\n"
+		"       gxemul-gui [general options] [configfile]\n"
+		"       gxemul-gui [general options] [machine"
+			" selection options] [binary...]\n\n";
 
-	// REMEMBER to keep the following things in synch:
+	// When changing command line options, REMEMBER to keep the following
+	// things in synch:
+	//
 	//	1. The help message.
 	//	2. The option parsing in ParseOptions.
 	//	3. The man page.
 
 	std::cout <<
-		"  -h             Displays this help message.\n"
-		"  -V             Starts in the Paused state. (Can also be used"
-			" to start\n"
-		"                 without loading an emulation at all.)\n"
+		"Machine selection options:\n"
+		"  -E t       Starts an emulation based on template t."
+			" (Use -H to get a list.)\n"
+		// -e is deprecated.
+		"\n"
+		"General options:\n"
+		"  -H         Displays a list of all machine"
+			" templates (for use with -E).\n"
+		"  -h         Displays this help message.\n"
+		"  -q         Quiet mode. (Supresses startup banner and "
+			"some debug output.)\n"
+		"  -V         Starts in the Paused state. (Can also be used"
+			" to start gxemul\n"
+		"             without loading an emulation at all.)\n"
 		// -W is undocumented. It is only used internally.
 		"\n"
-		"and configfile is a file with the .gxemul extension.\n" 
+		"An emulation setup is either created by supplying machine "
+			"selection options\n"
+		"directly on the command line, or by supplying a configuration"
+			" file (with\n"
+		"the .gxemul extension).\n"
 		"\n";
 }
 
@@ -410,7 +666,10 @@ int GXemul::Run()
 	}
 
 	m_ui->Initialize();
-	m_ui->ShowStartupBanner();
+	
+	if (!GetQuietMode())
+		m_ui->ShowStartupBanner();
+
 	m_ui->MainLoop();
 
 	return 0;
@@ -487,6 +746,34 @@ string GXemul::GetRunStateAsString() const
 }
 
 
+bool GXemul::GetQuietMode() const
+{
+	return m_quietMode;
+}
+
+
+void GXemul::SetQuietMode(bool quietMode)
+{
+	m_quietMode = quietMode;
+}
+
+
+void GXemul::ExecuteCycles(refcount_ptr<Component> component, int nrOfCycles)
+{
+	// TODO: Keep track of actual number of executed cycles per
+	// component, and try to make them run in synch!
+	if (nrOfCycles == 0)
+		nrOfCycles = 32768;
+
+	// Execute cycles in this component...
+	component->Run(nrOfCycles);
+
+	// ... and all of its children:
+	Components children = component->GetChildren();
+	foreach_vec(children, ExecuteCycles);
+}
+
+
 /*****************************************************************************/
 
 
@@ -529,7 +816,7 @@ int main(int argc, char *argv[])
 	GXemul gxemul(WithGUI(progname));
 
 	if (!gxemul.ParseOptions(argc, argv))
-		return 1;
+		return 0;
 
 	return gxemul.Run();
 }

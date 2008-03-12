@@ -1,5 +1,5 @@
 #
-#  $Id: Makefile.skel,v 1.71 2008-01-12 08:29:56 debug Exp $
+#  $Id: Makefile.skel,v 1.72 2008-03-12 11:45:40 debug Exp $
 #
 #  Makefile for GXemul
 #
@@ -14,13 +14,19 @@ all: build
 
 build:
 	cd src; $(MAKE); cd ..
-	$(CXX) $(COPTIM) src/components/*/*.o src/main/*.o src/main/*/*.o src/ui/*/*.o $(LIBS) -o $(BIN)
+	$(CXX) $(COPTIM) src/components/*/*.o src/ir/*.o src/main/*.o src/main/*/*.o src/ui/*/*.o $(LIBS) -o $(BIN)
 	ln -f $(BIN) $(BINGUI)
 
 test: build
 	./$(BIN) -W unittest > /dev/null
 
-documentation:
+documentation: build
+	sed s/PAGETITLE/Machines/g < doc/head.html > doc/machines.html
+	./$(BIN) -W machines >> doc/machines.html
+	cat doc/tail.html >> doc/machines.html
+	sed s/PAGETITLE/Components/g < doc/head.html > doc/components.html
+	./$(BIN) -W components >> doc/components.html
+	cat doc/tail.html >> doc/components.html
 	$(DOXYGEN) doc/Doxyfile
 
 install: test documentation
@@ -61,4 +67,5 @@ clean_all: clean
 	cd experiments; $(MAKE) clean_all; cd ..
 	cd demos; $(MAKE) clean; cd ..
 	rm -f _unittests.tmp unittest.h unittest_h.h commands.h commands_h.h
+	rm -f _components.tmp _commands.tmp components.h components_h.h
 	rm -f config.h Makefile src/Makefile src/*/Makefile src/*/*/Makefile

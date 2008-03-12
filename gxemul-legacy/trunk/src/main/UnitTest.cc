@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: UnitTest.cc,v 1.10 2008-01-12 08:29:56 debug Exp $
+ *  $Id: UnitTest.cc,v 1.11 2008-03-12 11:45:41 debug Exp $
  */
 
 #include <iostream>
@@ -40,9 +40,9 @@
 #include "../../unittest_h.h"
 
 
-void UnitTest::Assert(const string& strFailMessage, bool bCondition)
+void UnitTest::Assert(const string& strFailMessage, bool condition)
 {
-	if (!bCondition)
+	if (!condition)
 		Fail(strFailMessage);
 }
 

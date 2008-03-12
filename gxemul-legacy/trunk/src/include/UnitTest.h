@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: UnitTest.h,v 1.11 2008-01-12 08:29:56 debug Exp $
+ *  $Id: UnitTest.h,v 1.12 2008-03-12 11:45:41 debug Exp $
  */
 
 #include "misc.h"
@@ -118,17 +118,18 @@ public:
 	/*******************************************************************/
 
 	/**
-	 * \brief Asserts that a boolean condition is true.
+	 * \brief Asserts that a boolean condition is correct.
 	 *
-	 * If the condition is false, Fail is called with the failure message.
+	 * If the condition is not true, then Fail is called with the failure
+	 * message.
 	 *
 	 * The failure message can be something like "expected xyz",
 	 * or "the list should be empty at this point".
 	 *
 	 * @param strFailMessage failure message to print to std::cerr
-	 * @param bCondition condition to check
+	 * @param condition The result of some operation, which should be true.
 	 */
-	static void Assert(const string& strFailMessage, bool bCondition);
+	static void Assert(const string& strFailMessage, bool condition);
 
 	/**
 	 * \brief Asserts that two size_t values are equal.
@@ -211,7 +212,7 @@ public:
  *		... more test cases here ...
  *	}
  *
- * \#endif // WITHOUTUNITTESTS</pre>
+ *	\#endif // WITHOUTUNITTESTS</pre>
  *
  * Note that MyClass (in the example above) should inherit from the
  * UnitTestable class.

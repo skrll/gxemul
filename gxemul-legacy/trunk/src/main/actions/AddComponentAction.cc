@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: AddComponentAction.cc,v 1.1 2008-01-05 13:13:50 debug Exp $
+ *  $Id: AddComponentAction.cc,v 1.2 2008-03-12 11:45:41 debug Exp $
  */
 
 #include "actions/AddComponentAction.h"
@@ -71,8 +71,8 @@ static void Test_AddComponentAction_WithUndoRedo()
 	refcount_ptr<Component> dummyComponentA = new DummyComponent;
 	refcount_ptr<Component> dummyComponentB = new DummyComponent;
 
-	dummyComponentA->SetVariable("x", StateVariableValue("123"));
-	dummyComponentB->SetVariable("x", StateVariableValue("456"));
+	dummyComponentA->SetVariableValue("x", "123");
+	dummyComponentB->SetVariableValue("x", "456");
 
 	refcount_ptr<Action> actionA = new AddComponentAction(
 	    dummyComponentA, gxemulDummy.GetRootComponent());

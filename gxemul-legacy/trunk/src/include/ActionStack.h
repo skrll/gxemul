@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ActionStack.h,v 1.9 2008-01-05 13:13:49 debug Exp $
+ *  $Id: ActionStack.h,v 1.10 2008-03-12 11:45:41 debug Exp $
  */
 
 #include "misc.h"
@@ -50,7 +50,7 @@
  *
  * All modifications to the GXemul instance' Component tree should be done
  * using Actions, which are executed only using the ActionStack's
- * PushActionAndExecute function, or by the Undo/Redo functions.
+ * PushActionAndExecute() function, or by the Undo/Redo functions.
  */
 class ActionStack
 	: public UnitTestable

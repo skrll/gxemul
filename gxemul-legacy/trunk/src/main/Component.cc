@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Component.cc,v 1.7 2008-01-12 08:29:56 debug Exp $
+ *  $Id: Component.cc,v 1.8 2008-03-12 11:45:41 debug Exp $
  *
  *  Note: See DummyComponent.cc for unit tests of the component framework.
  */
@@ -33,31 +33,20 @@
 #include "assert.h"
 
 #include "Component.h"
-
-// For CreateComponent:
-#include "components/DummyComponent.h"
+#include "ComponentFactory.h"
 
 
 Component::Component(const string& className)
 	: m_parentComponent(NULL)
 	, m_className(className)
 {
+	AddVariableString("name", &m_name);
+	AddVariableString("template", &m_template);
 }
 
 
 Component::~Component()
 {
-}
-
-
-refcount_ptr<Component> Component::CreateComponent(const string& className)
-{
-	refcount_ptr<Component> component = NULL;
-
-	if (className == "dummy")
-		component = new DummyComponent;
-	
-	return component;
 }
 
 
@@ -67,17 +56,65 @@ string Component::GetClassName() const
 }
 
 
+string Component::GetAttribute(const string& attributeName)
+{
+	// The Component base class always returns an empty string
+	// for all attribute names. It is up to individual Component
+	// implementations to return overrides.
+
+	return "";
+}
+
+
 refcount_ptr<Component> Component::Clone() const
 {
-	refcount_ptr<Component> clone = CreateComponent(m_className);
-	if (clone.IsNULL())
-		return clone;
+	refcount_ptr<Component> clone =
+	    ComponentFactory::CreateComponent(GetClassName());
+	if (clone.IsNULL()) {
+		std::cerr << "INTERNAL ERROR in Component::Clone(): "
+		    "could not clone a '" << GetClassName()
+		    << "'\n";
+		assert(false);
 
-	clone->m_stateVariables = m_stateVariables;
+		// Return NULL:
+		return clone;
+	}
+
+	// Copy the value of each state variable to the clone:
+	StateVariableMap::const_iterator varIt = m_stateVariables.begin();
+	for ( ; varIt != m_stateVariables.end(); ++varIt) {
+		const string& varName = varIt->first;
+		const StateVariable& variable = varIt->second;
+
+		StateVariableMap::iterator cloneVarIt =
+		    clone->m_stateVariables.find(varName);
+
+		if (cloneVarIt == clone->m_stateVariables.end()) {
+			std::cerr << "INTERNAL ERROR in Component::Clone(): "
+			    "could not copy variable " << varName << "'s "
+			    << " value to the clone: clone is missing"
+			    " this variable?\n";
+			assert(false);
+		} else if (!(cloneVarIt->second).CopyValueFrom(variable)) {
+			std::cerr << "INTERNAL ERROR in Component::Clone(): "
+			    "could not copy variable " << varName << "'s "
+			    << " value to the clone.\n";
+			assert(false);
+		}
+	}
 
 	for (Components::const_iterator it = m_childComponents.begin();
-	    it != m_childComponents.end(); ++it)
-		clone->AddChild((*it)->Clone());
+	    it != m_childComponents.end(); ++it) {
+		refcount_ptr<Component> child = (*it)->Clone();
+		if (child.IsNULL()) {
+			std::cerr << "INTERNAL ERROR in Component::Clone(): "
+			    "could not clone child of class '" <<
+			    (*it)->GetClassName() << "'\n";
+			assert(false);
+		} else {
+			clone->AddChild(child);
+		}
+	}
 
 	return clone;
 }
@@ -85,7 +122,7 @@ refcount_ptr<Component> Component::Clone() const
 
 void Component::Reset()
 {
-	ResetVariables();
+	ResetState();
 
 	// Recurse:
 	for (size_t i = 0; i < m_childComponents.size(); ++ i)
@@ -93,9 +130,19 @@ void Component::Reset()
 }
 
 
-void Component::ResetVariables()
+void Component::ResetState()
 {
 	// Base implementation: Do nothing.
+}
+
+
+int Component::Run(int nrOfCycles)
+{
+	// Base implementation: Do nothing, but pretend we executed
+	// the instructions. Actual components that inherit from this
+	// class should of course _do_ something here.
+
+	return nrOfCycles;
 }
 
 
@@ -108,6 +155,71 @@ void Component::SetParent(Component* parentComponent)
 Component* Component::GetParent()
 {
 	return m_parentComponent;
+}
+
+
+string Component::GenerateTreeDump(const string& branchTemplate) const
+{
+	// Basically, this generates a string which looks like:
+	//
+	//	root
+	//	|-- child1
+	//	|   |-- child1's child1
+	//	|   \-- child1's child2
+	//	\-- child2
+	//	    \-- child2's child
+	//
+	// TODO: Comment this better.
+
+	string branch;
+	for (size_t pos=0; pos<branchTemplate.length(); pos++) {
+		stringchar ch = branchTemplate[pos];
+		if (ch == '\\') {
+			if (pos < branchTemplate.length() - 4)
+				branch += ' ';
+			else
+				branch += ch;
+		} else {
+			if (pos == branchTemplate.length() - 3 ||
+			    pos == branchTemplate.length() - 2)
+				ch = '-';
+			branch += ch;
+		}
+	}
+
+	// Fallback to showing the component's class name in parentheses...
+	string name = "(unnamed " + GetClassName() + ")";
+
+	// ... but prefer the state variable "name" if it is non-empty:
+	const StateVariable* value = GetVariable("name");
+	if (!value->ToString().empty())
+		name = value->ToString();
+
+	string str = branch + name;
+
+	// If this component was created by a template, then show the template
+	// type in [ ].
+	const StateVariable* templateName;
+	if ((templateName = GetVariable("template")) != NULL &&
+	    !templateName->ToString().empty())
+		str += "  [" + templateName->ToString() + "]";
+
+	// Show the branch of the tree...
+	string result = "  " + str + "\n";
+
+	// ... and recurse to show children, if there are any:
+	const Components& children = GetChildren();
+	for (size_t i=0, n=children.size(); i<n; ++i) {
+		string subBranch = branchTemplate;
+		if (i == n-1)
+			subBranch += "\\   ";
+		else
+			subBranch += "|   ";
+
+		result += children[i]->GenerateTreeDump(subBranch);
+	}
+
+	return result;
 }
 
 
@@ -134,15 +246,15 @@ void Component::AddChild(refcount_ptr<Component> childComponent,
 	size_t postfix = 0;
 	bool collision = false;
 	do {
-		StateVariableValue name;
-		if (!childComponent->GetVariable("name", &name) || collision) {
+		const StateVariable* name =
+		    childComponent->GetVariable("name");
+		if (name->ToString().empty() || collision) {
 			// Set the default name:  classname + postfix number
 			stringstream ss;
 			ss << childComponent->GetClassName() << postfix;
-			childComponent->SetVariable("name",
-			    StateVariableValue(ss.str()));
+			childComponent->SetVariableValue("name", ss.str());
 
-			childComponent->GetVariable("name", &name);
+			name = childComponent->GetVariable("name");
 		}
 
 		collision = false;
@@ -151,10 +263,10 @@ void Component::AddChild(refcount_ptr<Component> childComponent,
 				continue;
 
 			// Collision?
-			StateVariableValue otherName;
-			if (m_childComponents[i]->GetVariable(
-			    "name", &otherName)) {
-				if (name.ToString() == otherName.ToString()) {
+			const StateVariable* otherName =
+			    m_childComponents[i]->GetVariable("name");
+			if (otherName != NULL) {
+				if (name->ToString() == otherName->ToString()) {
 					collision = true;
 					++ postfix;
 					break;
@@ -193,15 +305,17 @@ Components& Component::GetChildren()
 }
 
 
+const Components& Component::GetChildren() const
+{
+	return m_childComponents;
+}
+
+
 string Component::GeneratePath() const
 {
-	string path;
-
-	StateVariableMap::const_iterator it = m_stateVariables.find("name");
-	if (it == m_stateVariables.end())
+	string path = GetVariable("name")->ToString();
+	if (path.empty())
 		path = "(" + GetClassName() + ")";
-	else
-		path = (it->second).GetValue().ToString();
 
 	if (m_parentComponent != NULL)
 		path = m_parentComponent->GeneratePath() + "." + path;
@@ -255,7 +369,7 @@ refcount_ptr<Component> Component::LookupPath(const vector<string>& path,
 		return component;
 	}
 
-	string nameOfThisComponent = (it->second).GetValue().ToString();
+	string nameOfThisComponent = (it->second).ToString();
 	bool match = (path[index] == nameOfThisComponent);
 
 	// No match? Or was it the last part of the path? Then return.
@@ -269,9 +383,10 @@ refcount_ptr<Component> Component::LookupPath(const vector<string>& path,
 	// If there are still parts left to check, look among all the children:
 	const string& pathPartToLookup = path[index+1];
 	for (size_t i=0, n=m_childComponents.size(); i<n; i++) {
-		StateVariableValue childName;
-		if (m_childComponents[i]->GetVariable("name", &childName)) {
-			if (childName.ToString() == pathPartToLookup) {
+		const StateVariable* childName =
+		    m_childComponents[i]->GetVariable("name");
+		if (childName != NULL) {
+			if (childName->ToString() == pathPartToLookup) {
 				component = m_childComponents[i]->
 				    LookupPath(path, index+1);
 				break;
@@ -347,23 +462,161 @@ vector<string> Component::FindPathByPartialMatch(
 }
 
 
-bool Component::GetVariable(const string& name, StateVariableValue* valuePtr)
+StateVariable* Component::GetVariable(const string& name)
+{
+	StateVariableMap::iterator it = m_stateVariables.find(name);
+	if (it == m_stateVariables.end())
+		return NULL;
+	else
+		return &(it->second);
+}
+
+
+const StateVariable* Component::GetVariable(const string& name) const
 {
 	StateVariableMap::const_iterator it = m_stateVariables.find(name);
 	if (it == m_stateVariables.end())
+		return NULL;
+	else
+		return &(it->second);
+}
+
+
+bool Component::AddVariableString(const string& name, string* variablePointer)
+{
+	StateVariableMap::iterator it = m_stateVariables.find(name);
+	if (it != m_stateVariables.end()) {
+		assert(false);
 		return false;
-	
-	if (valuePtr != NULL)
-		*valuePtr = (it->second).GetValue();
+	}
+
+	m_stateVariables[name] = StateVariable(name, variablePointer);
 
 	return true;
 }
 
 
-void Component::SetVariable(const string& name,
-	const StateVariableValue& newValue)
+bool Component::AddVariableUInt8(const string& name, uint8_t* variablePointer)
 {
-	m_stateVariables[name] = StateVariable(name, newValue);
+	StateVariableMap::iterator it = m_stateVariables.find(name);
+	if (it != m_stateVariables.end()) {
+		assert(false);
+		return false;
+	}
+
+	m_stateVariables[name] = StateVariable(name, variablePointer);
+
+	return true;
+}
+
+
+bool Component::AddVariableUInt16(const string& name, uint16_t* variablePointer)
+{
+	StateVariableMap::iterator it = m_stateVariables.find(name);
+	if (it != m_stateVariables.end()) {
+		assert(false);
+		return false;
+	}
+
+	m_stateVariables[name] = StateVariable(name, variablePointer);
+
+	return true;
+}
+
+
+bool Component::AddVariableUInt32(const string& name, uint32_t* variablePointer)
+{
+	StateVariableMap::iterator it = m_stateVariables.find(name);
+	if (it != m_stateVariables.end()) {
+		assert(false);
+		return false;
+	}
+
+	m_stateVariables[name] = StateVariable(name, variablePointer);
+
+	return true;
+}
+
+
+bool Component::AddVariableUInt64(const string& name, uint64_t* variablePointer)
+{
+	StateVariableMap::iterator it = m_stateVariables.find(name);
+	if (it != m_stateVariables.end()) {
+		assert(false);
+		return false;
+	}
+
+	m_stateVariables[name] = StateVariable(name, variablePointer);
+
+	return true;
+}
+
+
+bool Component::AddVariableSInt8(const string& name, int8_t* variablePointer)
+{
+	StateVariableMap::iterator it = m_stateVariables.find(name);
+	if (it != m_stateVariables.end()) {
+		assert(false);
+		return false;
+	}
+
+	m_stateVariables[name] = StateVariable(name, variablePointer);
+
+	return true;
+}
+
+
+bool Component::AddVariableSInt16(const string& name, int16_t* variablePointer)
+{
+	StateVariableMap::iterator it = m_stateVariables.find(name);
+	if (it != m_stateVariables.end()) {
+		assert(false);
+		return false;
+	}
+
+	m_stateVariables[name] = StateVariable(name, variablePointer);
+
+	return true;
+}
+
+
+bool Component::AddVariableSInt32(const string& name, int32_t* variablePointer)
+{
+	StateVariableMap::iterator it = m_stateVariables.find(name);
+	if (it != m_stateVariables.end()) {
+		assert(false);
+		return false;
+	}
+
+	m_stateVariables[name] = StateVariable(name, variablePointer);
+
+	return true;
+}
+
+
+bool Component::AddVariableSInt64(const string& name, int64_t* variablePointer)
+{
+	StateVariableMap::iterator it = m_stateVariables.find(name);
+	if (it != m_stateVariables.end()) {
+		assert(false);
+		return false;
+	}
+
+	m_stateVariables[name] = StateVariable(name, variablePointer);
+
+	return true;
+}
+
+
+bool Component::SetVariableValue(const string& name, const string& escapedValue)
+{
+	StateVariableMap::iterator it = m_stateVariables.find(name);
+	if (it == m_stateVariables.end())
+		return false;
+
+	(it->second).SetValue(escapedValue);
+
+	return true;
 }
 
 
@@ -442,7 +695,7 @@ refcount_ptr<Component> Component::Deserialize(const string& str, size_t& pos)
 	if (!GetNextToken(str, pos, token) || token != "{")
 		return deserializedTree;
 
-	deserializedTree = Component::CreateComponent(className);
+	deserializedTree = ComponentFactory::CreateComponent(className);
 	if (deserializedTree.IsNULL())
 		return deserializedTree;
 
@@ -491,9 +744,9 @@ refcount_ptr<Component> Component::Deserialize(const string& str, size_t& pos)
 				deserializedTree = NULL;
 				break;
 			}
-			
-			deserializedTree->SetVariable(name,
-			    StateVariableValue(varType, varValue));
+
+			// TODO: use varType?			
+			deserializedTree->SetVariableValue(name, varValue);
 		}
 	}
 

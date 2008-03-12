@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: CommandInterpreter.cc,v 1.8 2008-01-12 08:29:56 debug Exp $
+ *  $Id: CommandInterpreter.cc,v 1.9 2008-03-12 11:45:41 debug Exp $
  */
 
 #include "assert.h"
@@ -331,6 +331,37 @@ bool CommandInterpreter::AddKey(stringchar key)
 	case '\24':	// CTRL-T: show status
 		m_GXemul->GetUI()->ShowDebugMessage("\n");
 		RunCommand("status");
+		break;
+
+	case '\27':	// CTRL-W: remove current word (backspacing)
+		ClearCurrentInputLineVisually();
+
+		// 1. Remove any spaces left to the cursor.
+		while (m_currentCommandCursorPosition > 0) {
+			if (m_currentCommandString[
+			    m_currentCommandCursorPosition-1] == ' ') {
+				m_currentCommandCursorPosition --;
+				m_currentCommandString.erase(
+				    m_currentCommandCursorPosition, 1);
+			} else {
+				break;
+			}
+		}
+
+		// 2. Remove non-spaces left to the cusror, either until
+		//	the cursor is at position 0, or until there is a
+		//	space again.
+		while (m_currentCommandCursorPosition > 0) {
+			if (m_currentCommandString[
+			    m_currentCommandCursorPosition-1] != ' ') {
+				m_currentCommandCursorPosition --;
+				m_currentCommandString.erase(
+				    m_currentCommandCursorPosition, 1);
+			} else {
+				break;
+			}
+		}
+
 		break;
 
 	case '\177':	// ASCII 127 (octal 177) = del
@@ -700,6 +731,68 @@ static void Test_CommandInterpreter_KeyBuffer_CtrlK()
 	    ci.GetCurrentCommandBuffer(), "");
 }
 
+static void Test_CommandInterpreter_KeyBuffer_CtrlW()
+{
+	GXemul gxemul(false);
+	CommandInterpreter& ci = gxemul.GetCommandInterpreter();
+
+	UnitTest::Assert("buffer should contain ''",
+	    ci.GetCurrentCommandBuffer(), "");
+	ci.AddKey('\27');	// CTRL-W
+	UnitTest::Assert("buffer should still contain ''",
+	    ci.GetCurrentCommandBuffer(), "");
+
+	ci.AddKey('a');
+	ci.AddKey('b');
+	ci.AddKey('c');
+	UnitTest::Assert("buffer should contain abc",
+	    ci.GetCurrentCommandBuffer(), "abc");
+	ci.AddKey('\27');	// CTRL-W
+	UnitTest::Assert("buffer should be empty again",
+	    ci.GetCurrentCommandBuffer(), "");
+
+	ci.AddKey(' ');
+	ci.AddKey(' ');
+	ci.AddKey('a');
+	ci.AddKey('b');
+	ci.AddKey('c');
+	UnitTest::Assert("buffer should contain '  abc'",
+	    ci.GetCurrentCommandBuffer(), "  abc");
+	ci.AddKey('\27');	// CTRL-W
+	UnitTest::Assert("buffer should contain only two spaces",
+	    ci.GetCurrentCommandBuffer(), "  ");
+
+	ci.AddKey('a');
+	ci.AddKey('b');
+	ci.AddKey('c');
+	ci.AddKey(' ');
+	UnitTest::Assert("buffer should contain '  abc '",
+	    ci.GetCurrentCommandBuffer(), "  abc ");
+	ci.AddKey('\27');	// CTRL-W
+	UnitTest::Assert("buffer should again contain only two spaces",
+	    ci.GetCurrentCommandBuffer(), "  ");
+
+	ci.AddKey('a');
+	ci.AddKey('b');
+	ci.AddKey('c');
+	ci.AddKey('d');
+	ci.AddKey(' ');
+	ci.AddKey('e');
+	ci.AddKey('f');
+	ci.AddKey('g');
+	ci.AddKey('h');
+	ci.AddKey('i');
+	ci.AddKey(' ');
+	ci.AddKey('\2');	// CTRL-B = move left
+	ci.AddKey('\2');
+	ci.AddKey('\2');
+	UnitTest::Assert("buffer should contain '  abcd efghi '",
+	    ci.GetCurrentCommandBuffer(), "  abcd efghi ");
+	ci.AddKey('\27');	// CTRL-W
+	UnitTest::Assert("buffer should now contain '  abcd hi '",
+	    ci.GetCurrentCommandBuffer(), "  abcd hi ");
+}
+
 static void Test_CommandInterpreter_CommandHistory()
 {
 	GXemul gxemul(false);
@@ -1021,6 +1114,7 @@ UNITTESTS(CommandInterpreter)
 	UNITTEST(Test_CommandInterpreter_KeyBuffer);
 	UNITTEST(Test_CommandInterpreter_KeyBuffer_CursorMovement);
 	UNITTEST(Test_CommandInterpreter_KeyBuffer_CtrlK);
+	UNITTEST(Test_CommandInterpreter_KeyBuffer_CtrlW);
 
 	// Command History:
 	UNITTEST(Test_CommandInterpreter_CommandHistory);

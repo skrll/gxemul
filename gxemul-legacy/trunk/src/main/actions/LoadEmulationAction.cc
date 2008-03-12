@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: LoadEmulationAction.cc,v 1.2 2008-01-12 08:55:52 debug Exp $
+ *  $Id: LoadEmulationAction.cc,v 1.3 2008-03-12 11:45:41 debug Exp $
  */
 
 #include <assert.h>
@@ -111,13 +111,15 @@ void LoadEmulationAction::Execute()
 	// Read the entire file into a string.
 	// TODO: This is wasteful, of course. It actually takes twice the
 	// size of the file, since the string constructor generates a _copy_.
+	// But string takes care of unicode and such (if compiled as ustring).
 	char* buf = (char*) malloc(fileSize);
+	CHECK_ALLOCATION(buf);
 	memset(buf, 0, fileSize);
 	file.read(buf, fileSize);
 	string str(buf, fileSize);
 	free(buf);
 	file.close();
-	
+
 	size_t strPos = 0;
 	component = Component::Deserialize(str, strPos);
 
@@ -128,9 +130,8 @@ void LoadEmulationAction::Execute()
 	}
 
 	if (whereToAddIt.IsNULL()) {
-		StateVariableValue name;
-		if (!component->GetVariable("name", &name) ||
-		    name.ToString() != "root")
+		const StateVariable* name = component->GetVariable("name");
+		if (name == NULL || name->ToString() != "root")
 			m_gxemul.GetRootComponent()->AddChild(component);
 		else
 			m_gxemul.SetRootComponent(component);
@@ -167,8 +168,8 @@ static void Test_LoadEmulationAction_ReplaceRoot()
 
 	refcount_ptr<Component> dummyComponentA = new DummyComponent;
 	refcount_ptr<Component> dummyComponentB = new DummyComponent;
-	dummyComponentA->SetVariable("x", StateVariableValue("123"));
-	dummyComponentB->SetVariable("x", StateVariableValue("456"));
+	dummyComponentA->SetVariableValue("x", "123");
+	dummyComponentB->SetVariableValue("x", "456");
 	gxemul.GetRootComponent()->AddChild(dummyComponentA);
 	gxemul.GetRootComponent()->AddChild(dummyComponentB);
 	UnitTest::Assert("the root component should have children",
@@ -219,8 +220,8 @@ static void Test_LoadEmulationAction_ReplaceRootNoRootInFile()
 
 	refcount_ptr<Component> dummyComponentA = new DummyComponent;
 	refcount_ptr<Component> dummyComponentB = new DummyComponent;
-	dummyComponentA->SetVariable("x", StateVariableValue("123"));
-	dummyComponentB->SetVariable("x", StateVariableValue("456"));
+	dummyComponentA->SetVariableValue("x", "123");
+	dummyComponentB->SetVariableValue("x", "456");
 	gxemul.GetRootComponent()->AddChild(dummyComponentA);
 	gxemul.GetRootComponent()->AddChild(dummyComponentB);
 	UnitTest::Assert("the root component should have children",
@@ -272,8 +273,8 @@ static void Test_LoadEmulationAction_WithComponentTargetPath()
 
 	refcount_ptr<Component> dummyComponentA = new DummyComponent;
 	refcount_ptr<Component> dummyComponentB = new DummyComponent;
-	dummyComponentA->SetVariable("x", StateVariableValue("123"));
-	dummyComponentB->SetVariable("x", StateVariableValue("456"));
+	dummyComponentA->SetVariableValue("x", "123");
+	dummyComponentB->SetVariableValue("x", "456");
 	gxemul.GetRootComponent()->AddChild(dummyComponentA);
 	gxemul.GetRootComponent()->AddChild(dummyComponentB);
 	UnitTest::Assert("the root component should have children",

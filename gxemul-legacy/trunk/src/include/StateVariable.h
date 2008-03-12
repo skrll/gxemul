@@ -28,13 +28,12 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: StateVariable.h,v 1.2 2008-01-02 10:56:41 debug Exp $
+ *  $Id: StateVariable.h,v 1.3 2008-03-12 11:45:41 debug Exp $
  */
 
 #include "misc.h"
 
 #include "SerializationContext.h"
-#include "StateVariableValue.h"
 #include "UnitTest.h"
 
 
@@ -52,45 +51,165 @@ class StateVariable
 {
 public:
 	/**
-	 * \brief Default constructor for a StateVariable.
+	 * \brief An enumeration of the possible types of a %StateVariableValue.
 	 */
-	StateVariable() {}
+	enum Type {
+		String = 0,
+		Bool,
+		UInt8,
+		UInt16,
+		UInt32,
+		UInt64,
+		SInt8,
+		SInt16,
+		SInt32,
+		SInt64,
+		Array
+	};
+
+public:
+	/**
+	 * \brief Default constructor.
+	 */
+	StateVariable();
 
 	/**
-	 * \brief Base constructor for a StateVariable.
+	 * \brief Constructor for a String StateVariable.
 	 *
-	 * @param name		The name of the variable.
-	 * @param value		The variable's initial value.
+	 * @param name The variable's name.
+	 * @param ptrToString A pointer to the string which this
+	 *	variable refers to.
 	 */
-	StateVariable(const string& name, const StateVariableValue& value);
+	StateVariable(const string& name, string* ptrToString);
+
+	/**
+	 * \brief Constructor for a Bool StateVariable.
+	 *
+	 * @param name The variable's name.
+	 * @param ptrToVar A pointer to the variable.
+	 */
+	StateVariable(const string& name, bool* ptrToVar);
+
+	/**
+	 * \brief Constructor for an Array StateVariable.
+	 *
+	 * @param name The variable's name.
+	 * @param ptrToVar A pointer to the variable.
+	 * @param arrayLength Length in bytes of the array.
+	 */
+	StateVariable(const string& name, uint8_t* ptrToVar,
+		size_t arrayLength);
+
+	/**
+	 * \brief Constructor for a UInt8 StateVariable.
+	 *
+	 * @param name The variable's name.
+	 * @param ptrToVar A pointer to the variable.
+	 */
+	StateVariable(const string& name, uint8_t* ptrToVar);
+
+	/**
+	 * \brief Constructor for a UInt16 StateVariable.
+	 *
+	 * @param name The variable's name.
+	 * @param ptrToVar A pointer to the variable.
+	 */
+	StateVariable(const string& name, uint16_t* ptrToVar);
+
+	/**
+	 * \brief Constructor for a UInt32 StateVariable.
+	 *
+	 * @param name The variable's name.
+	 * @param ptrToVar A pointer to the variable.
+	 */
+	StateVariable(const string& name, uint32_t* ptrToVar);
+
+	/**
+	 * \brief Constructor for a UInt64 StateVariable.
+	 *
+	 * @param name The variable's name.
+	 * @param ptrToVar A pointer to the variable.
+	 */
+	StateVariable(const string& name, uint64_t* ptrToVar);
+
+	/**
+	 * \brief Constructor for a SInt8 StateVariable.
+	 *
+	 * @param name The variable's name.
+	 * @param ptrToVar A pointer to the variable.
+	 */
+	StateVariable(const string& name, int8_t* ptrToVar);
+
+	/**
+	 * \brief Constructor for a SInt16 StateVariable.
+	 *
+	 * @param name The variable's name.
+	 * @param ptrToVar A pointer to the variable.
+	 */
+	StateVariable(const string& name, int16_t* ptrToVar);
+
+	/**
+	 * \brief Constructor for a SInt32 StateVariable.
+	 *
+	 * @param name The variable's name.
+	 * @param ptrToVar A pointer to the variable.
+	 */
+	StateVariable(const string& name, int32_t* ptrToVar);
+
+	/**
+	 * \brief Constructor for a SInt64 StateVariable.
+	 *
+	 * @param name The variable's name.
+	 * @param ptrToVar A pointer to the variable.
+	 */
+	StateVariable(const string& name, int64_t* ptrToVar);
 
 	/**
 	 * \brief Gets the name of the variable.
 	 *
-	 * @return the name of the variable
+	 * @return The name of the variable.
 	 */
 	const string& GetName() const;
-	
-	/**
-	 * \brief Gets the value of the variable.
-	 *
-	 * @return the value of the variable
-	 */
-	const StateVariableValue& GetValue() const;
 
 	/**
-	 * \brief Sets the value of the variable.
+	 * \brief Gets the type of the variable.
 	 *
-	 * @param newValue	The value to assign to the variable.
+	 * @return The type of the variable.
 	 */
-	 void SetValue(const StateVariableValue& newValue);
+	enum Type GetType() const;
 
 	/**
 	 * \brief Serializes the variable into a string.
 	 *
-	 * @return a string, representing the variable
+	 * @return A string, representing the variable.
 	 */
 	string Serialize(SerializationContext& context) const;
+
+	/**
+	 * \brief Copy the value from another variable into this variable.
+	 *
+	 * @param otherVariable The variable to copy from.
+	 * @return True if the value was copied, false if copying was not
+	 *	possible (i.e. the types differed).
+	 */
+	bool CopyValueFrom(const StateVariable& otherVariable);
+
+	/**
+	 * \brief Returns the variable as a readable string.
+	 *
+	 * @return A string, representing the variable's value.
+	 */
+	string ToString() const;
+
+	/**
+	 * \brief Set the variable's value.
+	 *
+	 * @param escapedStringValue The new value, as a C-style escaped
+	 *	string.
+	 * @return True if the value was set, false if e.g. there was a
+	 *	parse error.
+	 */
+	bool SetValue(const string& escapedStringValue);
 
 
 	/********************************************************************/
@@ -98,8 +217,39 @@ public:
 	static void RunUnitTests(int& nSucceeded, int& nFailures);
 
 private:
+	/**
+	 * \brief Returns the type of the variable, as a string.
+	 *
+	 * @return A string representation of the variable's type.
+	 */
+	string GetTypeString() const;
+
+	/**
+	 * \brief Returns a string representation of the variable's value.
+	 *
+	 * @return A string representation of the variable's value.
+	 */
+	string ValueToString() const;
+
+private:
 	string			m_name;
-	StateVariableValue	m_value;
+	enum Type		m_type;
+	
+	union {
+		string*		pstr;
+		bool*		pbool;
+		uint8_t*	puint8;
+		uint16_t*	puint16;
+		uint32_t*	puint32;
+		uint64_t*	puint64;
+		int8_t*		psint8;
+		int16_t*	psint16;
+		int32_t*	psint32;
+		int64_t*	psint64;
+		uint8_t*	parray;
+	} m_value;
+
+	size_t			m_arrayLength;	// Only used for Arrays
 };
 
 

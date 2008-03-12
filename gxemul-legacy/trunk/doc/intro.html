@@ -6,7 +6,7 @@
   <meta name="robots" content="noarchive,nofollow,noindex">
 </head>
 <body>
-<!--  $Id: intro.html,v 1.138 2008-01-12 08:28:33 debug Exp $  -->
+<!--  $Id: intro.html,v 1.139 2008-03-12 11:45:40 debug Exp $  -->
 <!-- 10 lines header.  -->
 
 <h1>GXemul: Introduction</h1>
@@ -19,10 +19,12 @@
 
 <p><br><h3><a name="whatisgxemul">What is GXemul?</a></h3>
 
-<p>GXemul is an experimental framework for
-<a href="http://en.wikipedia.org/wiki/Full_virtualization">full-system</a>
-emulation. This means that, in addition to emulating processors, 
-surrounding devices and peripherals are also emulated.
+<p>GXemul is an experimental framework for <a 
+href="http://en.wikipedia.org/wiki/Full_virtualization">full-system 
+emulation/virtualization</a>. Several <a href="machines.html">machines</a> 
+and other <a href="components.html">components</a> that make up a computer 
+system have been implemented, and the framework is designed so that it 
+should be relatively easy to add new machine and component types.
 
 <p>GXemul 0.5.0 is a complete rewrite of GXemul in
 <a href="http://en.wikipedia.org/wiki/C%2B%2B">C++</a>. Previous versions
@@ -55,7 +57,7 @@ you would usually execute<pre>
 
 	or
 
-	cd /usr/<a href="http://www.freebsd.org/cgi/cvsweb.cgi/ports/emulators/gxemul/">ports/emulators/gxemul</a>; make install
+	cd <a href="http://www.freebsd.org/cgi/cvsweb.cgi/ports/emulators/gxemul/">/usr/ports/emulators/gxemul</a>; make install
 </pre>
 as root. That will install GXemul, either as a pre-build binary package,
 or from the <a href="http://www.freebsd.org/ports/">FreeBSD Ports system</a>.
@@ -144,7 +146,7 @@ code, then you need to comply with each individual source file some other
 way, for example by writing additional documentation containing copyright
 notes. I have not done this, since I do not plan on making distributions
 without source code. You need to check all individual files for details.
-The "easiest way out" if you plan to redistribute code from GXemul is, of
+The "easiest way out" if you plan to redistribute GXemul is, of
 course, to let it remain Free Software and simply include the source code.
 
 <p>In case you want to reuse parts of GXemul, but you need to do that 

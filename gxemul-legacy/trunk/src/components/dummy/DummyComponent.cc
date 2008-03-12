@@ -25,16 +25,37 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: DummyComponent.cc,v 1.7 2008-01-12 08:29:56 debug Exp $
+ *  $Id: DummyComponent.cc,v 1.8 2008-03-12 11:45:40 debug Exp $
  */
 
 #include "components/DummyComponent.h"
 #include "Checksum.h"
+#include "ComponentFactory.h"
 
 
-DummyComponent::DummyComponent()
-	: Component("dummy")
+DummyComponent::DummyComponent(string className)
+	: Component(className)
 {
+	// The dummy component should have no additional state.
+}
+
+
+refcount_ptr<Component> DummyComponent::Create()
+{
+	return new DummyComponent();
+}
+
+
+string DummyComponent::GetAttribute(const string& attributeName)
+{
+	if (attributeName == "stable")
+		return "yes";
+
+	if (attributeName == "description")
+		return "A dummy component, which does nothing.<br>"
+		    "It can act as a container for other components.";
+
+	return Component::GetAttribute(attributeName);
 }
 
 
@@ -47,7 +68,7 @@ static void Test_DummyComponent_CreateComponent()
 {
 	refcount_ptr<Component> component;
 
-	component = Component::CreateComponent("dummy");
+	component = ComponentFactory::CreateComponent("dummy");
 	UnitTest::Assert("creating a dummy component should be possible",
 	    component.IsNULL() == false);
 
@@ -160,43 +181,45 @@ static void Test_DummyComponent_AddChild_UniqueName()
 	refcount_ptr<Component> dummyChildB = new DummyComponent;
 	refcount_ptr<Component> dummyChildC = new DummyComponent;
 
-	StateVariableValue name;
 	UnitTest::Assert("dummyChildA should have no initial name",
-	    dummyChildA->GetVariable("name", &name) == false);
+	    dummyChildA->GetVariable("name")->ToString(), "");
 
 	dummy->AddChild(dummyChildA);
 
-	UnitTest::Assert("dummyChildA should have a name now",
-	    dummyChildA->GetVariable("name", &name) == true);
+	const StateVariable* name = dummyChildA->GetVariable("name");
 	UnitTest::Assert("dummyChildA's name mismatch",
-	    name.ToString(), "dummy0");
+	    name->ToString(), "dummy0");
 
 	dummy->AddChild(dummyChildB);
 
+	name = dummyChildA->GetVariable("name");
 	UnitTest::Assert("dummyChildA should still have a name",
-	    dummyChildA->GetVariable("name", &name) == true);
+	    name != NULL);
 	UnitTest::Assert("dummyChildA's name changed unexpectedly?",
-	    name.ToString(), "dummy0");
+	    name->ToString(), "dummy0");
 
+	name = dummyChildB->GetVariable("name");
 	UnitTest::Assert("dummyChildB should have a name now",
-	    dummyChildB->GetVariable("name", &name) == true);
+	    name != NULL);
 	UnitTest::Assert("dummyChildB's name mismatch",
-	    name.ToString(), "dummy1");
+	    name->ToString(), "dummy1");
 
 	dummy->AddChild(dummyChildC);
 
+	name = dummyChildC->GetVariable("name");
 	UnitTest::Assert("dummyChildC should have a name now",
-	    dummyChildC->GetVariable("name", &name) == true);
+	    name != NULL);
 	UnitTest::Assert("dummyChildC's name mismatch",
-	    name.ToString(), "dummy2");
+	    name->ToString(), "dummy2");
 
 	dummy->RemoveChild(dummyChildA);
 
+	name = dummyChildB->GetVariable("name");
 	UnitTest::Assert("dummyChildB should still have a name, after"
 		" removing child A",
-	    dummyChildB->GetVariable("name", &name) == true);
+	    name != NULL);
 	UnitTest::Assert("dummyChildB's should not have changed",
-	    name.ToString(), "dummy1");
+	    name->ToString(), "dummy1");
 }
 
 static void Test_DummyComponent_GeneratePath()
@@ -228,7 +251,7 @@ static void Test_DummyComponent_LookupPath()
 {
 	refcount_ptr<Component> dummyA = new DummyComponent;
 
-	dummyA->SetVariable("name", StateVariableValue("hello"));
+	dummyA->SetVariableValue("name", "hello");
 
 	refcount_ptr<Component> component1 = dummyA->LookupPath("nonsense");
 	UnitTest::Assert("nonsense lookup should fail",
@@ -240,8 +263,8 @@ static void Test_DummyComponent_LookupPath()
 
 	refcount_ptr<Component> child = new DummyComponent;
 	refcount_ptr<Component> childchild = new DummyComponent;
-	child->SetVariable("name", StateVariableValue("x"));
-	childchild->SetVariable("name", StateVariableValue("y"));
+	child->SetVariableValue("name", "x");
+	childchild->SetVariableValue("name", "y");
 	dummyA->AddChild(child);
 	child->AddChild(childchild);
 
@@ -276,16 +299,16 @@ static void Test_DummyComponent_FindPathByPartialMatch()
 	refcount_ptr<Component> m2pcibus0 = new DummyComponent;
 	refcount_ptr<Component> m3otherpci = new DummyComponent;
 
-	root->SetVariable("name", StateVariableValue("root"));
-	machine0->SetVariable("name", StateVariableValue("machine0"));
-	machine1->SetVariable("name", StateVariableValue("machine1"));
-	machine2->SetVariable("name", StateVariableValue("machine2"));
-	machine3->SetVariable("name", StateVariableValue("machine3"));
-	m0isabus0->SetVariable("name", StateVariableValue("isabus0"));
-	m1pcibus0->SetVariable("name", StateVariableValue("pcibus0"));
-	m1pcibus1->SetVariable("name", StateVariableValue("pcibus1"));
-	m2pcibus0->SetVariable("name", StateVariableValue("pcibus0"));
-	m3otherpci->SetVariable("name", StateVariableValue("otherpci"));
+	root->GetVariable("name")->SetValue("root");
+	machine0->GetVariable("name")->SetValue("machine0");
+	machine1->GetVariable("name")->SetValue("machine1");
+	machine2->GetVariable("name")->SetValue("machine2");
+	machine3->GetVariable("name")->SetValue("machine3");
+	m0isabus0->GetVariable("name")->SetValue("isabus0");
+	m1pcibus0->GetVariable("name")->SetValue("pcibus0");
+	m1pcibus1->GetVariable("name")->SetValue("pcibus1");
+	m2pcibus0->GetVariable("name")->SetValue("pcibus0");
+	m3otherpci->GetVariable("name")->SetValue("otherpci");
 
 	root->AddChild(machine0);
 	root->AddChild(machine1);
@@ -335,46 +358,20 @@ static void Test_DummyComponent_FindPathByPartialMatch()
 	    matches.size(), 0);
 }
 
-static void Test_DummyComponent_GetSet_Variables()
+static void Test_DummyComponent_GetUnknownVariable()
 {
 	refcount_ptr<Component> dummy = new DummyComponent;
 
-	UnitTest::Assert("variable variablename should not be set yet",
-	    dummy->GetVariable("variablename", NULL) == false);
-
-	StateVariableValue value("hello");
-	dummy->SetVariable("variablename", value);
-
-	StateVariableValue retrievedValue;
-
-	UnitTest::Assert("variable variablename should be set",
-	    dummy->GetVariable("variablename", &retrievedValue) == true);
-	UnitTest::Assert("retrieved value should be hello",
-	    retrievedValue.ToString() == "hello");
-
-	StateVariableValue value2("hello2");
-	dummy->SetVariable("variablename", value2);
-
-	UnitTest::Assert("variable variablename should still be set",
-	    dummy->GetVariable("variablename", &retrievedValue) == true);
-	UnitTest::Assert("retrieved value should be hello2",
-	    retrievedValue.ToString() == "hello2");
+	UnitTest::Assert("variable variablename should not be set",
+	    dummy->GetVariable("variablename") == NULL);
 }
 
-static void Test_DummyComponent_Clone()
+static void Test_DummyComponent_Clone_Basic()
 {
 	refcount_ptr<Component> dummy = new DummyComponent;
 	refcount_ptr<Component> dummyChildA = new DummyComponent;
 	refcount_ptr<Component> dummyChildA1 = new DummyComponent;
 	refcount_ptr<Component> dummyChildA2 = new DummyComponent;
-
-	dummy->SetVariable("x", StateVariableValue("value 1"));
-	dummy->SetVariable("y", StateVariableValue("value 2"));
-
-	dummyChildA1->SetVariable("x", StateVariableValue("value\nhello"));
-	dummyChildA2->SetVariable("something", StateVariableValue());
-	dummyChildA2->SetVariable("numericTest", StateVariableValue(123));
-	dummyChildA2->SetVariable("z", StateVariableValue(-1));
 
 	dummyChildA->AddChild(dummyChildA1);
 	dummyChildA->AddChild(dummyChildA2);
@@ -391,7 +388,7 @@ static void Test_DummyComponent_Clone()
 	UnitTest::Assert("clone should have same checksum",
 	    originalChecksum == cloneChecksum);
 
-	dummy->SetVariable("x", StateVariableValue("modified"));
+	dummy->SetVariableValue("name", "modified");
 
 	Checksum originalChecksumAfterModifyingOriginal;
 	dummy->AddChecksum(originalChecksumAfterModifyingOriginal);
@@ -403,7 +400,108 @@ static void Test_DummyComponent_Clone()
 	UnitTest::Assert("clone should have same checksum",
 	    cloneChecksum == cloneChecksumAfterModifyingOriginal);
 
-	clone->SetVariable("x", StateVariableValue("modified"));
+	clone->SetVariableValue("name", "modified");
+
+	Checksum originalChecksumAfterModifyingClone;
+	dummy->AddChecksum(originalChecksumAfterModifyingClone);
+	Checksum cloneChecksumAfterModifyingClone;
+	clone->AddChecksum(cloneChecksumAfterModifyingClone);
+
+	UnitTest::Assert("original should have same checksum, after the "
+		"clone has been modified",
+	    originalChecksumAfterModifyingClone ==
+	    originalChecksumAfterModifyingOriginal);
+	UnitTest::Assert("modified clone should have same checksum as "
+		"modified original",
+	    cloneChecksumAfterModifyingClone ==
+	    originalChecksumAfterModifyingOriginal);
+}
+
+class DummyComponentWithAllVariableTypes
+	: public DummyComponent
+{
+public:
+	DummyComponentWithAllVariableTypes()
+		: DummyComponent("dummy2")
+	{
+		AddVariableString("m_string", &m_string);
+		AddVariableUInt8 ("m_uint8",  &m_uint8);
+		AddVariableUInt16("m_uint16", &m_uint16);
+		AddVariableUInt32("m_uint32", &m_uint32);
+		AddVariableUInt64("m_uint64", &m_uint64);
+		AddVariableSInt8 ("m_sint8",  &m_sint8);
+		AddVariableSInt16("m_sint16", &m_sint16);
+		AddVariableSInt32("m_sint32", &m_sint32);
+		AddVariableSInt64("m_sint64", &m_sint64);
+	}
+
+	virtual void ResetState()
+	{
+		DummyComponent::ResetState();
+
+		m_string = "some value";
+		m_uint8 = 123;
+		m_uint16 = 0xf9a2;
+		m_uint32 = 0x98f8aa01;
+		m_uint64 = 0xf819292930300a0aULL;
+		m_sint8 = -123;
+		m_sint16 = -400;
+		m_sint32 = -10000;
+		m_sint64 = -42;
+	}
+
+	static refcount_ptr<Component> Create()
+	{
+		return new DummyComponentWithAllVariableTypes();
+	}
+
+private:
+	string		m_string;
+	uint8_t		m_uint8;
+	uint16_t	m_uint16;
+	uint32_t	m_uint32;
+	uint64_t	m_uint64;
+	int8_t		m_sint8;
+	int16_t		m_sint16;
+	int32_t		m_sint32;
+	int64_t		m_sint64;
+};
+
+static void Test_DummyComponent_Clone_AllVariableTypes()
+{
+	refcount_ptr<Component> dummy = new DummyComponentWithAllVariableTypes;
+	refcount_ptr<Component> dA = new DummyComponentWithAllVariableTypes;
+	refcount_ptr<Component> dA1 = new DummyComponentWithAllVariableTypes;
+	refcount_ptr<Component> dA2 = new DummyComponentWithAllVariableTypes;
+
+	dA->AddChild(dA1);
+	dA->AddChild(dA2);
+	dummy->AddChild(dA);
+
+	Checksum originalChecksum;
+	dummy->AddChecksum(originalChecksum);
+
+	refcount_ptr<Component> clone = dummy->Clone();
+
+	Checksum cloneChecksum;
+	clone->AddChecksum(cloneChecksum);
+
+	UnitTest::Assert("clone should have same checksum",
+	    originalChecksum == cloneChecksum);
+
+	dummy->SetVariableValue("name", "modified");
+
+	Checksum originalChecksumAfterModifyingOriginal;
+	dummy->AddChecksum(originalChecksumAfterModifyingOriginal);
+	Checksum cloneChecksumAfterModifyingOriginal;
+	clone->AddChecksum(cloneChecksumAfterModifyingOriginal);
+
+	UnitTest::Assert("original should have changed checksum",
+	    originalChecksum != originalChecksumAfterModifyingOriginal);
+	UnitTest::Assert("clone should have same checksum",
+	    cloneChecksum == cloneChecksumAfterModifyingOriginal);
+
+	clone->SetVariableValue("name", "modified");
 
 	Checksum originalChecksumAfterModifyingClone;
 	dummy->AddChecksum(originalChecksumAfterModifyingClone);
@@ -427,15 +525,6 @@ static void Test_DummyComponent_SerializeDeserialize()
 	refcount_ptr<Component> dummyChildA1 = new DummyComponent;
 	refcount_ptr<Component> dummyChildA2 = new DummyComponent;
 
-	dummy->SetVariable("x", StateVariableValue("value 1"));
-	dummy->SetVariable("y", StateVariableValue("value 2"));
-
-	dummyChildA1->SetVariable("x", StateVariableValue("value\nhello"));
-	dummyChildA2->SetVariable("something", StateVariableValue());
-	dummyChildA2->SetVariable("numericTest", StateVariableValue(123));
-	dummyChildA2->SetVariable("numericTest2", StateVariableValue(0));
-	dummyChildA2->SetVariable("numericTest3", StateVariableValue(-1));
-
 	dummyChildA->AddChild(dummyChildA1);
 	dummyChildA->AddChild(dummyChildA2);
 	dummy->AddChild(dummyChildA);
@@ -446,6 +535,10 @@ static void Test_DummyComponent_SerializeDeserialize()
 
 UNITTESTS(DummyComponent)
 {
+	ComponentFactory::RegisterComponentClass("dummy2",
+	    DummyComponentWithAllVariableTypes::Create,
+	    Component::GetAttribute);
+
 	// Creation using CreateComponent
 	UNITTEST(Test_DummyComponent_CreateComponent);
 
@@ -464,11 +557,12 @@ UNITTESTS(DummyComponent)
 	UNITTEST(Test_DummyComponent_LookupPath);
 	UNITTEST(Test_DummyComponent_FindPathByPartialMatch);
 
-	// Get/Set state variables
-	UNITTEST(Test_DummyComponent_GetSet_Variables);
+	// Get state variables
+	UNITTEST(Test_DummyComponent_GetUnknownVariable);
 
 	// Clone
-	UNITTEST(Test_DummyComponent_Clone);
+	UNITTEST(Test_DummyComponent_Clone_Basic);
+	UNITTEST(Test_DummyComponent_Clone_AllVariableTypes);
 
 	// Serialization/deserialization
 	UNITTEST(Test_DummyComponent_SerializeDeserialize);

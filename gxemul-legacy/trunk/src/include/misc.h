@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: misc.h,v 1.272 2008-01-12 08:55:52 debug Exp $
+ *  $Id: misc.h,v 1.273 2008-03-12 11:45:41 debug Exp $
  *
  *  Misc. definitions for GXemul.
  */
@@ -46,6 +46,9 @@
 // The recommended way to add a specific message to the startup banner or
 // about box is to use the SECONDARY_MSG. This should end with a newline
 // character, unless it is completely empty.
+//
+// Example:  "Modified by XYZ to include support for machine type UVW.\n"
+//
 #define	SECONDARY_MSG	""
 
 
@@ -83,18 +86,30 @@ using std::stringstream;
 using std::vector;
 
 
+// Generic and vector-specific foreach, which work the way I want it.
+// (STL's for_each and mem_fun behave differently.)
+#define foreach_item(containertype,container,func) {	\
+	containertype::iterator _it; \
+	for (_it=container.begin(); _it!=container.end(); ++_it) (func)(*_it); }
+#define foreach_vec(container,func) { for (size_t _i=0, _n=(container).size(); \
+	_i<_n; ++_i) (func)((container)[_i]); }
+
+
 #ifndef NDEBUG
 #include "debug_new.h"
 #endif
 
+
+// Reference counting is needed in lots of places, so it is best to
+// include it from this file.
 #include "refcount_ptr.h"  
 
 
 #ifdef NO_C99_PRINTF_DEFINES
-/*
- *  This is a SUPER-UGLY HACK which happens to work on some machines.
- *  The correct solution is to upgrade your compiler to C99.
- */
+//
+// This is a SUPER-UGLY HACK which happens to work on some machines.
+// The correct solution is to upgrade your compiler to C99.
+//
 #ifdef NO_C99_64BIT_LONGLONG
 #define	PRIi8		"i"
 #define	PRIi16		"i"
@@ -120,7 +135,7 @@ using std::vector;
 #ifdef NO_MAP_ANON
 #error mmap for systems without MAP_ANON has not yet been implemented. \
 	The old implementation was too ugly. Please let me know about this \
-	if you see this error message.
+	if you see this error message. (Most likely IRIX systems.)
 #endif
 
 

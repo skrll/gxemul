@@ -6,7 +6,7 @@
   <meta name="robots" content="noarchive,nofollow,noindex">
 </head>
 <body>
-<!--  $Id: TODO.html,v 1.1 2008-01-12 08:28:33 debug Exp $  -->
+<!--  $Id: TODO.html,v 1.2 2008-03-12 11:45:40 debug Exp $  -->
 <!-- 10 lines header.  -->
 
 <h1>GXemul: TODO</h1>
@@ -17,7 +17,7 @@
 
 <h2>TODO</h2>
 
-<pre><font color="#b0b0b0">$Id: TODO.html,v 1.1 2008-01-12 08:28:33 debug Exp $</font></pre>
+<pre><font color="#b0b0b0">$Id: TODO.html,v 1.2 2008-03-12 11:45:40 debug Exp $</font></pre>
 
 <p>Some things, in approximate Time order, that I'd like to implement or fix.
 (Things at the top need to be fixed before those at the bottom.)
@@ -35,69 +35,162 @@ of GXemul.
 </ul>
 
 <p><hr><pre>
+<i>
+[ ] = not started
+[/] = started, but not completed
+[X] = completed (but these are usually removed from the TODO list)
+</i>
+<hr>
+
+Legacy (0.4.x) series
+---------------------
+
+	[ ]  Perhaps release 0.4.6.4, with:
+		[ ]  Fixes for PPC instructions?
+		[ ]  OF fixes... Try to get FreeBSD/macppc to boot further?
+
+<hr>
+
 Misc.
 -----
 
-	[ ]  Begin on the "testmips" template as soon as possible.
+	[ ]  Commit to CVS!
 
-		[ ]  "add testmips" should add a machine0, not a testmips0!
-		     Think about this. The "tree" command shows
-		     the value of a "template" variable after the name:
+	[/]  State variable Unit tests.
 
-		     	root
-		     	\-- machine0  [testmips]
+	[ ]  RAM component!
+		[ ]  Send initialization parameters to components,
+			e.g. RAM size. :)
+		[ ]  Read-only variables! E.g. "size" of a RAM component.
 
-		[ ]  Automagically generated documentation for templates
-		     that are marked as Stable (?)
-		
-		[ ]  In release builds, only Stable templates should be
-		     visible/available, others should not be included.
+	[ ]  Variables that have side effects on write, e.g. the "pc"
+	     might invalidate "current PC page" pointers, etc.
 
-	[ ]  References from e.g. Components that need fast runtime access.
-	     Will the state variables stay put in memory? Or the other way
-	     around, with state variables referencing the value in the
-	     Component?
+	[/]  Run loop!
+		[ ]  Single step = 1 cycle, otherwise a larger "chunk".
+		[/]  Component->Run() ...
+			[ ]  Start with MIPS_CPUComponent::Run()
+		[ ]  Ask each component what frequency it is running on?
+		[ ]  Each component may be cycle-accurate, or not.
+		     If the user wishes to run a cycle-accurate simulation,
+		     and one or more components is NOT marked as cycle-accurate,
+		     then there will be a warning of some kind.
 
-	[ ]  Large memory arrays, e.g. for RAM and framebuffer emulation.
-		Serialization/Deserialization? Perhaps as strings, with
-			zero-blocks not written out, and assumed on read?
-		Cloning/copy constructor? Copy-on-write per block?
-		Undo?
-		Handles with copy-on-write?
-		While in memory, handles point to copy-on-write memory, while
-		when being saved, the handles' contents is stored to a file?
+	[ ]  Make some initial things in the GUI work, such as a window
+	     for the text console, and some initial buttons that execute
+	     commands.
 
-	[ ]  Expand suitable unit tests to include tests for these large state
-	     variables!
+	[ ]  Components
+		[ ]  "help" about components could show a file:/// link to
+		     the installed documentation about that component or
+		     machine! (If it exists.)
 
-	[ ] Undo/redo commands should show what they are doing, e.g.
-		Undoing "add component"
-	    or
-	        Redoing "remove component".
-	    Preferably even including arguments. :-) Think about this.
+		[ ]  Reintroduce the -e command line option, for "model hint"
+		     given to the machine template. (3max, for the decstation
+		     type)   Not only for templates. E.g. a MIPS processor, with'
+		     subtype "R3000" instead of "5Kc" or so...
 
-	[ ] ModifyStateAction
+		[ ]  How about aliases? 5000/200, 3max etc. vs pmax/DECstation?
+		     Aliases + comments, for templates.
+
+		[ ]  Limit where components can be added. Like "drop targets"?
+			E.g. a machine can be added at the root, but a machine can not
+			be added on a pcibus. Similarly, a pcibus can not be added
+			at the root. It has to be in a machine of some kind.
+			Think about this. Perhaps as simple as a "if parent class is
+			not blah blah then disallow adding".
+				A machine can be added into a dummy component.
+				A dummy component can be added into a dummy component.
+				A pcibus can be added into a mainbus (in a machine.)
+				etc.
+			bool IsItOkToAddItToThisProposedParentComponent(propsedParent) const;
+
+	[ ]  Define an Interface, "UIOwner" or such, that the UI can
+	     use to communicate back to its owning GXemul instance; it
+	     does not need to have access to the full GXemul class
+	     member functions...
+
+	[ ]  Require binary file (or disk image) to be loaded,
+	     when starting a template based machine from the command line!
+	     	[ ]  Support for reading CD9660, EXT2FS, FFS/UFS, etc!!!
+	     	     and reading the binary from there. Autodetect common
+	     	     cases:  /netbsd, /bsd, /boot/kernel or /kernel,
+	     	     /vmlinu*, etc. If there is only one match, then boot
+	     	     that, otherwise require explicit filename on the
+	     	     command line (either for a file in an emulated
+	     	     filesystem, or a host file).
+
+	[/]  IR: this could be done separately from actual emulation
+	     code, and unit tested. src/ir/
+		[X]  IRBlockCache, hold a bunch of natively translated chunks
+		     of code.
+		[ ]  runtime option to turn off native code generation
+		     backends.		
+		[ ]  IR opcode etc.
+			[ ]  Debug dump must be possible.
+			[ ]  Load of various types
+			[ ]  Store of various types
+			[ ]  Arithmetic
+			[ ]  Bit logic
+			[ ]  Architecture dependent operations (setting/reading
+			     status registers, manipulating the TLBs,
+			     triggering software interrupts, etc)
+			[ ]  Conditional branches
+			[ ]  Unconditional branches
+			[ ]  Calls to subroutines. Special case for known
+			     leaf functions?
+			[ ]  Labels. (?)
+		     Abstraction framework:
+			[ ]  "Run this code"
+				NOTE: If no native target is in use, this should
+				run the code in plain C++! It is ok for this
+				to be not 100% tightly optimized.
+			[ ]  Count nr of times a block has been executed;
+			     this can be used to go from
+			     	1. IR only, to
+			     	2. native, but not optimized
+			     	3. native, heavily optimized
+			     	etc.
+			[ ]  Internal helpers such as "mark this as
+			     executable in memory".
+		[ ]  Initial target: amd64.
+			[ ]  Should generate machine code directly in memory,
+			     should not depend on any specific assembler's
+			     syntax.
+		[ ]  Optimizations?
+			[ ]  Target-independent?
+			[ ]  Per target.
+		[/]  Unit tests. (These probably only run if the host
+			matches one of the supported targets.)
+			E.g. for each IR instruction, and/or for each
+			specific optimization.
+
+	[ ]  UnitTest::Assert => macro, so that the correct line number and
+		file name ends up in the output. Perhaps
+			ASSERT_BOOL(msg, boolexpression)
+			ASSERT_STRING(msg, string, expected)
+			ASSERT_INT(msg, value, expected)
+	     and remove the Assert function(s) entierly?
+
+
+Actions and undo/redo
+---------------------
+
+	[ ]  ModifyStateAction
 		Undoable by remembering old value of a state variable.
 
-	[ ] MoveComponentAction
+	[ ]  MoveComponentAction
 		Undoable by remembering position, similar to Remove, where
 		the component was before.
 
-	[ ] ResetAction
+	[ ]  ResetAction
 		Undoable by keeping a clone of the entire old state.
 
-	[ ]  Limit where components can be added. Like "drop targets"?
-		E.g. a machine can be added at the root, but a machine can not
-		be added on a pcibus. Similarly, a pcibus can not be added
-		at the root. It has to be in a machine of some kind.
-		Think about this. Perhaps as simple as a "if parent class is
-		not blah blah then disallow adding".
-			A machine can be added into a dummy component.
-			A dummy component can be added into a dummy component.
-			A pcibus can be added into a mainbus (in a machine.)
-			etc.
-		bool IsItOkToAddItToThisProposedParentComponent(propsedParent) const;
-		:)
+	[ ]  Undo/redo commands should show what they are doing, e.g.
+		Undoing "add component"
+	     or
+	        Redoing "remove component".
+	     Preferably even including arguments. :-) Think about this.
 
 
 CommandInterpreter
@@ -147,30 +240,25 @@ CommandInterpreter
 				starting point.
 	[ ]	print expr  	Prints expression (gets a state variable).
 	[ ]	expr = value	Sets a state variable
-	[ ]	c
-	[ ]	continue	sets RunState to Running
 	[ ]	pause		sets RunState to Paused
-	[ ]	s
 	[ ]	step		single-step (Paused)
 	[ ]	trace		toggle function call tracing
-	[ ]	r
 	[ ]	registers	dump registers of a cpu (short form for
 				inspect [focuspath.]cpu  perhaps?)
 
-	x)  "Methods" on objects? E.g. ... ram.read8(addr) returning
-	    a byte from that address.
+	[ ]  c, s, r  as abbreviated commands for continue, step, and registers?
 
-	x)  Strings should be supported, both for e.g. variable
-	    assignment, and for e.g. placing strings in memory.
+	[ ]  "Methods" on objects? E.g. ... ram.read8(addr) returning
+	     a byte from that address.
 
-	x)  Arrays?
+	[ ]  Strings should be supported, both for e.g. variable
+	     assignment, and for e.g. placing strings in memory.
+
+	[ ]  Arrays?
 
 
 Components
 ----------
-
-	[ ]  Component registry. (For CreateComponent etc.)
-		[ ]  Add a Command for listing available components!
 
 	[ ]  Reset. Implement this in practice?
 
@@ -191,7 +279,10 @@ Components
 				the components framework (e.g. serialization...)
 	machines/		Machines are usually TEMPLATES which set up a
 				couple of other components!
-	memory/			RAM, ROM, caches, ...
+	memory/
+		ram
+		rom
+		cache(s)
 	network/		Ethernet and others end up here
 	sound/			sound cards
 
@@ -205,7 +296,7 @@ I18N
 	   it all working. po directories/files, etc.
 	x) Initial translation would be Swedish.   LANG=sv_SE.UTF-8 ./gxemul-gui
 	x) Use LANG=he_IL.UTF-8 ./gxemul-gui to try a right-to-left languages,
-	   or  LANG=ja_JP.UTF-8 ./gxemul-gui tp try an asian language.
+	   or  LANG=ja_JP.UTF-8 ./gxemul-gui to try an asian language.
 
 
 Error handling
@@ -221,6 +312,12 @@ GTKMM GUI
 	x)  Dockable windows!
 
 	x)  Command input window!  Make it look nice.
+
+	x)  "GXemul" _last_ in the title bar of windows, not first.
+		emulation_name - GXemul
+		machine_name (VGA) - GXemul
+		machine_name (serial console, tty0) - GXemul
+		etc.
 
 	x)  Copy/Paste of components! Both inside one GXemul instance,
 	    and _BETWEEN APPLICATIONS_!
@@ -261,9 +358,10 @@ GTKMM GUI
 			About
 
 	x)  Toolbar button area:
-		Play (start emulation)
+		Run/step forward (start emulation)
 		Pause (pause emulation, button kept down until unpaused)
 		Reset (with a dialog asking for confirmation)
+		Run/step backwards
 		Undo/Redo!
 	    (Optional plug-in-ability/extensibility. Buttons should
 	    be bound to debugger commands.)
@@ -304,7 +402,8 @@ Think about
 	    to have no such break conditions.
 
 	    [ ]	Optionally increase counters instead of breaking,
-		for statistics gathering.
+		for statistics gathering.  (Of course, it should then be
+		possible to set a break condition such as   expr > 50 or so)
 
 	    [ ]	Compile these conditions into some form of internal
 	    	byte code?
@@ -316,6 +415,8 @@ Think about
 		2) Fixed. (For fixed 1 instruction/cycle speed.)
 		   Each device must then have a specified speed (such
 		   as 50 MHz...)
+	    It should be possible to switch timing modes during an emulation,
+	    but going back after such a switch does not have to be possible.
 
 	x)  Generic timer framework
 
@@ -327,6 +428,9 @@ Think about
 			[ ]  Built-in NAT layer
 			[ ]  Perhaps VDE or similar?
 
+	x)  PROM emulation in software: Some kind of plugin system,
+	    allowing machines to plug in software PROM emulation packages.
+
 	x)  Regular saving of state with time stamps (i.e. cycle numbers),
 	    so that running "backwards" is possible!
 	    NOTE:
@@ -336,6 +440,12 @@ Think about
 		   backwards" button?) and the debugger.
 	    A kind of "exponential decay"-kind of discarding of old states is
 	    probably the best way to do it.
+	    Not necessary to be able to save the "Backward state"; saving
+	    the state will only save the latest state.
+
+	x)  "Live migration" might be possible. Or at least migrating while
+		the emulation is being paused. (Not very live-ish, but perhaps
+		this can be tweaked.)
 
 	x)  Actual machines being emulated 1 per process? Or all in the
 	    same process?
@@ -352,16 +462,10 @@ Think about
 	    launched.  F1 in dialogs could link to a page with screenshots
 	    + description of each dialog.
 
-	x)  Prepare for / investigate native code generation.
-		The intermediate representation might be better of having as
-		a byte-codish thing that is compiled to native code, instead
-		of pointers-to-functions? Think about this.
-		(Native translation for amd64 only, to begin with, to save
-		time.)
-
 	x)  Userland emulation!
 		Both from the command line, and from the GUI? (Startable,
 		at least.) Possibility to inspect cache misses, etc.
+		-u emulname  should imply -q.
 
 	x)  Command-line options compatible with pre-0.5.0! Start e.g.
 	    framebuffers in full-screen / windowed mode, _not_ docked.
@@ -379,15 +483,14 @@ Think about
 		Sun's old bus for keyboards/mice
 		...
 
-	x)  Architectures to concentrate on, from the beginning:
-		MIPS (since that's what works best in GXemul before 0.5.)
-			testmips, then pmax and others?
-		M88K (so that the work so far isn't lost)
-		amd64 (since there's more software to test that way, and
-			it will be fun/interesting to delve into
-			emulation of variable-length ISAs :-)
-		some simple AVR microcontroller? for demos
-		and all others... :)
+	x)  TFTP server built-in into the simulated gateway? For netbooting.
+
+	x)  Investigate switching to SVN for source code revision control.
+	    (If SVN works on FreeBSD/alpha 4.9.)
+
+	x)  GDB debug connection (again).
+	
+	x)  SuperH emulation: Not only SH4, but SH3 too?
 
 
 Preparation for release 0.5.0
@@ -397,12 +500,12 @@ Preparation for release 0.5.0
 	   been duplicated. AT LEAST the following before any kind of
 	   0.5.0 BETA:
 	   	o) testmips!
+		o) working GUI.
 	   	o) at least one REAL mips machine, such as pmax!
 	 	o) basic debugger commands:
 	 		trace tree, single step, registers, etc.
-
-	x) No exact date is set for this. Perhaps during the later
-	   part of 2008? (If I am lucky enough to get lots of spare time.)
+	 	o) reasonably good 64-bit and 32-bit native code generation
+	 	   speed.
 
 	x) Carefully read through all the source code.
 
@@ -413,14 +516,20 @@ Preparation for release 0.5.0
 		   customized distributions of gxemul (by naming the directory
 		   gxemul-MyVer-1.2.3 etc, and supplying all source code). +
 		   SECONDARY_MSG in misc.h.
-		x) Automated build of list of Commands + long
+		x) Automated build of list of CommandInterpreter Commands + long
 		   description as HTML?
-		x) Automated build of lists of Components too?
-		x) If documentation is automatically built, only include STABLE
-		   features in the documentation!
 		x) User guide with screenshots of the new GUI, _BUT_ the
 		   instructions should always mention how things are done
 		   using the text-only UI as well.
+		x) guestoses.html page in the same location as the legacy version,
+		   but with links into various Machine pages (where the actual
+		   documentation for guest OSes are).
+
+	x) When making a release:
+		Make sure to run "make documentation" in the release-named
+		directory, so that html documentation about components and
+		machines is produced for the Stable version, and not the
+		Development version!
 
 	x) Carefully check that the man page reflects the correct
 	   command line options etc.
@@ -428,9 +537,23 @@ Preparation for release 0.5.0
 	x) Carefully read through all the documentation, and test all
 	   instructions given there.
 
+	x) Take reasonable screenshots of the new version, and place on
+	   the homepage. In particular, take a small thumbnail screenshot,
+	   and place above the text "Introduction" in the lefthand navigation
+	   section, on all pages. (And replace the icon on gavare.se for
+	   GXemul with this icon, and perhaps also on Wikipedia?)
+		x)  Screenshots of simple bootup of guest OSes (maybe
+			even amd64 guest OSes?)
+		x)  Screenshots of the GUI, when debugging.
+		x)  Screenshots of running in text console mode, e.g.
+			booting a netbsd kernel, and then single-stepping.
+
 	x) Make sure that the web page looks reasonable. There should be
 	   clear ways to download the old 0.4.x version in addition to
 	   the 0.5.0 release, even when 0.5.0 has been released.
+		x)  Move down legacy screenshots to after the "news"
+		    section.
+		x)  Rename Curiosities/history to Curiosities/older history
 
 </pre>
 <hr>

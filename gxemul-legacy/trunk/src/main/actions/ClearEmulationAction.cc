@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ClearEmulationAction.cc,v 1.1 2008-01-12 08:29:56 debug Exp $
+ *  $Id: ClearEmulationAction.cc,v 1.2 2008-03-12 11:45:41 debug Exp $
  */
 
 #include <assert.h>
@@ -70,8 +70,8 @@ static void Test_ClearEmulationAction_TestAction()
 
 	refcount_ptr<Component> dummyComponentA = new DummyComponent;
 	refcount_ptr<Component> dummyComponentB = new DummyComponent;
-	dummyComponentA->SetVariable("x", StateVariableValue("123"));
-	dummyComponentB->SetVariable("x", StateVariableValue("456"));
+	dummyComponentA->SetVariableValue("x", "123");
+	dummyComponentB->SetVariableValue("x", "456");
 
 	gxemul.GetRootComponent()->AddChild(dummyComponentA);
 	gxemul.GetRootComponent()->AddChild(dummyComponentB);

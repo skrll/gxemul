@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: RemoveComponentAction.cc,v 1.1 2008-01-05 13:13:50 debug Exp $
+ *  $Id: RemoveComponentAction.cc,v 1.2 2008-03-12 11:45:41 debug Exp $
  */
 
 #include <assert.h>
@@ -78,13 +78,13 @@ static void Test_RemoveComponentAction_WithUndoRedo()
 	refcount_ptr<Component> dummyChildA1 = new DummyComponent;
 	refcount_ptr<Component> dummyChildA2 = new DummyComponent;
 
-	dummy->SetVariable("x", StateVariableValue("value 1"));
-	dummy->SetVariable("y", StateVariableValue("value 2"));
-	dummyChildA1->SetVariable("x", StateVariableValue("value\nhello"));
-	dummyChildA2->SetVariable("something", StateVariableValue());
-	dummyChildA2->SetVariable("numericTest", StateVariableValue(123));
-	dummyChildA2->SetVariable("numericTest2", StateVariableValue(0));
-	dummyChildA2->SetVariable("numericTest3", StateVariableValue(-1));
+	dummy->SetVariableValue("x", "value 1");
+	dummy->SetVariableValue("y", "value 2");
+	dummyChildA1->SetVariableValue("x", "value\nhello");
+	dummyChildA2->SetVariableValue("something", "");
+	dummyChildA2->SetVariableValue("numericTest", "123");
+	dummyChildA2->SetVariableValue("numericTest2", "0");
+	dummyChildA2->SetVariableValue("numericTest3", "-1");
 
 	dummyChildA->AddChild(dummyChildA1);
 	dummyChildA->AddChild(dummyChildA2);

@@ -27,7 +27,7 @@
  *  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *  SUCH DAMAGE.
  *
- *  $Id: GXemul.h,v 1.13 2008-01-12 08:29:56 debug Exp $
+ *  $Id: GXemul.h,v 1.14 2008-03-12 11:45:41 debug Exp $
  */
 
 #include "misc.h"
@@ -50,6 +50,7 @@
  *	<li>a tree of components, which make up the full
  *		state of the current emulation setup
  *	<li>an ActionStack, for undo/redo functionality
+ *	<li>a UI
  *	<li>a CommandInterpreter
  *	<li>a RunState
  * </ol>
@@ -121,14 +122,14 @@ public:
 	/**
 	 * \brief Gets a reference to the CommandInterpreter.
 	 *
-	 * @return a reference to the %GXemul instance' CommandInterpreter
+	 * @return A reference to the %GXemul instance' CommandInterpreter.
 	 */
 	CommandInterpreter& GetCommandInterpreter();
 
 	/**
 	 * \brief Gets a reference to the ActionStack.
 	 *
-	 * @return a reference to the %GXemul instance' ActionStack
+	 * @return A reference to the %GXemul instance' ActionStack.
 	 */
 	ActionStack& GetActionStack();
 
@@ -182,8 +183,42 @@ public:
 	 */
 	string GetRunStateAsString() const;
 
+	/**
+	 * \brief Gets the current quiet mode setting.
+	 *
+	 * @return True if running in quiet mode, false for normal operation.
+	 */
+	bool GetQuietMode() const;
+
+	/**
+	 * \brief Sets whether or not to run in quiet mode.
+	 *
+	 * @param quietMode true to run in quiet mode, false otherwise.
+	 */
+	void SetQuietMode(bool quietMode);
+
+	/**
+	 * \brief Run the emulation for a while.
+	 *
+	 * \param component	A reference counted pointer
+	 *	to the root component.
+	 * \param nrOfCycles	The approximate number of cycles to execute.
+	 *	If this value is zero (default), then a "reasonable
+	 *	chunk" of instructions will be executed. If it is 1, exactly
+	 *	one instruction will be executed.
+	 */
+	void ExecuteCycles(refcount_ptr<Component> component,
+		int nrOfCycles = 0);
 
 private:
+	/**
+	 * \brief Creates an emulation setup from a template machine name.
+	 *
+	 * @param templateName The name of the template machine.
+	 * @return True if the emulation was created, false otherwise.
+	 */
+	bool CreateEmulationFromTemplateMachine(const string& templateName);
+
 	/**
 	 * \brief Prints help message to std::cout.
 	 *
@@ -197,6 +232,7 @@ private:
 	RunState		m_runState;
 	bool			m_bWithGUI;
 	bool			m_bRunUnitTests;
+	bool			m_quietMode;
 	refcount_ptr<UI>	m_ui;
 	refcount_ptr<Component>	m_rootComponent;
 	ActionStack		m_actionStack;

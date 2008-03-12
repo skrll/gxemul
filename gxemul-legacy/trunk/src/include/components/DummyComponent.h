@@ -28,8 +28,11 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: DummyComponent.h,v 1.4 2008-01-02 10:56:41 debug Exp $
+ *  $Id: DummyComponent.h,v 1.5 2008-03-12 11:45:41 debug Exp $
  */
+
+// COMPONENT(dummy)
+
 
 #include "Component.h"
 
@@ -47,11 +50,24 @@ public:
 	/**
 	 * \brief Constructs a DummyComponent.
 	 */
-	DummyComponent();
+	DummyComponent(string className = "dummy");
+
+	/**
+	 * \brief Creates a DummyComponent.
+	 */
+	static refcount_ptr<Component> Create();
+
+	/**
+	 * \brief Get attribute information about the RAMComponent class.
+	 *
+	 * @param attributeName The attribute name.
+	 * @return A string representing the attribute value.
+	 */
+	static string GetAttribute(const string& attributeName);
 
 
 	/********************************************************************/
-
+public:
 	static void RunUnitTests(int& nSucceeded, int& nFailures);
 };
 

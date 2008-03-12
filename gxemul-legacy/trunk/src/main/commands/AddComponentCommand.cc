@@ -25,11 +25,12 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: AddComponentCommand.cc,v 1.1 2008-01-12 08:29:56 debug Exp $
+ *  $Id: AddComponentCommand.cc,v 1.2 2008-03-12 11:45:41 debug Exp $
  */
 
 #include "actions/AddComponentAction.h"
 #include "commands/AddComponentCommand.h"
+#include "ComponentFactory.h"
 #include "GXemul.h"
 
 
@@ -66,7 +67,7 @@ void AddComponentCommand::Execute(GXemul& gxemul,
 	string componentName = arguments[0];
 
 	refcount_ptr<Component> componentToAdd =
-	    Component::CreateComponent(componentName);
+	    ComponentFactory::CreateComponent(componentName);
 
 	if (componentToAdd.IsNULL()) {
 		ShowMsg(gxemul, componentName + ": unknown component.\n");

@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Component.h,v 1.9 2008-01-12 08:29:56 debug Exp $
+ *  $Id: Component.h,v 1.10 2008-03-12 11:45:41 debug Exp $
  */
 
 #include "misc.h"
@@ -52,9 +52,11 @@ typedef vector< refcount_ptr<Component> > Components;
 class Component
 	: public ReferenceCountable
 {
-public:
+protected:
 	/**
 	 * \brief Base constructor for a %Component.
+	 *
+	 * See also: the Create() function.
 	 *
 	 * @param className	The name of the component class.
 	 *			It should be a short, descriptive name.
@@ -62,17 +64,8 @@ public:
 	 */
 	Component(const string& className);
 
+public:
 	virtual ~Component() = 0;
-
-	/**
-	 * \brief Creates a component given a short component class name.
-	 *
-	 * @param className	The component class name, e.g. "pcibus".
-	 * @return A reference counted Component pointer. This is set to the
-	 *	newly created component on success. On failure it is set to
-	 *	NULL.
-	 */
-	static refcount_ptr<Component> CreateComponent(const string& className);
 
 	/**
 	 * \brief Gets the class name of the component.
@@ -83,6 +76,31 @@ public:
 	string GetClassName() const;
 
 	/**
+	 * \brief Creates a Component.
+	 *
+	 * The reason for having this helper, instead of simply calling the
+	 * constructor of a specific %Component, is to make templates work
+	 * in a reasonable and straight-forward manner. (Note: This concept
+	 * of templates is unrelated to the C++ concept of templates. It just
+	 * happens to be the same word.)
+	 *
+	 * E.g. DummyComponent::Create() returns a new DummyComponent, but
+	 * TestMIPSMachine::Create() returns a new MachineComponent
+	 * (with some pre-defined child components), not a TestMIPS component.
+	 */
+	static refcount_ptr<Component> Create();
+
+	/**
+	 * \brief Get attribute information about a Component.
+	 *
+	 * @param attributeName The attribute name.
+	 * @return A string representing the attribute value. The base
+	 *	implementation returns an empty string; it is up to individual
+	 *	Components to return other values.
+	 */
+	static string GetAttribute(const string& attributeName);
+
+	/**
 	 * \brief Clones the component and all its children.
 	 *
 	 * The new copy is a complete copy; modifying either the copy or the
@@ -91,6 +109,15 @@ public:
 	 * @return A reference counted pointer to the clone.
 	 */
 	refcount_ptr<Component> Clone() const;
+
+	/**
+	 * \brief Generates an ASCII tree dump of a component tree.
+	 *
+	 * @param branchTemplate Used for recursion. Start with an empty
+	 *	string ("").
+	 * @return An ASCII string containing the tree.
+	 */
+	string GenerateTreeDump(const string& branchTemplate) const;
 
 	/**
 	 * \brief Resets the state of this component and all its children.
@@ -104,12 +131,21 @@ public:
 	 * traversed.
 	 *
 	 * Note 2: After a component's state variables have been reset, the
-	 * base class' ResetVariables function should be called.
+	 * base class' ResetState() function should also be called.
 	 *
 	 * The implementation of this function ususally takes the form of a
-	 * list of calls to Component::SetVariable.
+	 * number of assignment of values to member variables, and then
+	 * the call to the base class' ResetState() function.
 	 */
-	virtual void ResetVariables();
+	virtual void ResetState();
+
+	/**
+	 * \brief Runs the component for a number of cycles.
+	 *
+	 * @param nrOfCycles	The number of cycles to run.
+	 * @return	The number of cycles actually executed.
+	 */
+	int Run(int nrOfCycles);
 
 	/**
 	 * \brief Sets the parent component of this component.
@@ -222,28 +258,53 @@ public:
 	/**
 	 * \brief Gets pointers to child components.
 	 *
-	 * @return reference counted pointers to child components
+	 * @return Reference counted pointers to child components.
 	 */
 	Components& GetChildren();
 
 	/**
-	 * \brief Gets the value of a state variable.
+	 * \brief Gets pointers to child components, as a const reference.
 	 *
-	 * @param name the variable name
-	 * @param valuePtr a pointer to a StateVariableValue which will be
-	 *		filled with the value of the variable, or NULL
-	 * @return true if the variable was available, false otherwise
+	 * @return Reference counted pointers to child components.
 	 */
-	bool GetVariable(const string& name, StateVariableValue* valuePtr);
+	const Components& GetChildren() const;
 
 	/**
-	 * \brief Sets a state variable.
+	 * \brief Gets a pointer to a state variable.
 	 *
-	 * @param name the variable name
-	 * @param newValue the new value for the state variable
+	 * NOTE: The returned pointer should be used immediately after the
+	 *	call. It will in general not be valid after e.g. an
+	 *	AddVariable* call.
+	 *
+	 * @param name The variable name.
+	 * @return A pointer to the variable, it the name was
+	 *	known; NULL otherwise.
 	 */
-	void SetVariable(const string& name,
-		const StateVariableValue& newValue);
+	StateVariable* GetVariable(const string& name);
+
+	/**
+	 * \brief Gets a pointer to a state variable.
+	 *
+	 * NOTE: The returned pointer should be used immediately after the
+	 *	call. It will in general not be valid after e.g. an
+	 *	AddVariable* call.
+	 *
+	 * @param name The variable name.
+	 * @return A pointer to the variable, it the name was
+	 *	known; NULL otherwise.
+	 */
+	const StateVariable* GetVariable(const string& name) const;
+
+	/**
+	 * \brief Sets a variable to a new value.
+	 *
+	 * @param name The variable name.
+	 * @param escapedValue The new value, as a C-style escaped string.
+	 * @return True if the value was set, false otherwise. (E.g. if
+	 *	the name was not known, or if there was a parse error
+	 *	when parsing the value.)
+	 */
+	bool SetVariableValue(const string& name, const string& escapedValue);
 
 	/**
 	 * \brief Serializes the %Component into a string stream.
@@ -285,6 +346,133 @@ public:
 	 */
 	void AddChecksum(Checksum& checksum) const;
 	
+protected:
+	/**
+	 * \brief Adds a string state variable to the %Component.
+	 *
+	 * This function is only meant to be called from the component's
+	 * constructor.
+	 *
+	 * @param name The variable name.
+	 * @param variablePointer A pointer to the variable that the name should
+	 *	be connected to.
+	 * @return True if the state variable was added, false if the name
+	 *	was already in use.
+	 */
+	bool AddVariableString(const string& name, string* variablePointer);
+
+	/**
+	 * \brief Adds a uint8 state variable to the %Component.
+	 *
+	 * This function is only meant to be called from the component's
+	 * constructor.
+	 *
+	 * @param name The variable name.
+	 * @param variablePointer A pointer to the variable that the name should
+	 *	be connected to.
+	 * @return True if the state variable was added, false if the name
+	 *	was already in use.
+	 */
+	bool AddVariableUInt8(const string& name, uint8_t* variablePointer);
+
+	/**
+	 * \brief Adds a uint16 state variable to the %Component.
+	 *
+	 * This function is only meant to be called from the component's
+	 * constructor.
+	 *
+	 * @param name The variable name.
+	 * @param variablePointer A pointer to the variable that 
+	 *	the name should be connected to.
+	 * @return True if the state variable was added, false if the name
+	 *	was already in use.
+	 */
+	bool AddVariableUInt16(const string& name, uint16_t* variablePointer);
+
+	/**
+	 * \brief Adds a uint32 state variable to the %Component.
+	 *
+	 * This function is only meant to be called from the component's
+	 * constructor.
+	 *
+	 * @param name The variable name.
+	 * @param variablePointer A pointer to the variable 
+	 *	that the name should be connected to.
+	 * @return True if the state variable was added, false if the name
+	 *	was already in use.
+	 */
+	bool AddVariableUInt32(const string& name, uint32_t* variablePointer);
+
+	/**
+	 * \brief Adds a uint64 state variable to the %Component.
+	 *
+	 * This function is only meant to be called from the component's
+	 * constructor.
+	 *
+	 * @param name The variable name.
+	 * @param variablePointer A pointer to the 
+	 *	variable that the name should be connected to.
+	 * @return True if the state variable was added, false if the name
+	 *	was already in use.
+	 */
+	bool AddVariableUInt64(const string& name, uint64_t* variablePointer);
+
+	/**
+	 * \brief Adds a sint8 state variable to the %Component.
+	 *
+	 * This function is only meant to be called from the component's
+	 * constructor.
+	 *
+	 * @param name The variable name.
+	 * @param variablePointer A pointer to the variable that the name
+	 *	should be connected to.
+	 * @return True if the state variable was added, false if the name
+	 *	was already in use.
+	 */
+	bool AddVariableSInt8(const string& name, int8_t* variablePointer);
+
+	/**
+	 * \brief Adds a sint16 state variable to the %Component.
+	 *
+	 * This function is only meant to be called from the component's
+	 * constructor.
+	 *
+	 * @param name The variable name.
+	 * @param variablePointer A pointer to the variable that the name
+	 *	should be connected to.
+	 * @return True if the state variable was added, false if the name
+	 *	was already in use.
+	 */
+	bool AddVariableSInt16(const string& name, int16_t* variablePointer);
+
+	/**
+	 * \brief Adds a sint32 state variable to the %Component.
+	 *
+	 * This function is only meant to be called from the component's
+	 * constructor.
+	 *
+	 * @param name The variable name.
+	 * @param variablePointer A pointer to the variable that the
+	 *	name should be connected to.
+	 * @return True if the state variable was added, false if the name
+	 *	was already in use.
+	 */
+	bool AddVariableSInt32(const string& name, int32_t* variablePointer);
+
+	/**
+	 * \brief Adds a sint64 state variable to the %Component.
+	 *
+	 * This function is only meant to be called from the component's
+	 * constructor.
+	 *
+	 * @param name The variable name.
+	 * @param variablePointer A pointer to the variable that the name
+	 *	should be connected to.
+	 * @return True if the state variable was added, false if the name
+	 *	was already in use.
+	 */
+	bool AddVariableSInt64(const string& name, int64_t* variablePointer);
+
 private:
 	/**
 	 * \brief Looks up a path from this %Component,
@@ -323,6 +511,12 @@ private:
 	Components		m_childComponents;
 	string			m_className;
 	StateVariableMap	m_stateVariables;
+
+	// The following are this component's variables. Components that
+	// inherit from this class add their own instance variables.
+	string		m_name;		// This Component's instance name.
+	string		m_template;	// Set if this Component
+					// was based on a template.
 };
 
 

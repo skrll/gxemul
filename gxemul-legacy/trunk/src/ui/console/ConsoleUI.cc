@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ConsoleUI.cc,v 1.6 2008-01-12 08:29:57 debug Exp $
+ *  $Id: ConsoleUI.cc,v 1.7 2008-03-12 11:45:41 debug Exp $
  */
 
 #include <signal.h>
@@ -178,8 +178,8 @@ int ConsoleUI::MainLoop()
 		switch (m_gxemul->GetRunState()) {
 
 		case GXemul::Running:
-			std::cout << "Running: TODO\n";
-			m_gxemul->SetRunState(GXemul::Quitting);
+			m_gxemul->ExecuteCycles(
+			    m_gxemul->GetRootComponent());
 			break;
 			
 		case GXemul::Quitting:
