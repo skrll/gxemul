@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemul.cc,v 1.22 2008-03-14 12:12:16 debug Exp $
+ *  $Id: GXemul.cc,v 1.23 2008-03-14 12:22:27 debug Exp $
  *
  *  This file contains three things:
  *
@@ -807,8 +807,8 @@ void GXemul::ExecuteCycles(double timeslice)
 	double globalCurrentTime = GetGlobalTime();
 	double globalTargetTime = globalCurrentTime + timeslice;
 
-	// Reset the component's notion of current time, and find the highest
-	// frequency in use:
+	// Reset the components' notion of current time, and find the
+	// highest frequency in use:
 	size_t i, n = components.size();
 	double highestFreq = 0.0;
 	for (i=0; i<n; ++i) {
