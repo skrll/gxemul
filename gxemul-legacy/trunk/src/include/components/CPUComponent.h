@@ -1,5 +1,5 @@
-#ifndef MIPS_CPUCOMPONENT_H
-#define	MIPS_CPUCOMPONENT_H
+#ifndef CPUCOMPONENT_H
+#define	CPUCOMPONENT_H
 
 /*
  *  Copyright (C) 2008  Anders Gavare.  All rights reserved.
@@ -28,67 +28,54 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: MIPS_CPUComponent.h,v 1.2 2008-03-14 12:12:16 debug Exp $
+ *  $Id: CPUComponent.h,v 1.1 2008-03-14 12:12:16 debug Exp $
  */
 
-// COMPONENT(mips_cpu)
+// COMPONENT(cpu)
 
 
-#include "CPUComponent.h"
+#include "Component.h"
+
+#include "UnitTest.h"
 
 
 /**
- * \brief A Component representing a MIPS processor.
+ * \brief A Component base-class for processors.
  */
-class MIPS_CPUComponent
-	: public CPUComponent
+class CPUComponent
+	: public Component
+	, public UnitTestable
 {
 public:
 	/**
-	 * \brief Constructs a MIPS_CPUComponent.
+	 * \brief Constructs a CPUComponent.
 	 */
-	MIPS_CPUComponent();
+	CPUComponent(const string& className);
 
 	/**
-	 * \brief Creates a MIPS_CPUComponent.
+	 * \brief Creates a CPUComponent.
 	 */
 	static refcount_ptr<Component> Create();
 
 	/**
-	 * \brief Get attribute information about the MIPS_CPUComponent class.
+	 * \brief Get attribute information about the CPUComponent class.
 	 *
 	 * @param attributeName The attribute name.
 	 * @return A string representing the attribute value.
 	 */
 	static string GetAttribute(const string& attributeName);
 
-	/**
-	 * \brief Runs the component for a number of cycles.
-	 *
-	 * @param nrOfCycles    The number of cycles to run.
-	 * @return      The number of cycles actually executed.
-	 */
-	virtual int Run(int nrOfCycles);
-
-	/**
-	 * \brief Returns the current frequency (in Hz) that the component
-	 *	runs at.
-	 *
-	 * @return	The component's frequency in Hz.
-	 */
-	virtual double GetCurrentFrequency() const;
-
 
 	/********************************************************************/
 
 	static void RunUnitTests(int& nSucceeded, int& nFailures);
 
-private:
-	bool NativeTranslationExists();
-	void LookupCurrentCodePage();
-	void ExecuteMIPS16Instruction(uint16_t iword);
-	void ExecuteInstruction(uint32_t iword);
+protected:
+	uint64_t	m_pc;
+
+	const uint32_t *m_currentCodePage;
+	int		m_pageSize;
 };
 
 
-#endif	// MIPS_CPUCOMPONENT_H
+#endif	// CPUCOMPONENT_H

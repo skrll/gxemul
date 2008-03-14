@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: StatusCommand.cc,v 1.1 2008-01-12 08:29:56 debug Exp $
+ *  $Id: StatusCommand.cc,v 1.2 2008-03-14 12:12:16 debug Exp $
  */
 
 #include "commands/StatusCommand.h"
@@ -45,8 +45,10 @@ StatusCommand::~StatusCommand()
 
 void StatusCommand::Execute(GXemul& gxemul, const vector<string>& arguments)
 {
-	gxemul.GetUI()->ShowDebugMessage(
-	    "Runstate: " + gxemul.GetRunStateAsString() + "\n");
+	stringstream ss;
+	ss << "Runstate: " << gxemul.GetRunStateAsString() <<
+	    "   Global time: " << gxemul.GetGlobalTime() << "\n";
+	gxemul.GetUI()->ShowDebugMessage(ss.str());
 }
 
 

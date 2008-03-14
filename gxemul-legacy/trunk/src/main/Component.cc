@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Component.cc,v 1.8 2008-03-12 11:45:41 debug Exp $
+ *  $Id: Component.cc,v 1.9 2008-03-14 12:12:16 debug Exp $
  *
  *  Note: See DummyComponent.cc for unit tests of the component framework.
  */
@@ -146,6 +146,16 @@ int Component::Run(int nrOfCycles)
 }
 
 
+double Component::GetCurrentFrequency() const
+{
+	// The base component does not run at any frequency. Only components
+	// that actually run something "per cycle" should return values
+	// greater than 0.0.
+
+	return 0.0;
+}
+
+
 void Component::SetParent(Component* parentComponent)
 {
 	m_parentComponent = parentComponent;
@@ -203,6 +213,22 @@ string Component::GenerateTreeDump(const string& branchTemplate) const
 	if ((templateName = GetVariable("template")) != NULL &&
 	    !templateName->ToString().empty())
 		str += "  [" + templateName->ToString() + "]";
+
+	// If this component has a frequency (i.e. it is runnable), then
+	// show the frequency:
+	double freq = GetCurrentFrequency();
+	if (freq != 0.0) {
+		stringstream ss;
+		if (freq >= 1e9)
+			ss << freq/1e9 << " GHz";
+		else if (freq >= 1e6)
+			ss << freq/1e6 << " MHz";
+		else if (freq >= 1e3)
+			ss << freq/1e3 << " kHz";
+		else
+			ss << freq << " Hz";
+		str += "  (" + ss.str() + ")";
+	}
 
 	// Show the branch of the tree...
 	string result = "  " + str + "\n";

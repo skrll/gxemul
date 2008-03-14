@@ -27,7 +27,7 @@
  *  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *  SUCH DAMAGE.
  *
- *  $Id: GXemul.h,v 1.14 2008-03-12 11:45:41 debug Exp $
+ *  $Id: GXemul.h,v 1.15 2008-03-14 12:12:15 debug Exp $
  */
 
 #include "misc.h"
@@ -184,6 +184,24 @@ public:
 	string GetRunStateAsString() const;
 
 	/**
+	 * \brief Gets the current global time of the emulation.
+	 *
+	 * Note: This is not necessarily equal to real-world time.
+	 *
+	 * @return The time, in seconds, that the emulation has been executing.
+	 */
+	double GetGlobalTime() const;
+
+	/**
+	 * \brief Sets the current global time of the emulation.
+	 *
+	 * Note: This is not necessarily equal to real-world time.
+	 *
+	 * @param globalTime The time, in seconds.
+	 */
+	void SetGlobalTime(double globalTime);
+
+	/**
 	 * \brief Gets the current quiet mode setting.
 	 *
 	 * @return True if running in quiet mode, false for normal operation.
@@ -199,16 +217,8 @@ public:
 
 	/**
 	 * \brief Run the emulation for a while.
-	 *
-	 * \param component	A reference counted pointer
-	 *	to the root component.
-	 * \param nrOfCycles	The approximate number of cycles to execute.
-	 *	If this value is zero (default), then a "reasonable
-	 *	chunk" of instructions will be executed. If it is 1, exactly
-	 *	one instruction will be executed.
 	 */
-	void ExecuteCycles(refcount_ptr<Component> component,
-		int nrOfCycles = 0);
+	void ExecuteCycles(double timeslice = 0.01);
 
 private:
 	/**
@@ -233,6 +243,7 @@ private:
 	bool			m_bWithGUI;
 	bool			m_bRunUnitTests;
 	bool			m_quietMode;
+	double			m_globalTime;
 	refcount_ptr<UI>	m_ui;
 	refcount_ptr<Component>	m_rootComponent;
 	ActionStack		m_actionStack;

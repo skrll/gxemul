@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: MIPS_CPUComponent.cc,v 1.1 2008-03-12 11:45:40 debug Exp $
+ *  $Id: MIPS_CPUComponent.cc,v 1.2 2008-03-14 12:12:15 debug Exp $
  */
 
 #include <assert.h>
@@ -33,18 +33,22 @@
 
 
 MIPS_CPUComponent::MIPS_CPUComponent()
-	: Component("mips_cpu")
-	, m_pc(0xffffffffbfc00000ULL)
-	, m_currentCodePage(NULL)
-	, m_pageSize(4096)
+	: CPUComponent("mips_cpu")
 {
-	AddVariableUInt64("pc", &m_pc);
+	m_pc = 0xffffffffbfc00000ULL;
+	m_pageSize = 4096;
 }
 
 
 refcount_ptr<Component> MIPS_CPUComponent::Create()
 {
 	return new MIPS_CPUComponent();
+}
+
+
+double MIPS_CPUComponent::GetCurrentFrequency() const
+{
+	return 100.0e6;
 }
 
 

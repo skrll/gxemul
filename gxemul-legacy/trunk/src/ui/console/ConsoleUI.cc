@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: ConsoleUI.cc,v 1.7 2008-03-12 11:45:41 debug Exp $
+ *  $Id: ConsoleUI.cc,v 1.8 2008-03-14 12:12:16 debug Exp $
  */
 
 #include <signal.h>
@@ -178,8 +178,7 @@ int ConsoleUI::MainLoop()
 		switch (m_gxemul->GetRunState()) {
 
 		case GXemul::Running:
-			m_gxemul->ExecuteCycles(
-			    m_gxemul->GetRootComponent());
+			m_gxemul->ExecuteCycles();
 			break;
 			
 		case GXemul::Quitting:

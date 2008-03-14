@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: Component.h,v 1.10 2008-03-12 11:45:41 debug Exp $
+ *  $Id: Component.h,v 1.11 2008-03-14 12:12:15 debug Exp $
  */
 
 #include "misc.h"
@@ -145,7 +145,15 @@ public:
 	 * @param nrOfCycles	The number of cycles to run.
 	 * @return	The number of cycles actually executed.
 	 */
-	int Run(int nrOfCycles);
+	virtual int Run(int nrOfCycles);
+
+	/**
+	 * \brief Returns the current frequency (in Hz) that the component
+	 *	runs at.
+	 *
+	 * @return	The component's frequency in Hz.
+	 */
+	virtual double GetCurrentFrequency() const;
 
 	/**
 	 * \brief Sets the parent component of this component.

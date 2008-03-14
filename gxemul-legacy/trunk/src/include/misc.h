@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: misc.h,v 1.273 2008-03-12 11:45:41 debug Exp $
+ *  $Id: misc.h,v 1.274 2008-03-14 12:12:15 debug Exp $
  *
  *  Misc. definitions for GXemul.
  */
@@ -84,6 +84,8 @@ using std::ostream;
 using std::set;
 using std::stringstream;
 using std::vector;
+using std::min;
+using std::max;
 
 
 // Generic and vector-specific foreach, which work the way I want it.

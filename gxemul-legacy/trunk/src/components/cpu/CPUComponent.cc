@@ -1,6 +1,3 @@
-#ifndef MIPS_CPUCOMPONENT_H
-#define	MIPS_CPUCOMPONENT_H
-
 /*
  *  Copyright (C) 2008  Anders Gavare.  All rights reserved.
  *
@@ -28,67 +25,66 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: MIPS_CPUComponent.h,v 1.2 2008-03-14 12:12:16 debug Exp $
+ *  $Id: CPUComponent.cc,v 1.1 2008-03-14 12:12:32 debug Exp $
  */
 
-// COMPONENT(mips_cpu)
+#include <assert.h>
+#include "components/CPUComponent.h"
 
 
-#include "CPUComponent.h"
-
-
-/**
- * \brief A Component representing a MIPS processor.
- */
-class MIPS_CPUComponent
-	: public CPUComponent
+CPUComponent::CPUComponent(const string& className)
+	: Component(className)
+	, m_pc(0)
+	, m_currentCodePage(NULL)
+	, m_pageSize(0)
 {
-public:
-	/**
-	 * \brief Constructs a MIPS_CPUComponent.
-	 */
-	MIPS_CPUComponent();
-
-	/**
-	 * \brief Creates a MIPS_CPUComponent.
-	 */
-	static refcount_ptr<Component> Create();
-
-	/**
-	 * \brief Get attribute information about the MIPS_CPUComponent class.
-	 *
-	 * @param attributeName The attribute name.
-	 * @return A string representing the attribute value.
-	 */
-	static string GetAttribute(const string& attributeName);
-
-	/**
-	 * \brief Runs the component for a number of cycles.
-	 *
-	 * @param nrOfCycles    The number of cycles to run.
-	 * @return      The number of cycles actually executed.
-	 */
-	virtual int Run(int nrOfCycles);
-
-	/**
-	 * \brief Returns the current frequency (in Hz) that the component
-	 *	runs at.
-	 *
-	 * @return	The component's frequency in Hz.
-	 */
-	virtual double GetCurrentFrequency() const;
+	AddVariableUInt64("pc", &m_pc);
+}
 
 
-	/********************************************************************/
-
-	static void RunUnitTests(int& nSucceeded, int& nFailures);
-
-private:
-	bool NativeTranslationExists();
-	void LookupCurrentCodePage();
-	void ExecuteMIPS16Instruction(uint16_t iword);
-	void ExecuteInstruction(uint32_t iword);
-};
+refcount_ptr<Component> CPUComponent::Create()
+{
+	return NULL;
+}
 
 
-#endif	// MIPS_CPUCOMPONENT_H
+string CPUComponent::GetAttribute(const string& attributeName)
+{
+	if (attributeName == "stable")
+		return "yes";
+
+	if (attributeName == "description")
+		return "Base-class for all processors.";
+
+	return Component::GetAttribute(attributeName);
+}
+
+
+/*****************************************************************************/
+
+
+#ifndef WITHOUTUNITTESTS
+
+#include "ComponentFactory.h"
+
+static void Test_CPUComponent_IsStable()
+{
+	UnitTest::Assert("the CPUComponent should be stable",
+	    ComponentFactory::HasAttribute("cpu", "stable"));
+}
+
+static void Test_CPUComponent_Create()
+{
+	refcount_ptr<Component> cpu =
+	    ComponentFactory::CreateComponent("cpu");
+	UnitTest::Assert("component was created?", cpu.IsNULL());
+}
+
+UNITTESTS(CPUComponent)
+{
+	UNITTEST(Test_CPUComponent_IsStable);
+	UNITTEST(Test_CPUComponent_Create);
+}
+
+#endif
+

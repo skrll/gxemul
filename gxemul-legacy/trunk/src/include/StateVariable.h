@@ -28,7 +28,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: StateVariable.h,v 1.3 2008-03-12 11:45:41 debug Exp $
+ *  $Id: StateVariable.h,v 1.4 2008-03-14 12:12:15 debug Exp $
  */
 
 #include "misc.h"
@@ -51,7 +51,7 @@ class StateVariable
 {
 public:
 	/**
-	 * \brief An enumeration of the possible types of a %StateVariableValue.
+	 * \brief An enumeration of the possible types of a %StateVariable.
 	 */
 	enum Type {
 		String = 0,

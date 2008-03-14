@@ -25,7 +25,7 @@
  *  SUCH DAMAGE.
  *
  *
- *  $Id: GXemul.cc,v 1.21 2008-03-12 11:45:41 debug Exp $
+ *  $Id: GXemul.cc,v 1.22 2008-03-14 12:12:16 debug Exp $
  *
  *  This file contains three things:
  *
@@ -279,6 +279,7 @@ GXemul::GXemul(bool bWithGUI)
 
 void GXemul::ClearEmulation()
 {
+	m_globalTime = 0.0;
 	m_rootComponent = new DummyComponent;
 	m_rootComponent->SetVariableValue("name", "root");
 	m_emulationFileName = "";
@@ -700,6 +701,18 @@ ActionStack& GXemul::GetActionStack()
 }
 
 
+double GXemul::GetGlobalTime() const
+{
+	return m_globalTime;
+}
+
+
+void GXemul::SetGlobalTime(double globalTime)
+{
+	m_globalTime = globalTime;
+}
+
+
 UI* GXemul::GetUI()
 {
 	return m_ui;
@@ -758,19 +771,90 @@ void GXemul::SetQuietMode(bool quietMode)
 }
 
 
-void GXemul::ExecuteCycles(refcount_ptr<Component> component, int nrOfCycles)
+struct ComponentAndFrequency
 {
-	// TODO: Keep track of actual number of executed cycles per
-	// component, and try to make them run in synch!
-	if (nrOfCycles == 0)
-		nrOfCycles = 32768;
+	refcount_ptr<Component>		component;
+	double				frequency;
+	double				currentTime;
+};
 
-	// Execute cycles in this component...
-	component->Run(nrOfCycles);
+typedef vector<ComponentAndFrequency> ComponentAndFrequencyVector;
 
-	// ... and all of its children:
-	Components children = component->GetChildren();
-	foreach_vec(children, ExecuteCycles);
+static void AddComponentsToVector(ComponentAndFrequencyVector& vec,
+	refcount_ptr<Component> node)
+{
+	ComponentAndFrequency c;
+	c.component = node;
+	c.frequency = node->GetCurrentFrequency();
+
+	if (c.frequency > 0.0)
+		vec.push_back(c);
+
+	Components children = node->GetChildren();
+	for (size_t i=0; i<children.size(); ++i)
+		AddComponentsToVector(vec, children[i]);
+}
+
+void GXemul::ExecuteCycles(double timeslice)
+{
+	// First, gather all components from the component tree into a
+	// vector. It is much more efficient to loop over the vector than the
+	// tree. For each component, also save its current frequency.
+
+	ComponentAndFrequencyVector components;
+	AddComponentsToVector(components, GetRootComponent());
+
+	double globalCurrentTime = GetGlobalTime();
+	double globalTargetTime = globalCurrentTime + timeslice;
+
+	// Reset the component's notion of current time, and find the highest
+	// frequency in use:
+	size_t i, n = components.size();
+	double highestFreq = 0.0;
+	for (i=0; i<n; ++i) {
+		components[i].currentTime = globalCurrentTime;
+		highestFreq = max(highestFreq, components[i].frequency);
+	}
+
+	bool cycleAccurate = true;	// TODO: setting
+
+	// Run cycles in all components, until all components have
+	// reached the target time.
+	if (cycleAccurate) {
+		// Run at the finest possible granularity:
+		double delta = 1.0 / highestFreq;
+		while (globalCurrentTime < globalTargetTime) {
+			double targetTime = 1.0/highestFreq + globalCurrentTime;
+
+			while (true) {
+				int nComponentsThatAreExecuting = 0;
+				for (i=0; i<n; i++) {
+					if (components[i].currentTime <
+					     targetTime) {
+						nComponentsThatAreExecuting++;
+						components[i].component->Run(1);
+						components[i].currentTime +=
+						    1.0/components[i].frequency;
+					}
+				}
+
+				if (nComponentsThatAreExecuting == 0)
+					break;
+			}
+
+			globalCurrentTime += delta;
+		}
+	} else {
+		// Run larger chunks:
+		for (i=0; i<n; i++) {
+			// To reach globalTargetTime, how many cycles does this
+			// component need to run?   (Hz * time slice length)
+			components[i].component->Run((int)
+			    (timeslice * components[i].frequency));
+		}
+	}
+
+	SetGlobalTime(globalTargetTime);
 }
 
 
