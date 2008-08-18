@@ -1,0 +1,23 @@
+#
+#  Makefile for GXmvcf
+#
+
+all: buildsrc
+
+buildsrc:
+	cd src; $(MAKE)
+
+test: buildsrc
+	cd src; $(MAKE) runtests
+
+documentation:
+	$(DOXYGEN) doc/Doxyfile
+
+clean:
+	rm -rf doc/doxygen
+	cd src; $(MAKE) clean
+
+clean_all: clean
+	rm -f _unittests.tmp unittest.h unittest_h.h
+	rm -f config.h Makefile src/Makefile
+

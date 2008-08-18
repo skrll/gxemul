@@ -1,0 +1,23 @@
+#
+#  Makefile for GXmvcf.
+#
+
+CXXFLAGS=$(CXXFLAGSBASE) $(CPEDANTIC) $(INCLUDE1)
+LIBS=$(XLIB) $(OTHERLIBS)
+
+OBJS=debug_new.o UnitTest.o
+
+all: $(OBJS)
+
+$(OBJS): Makefile
+
+runtests: runtests.o $(OBJS)
+	$(CXX) $(CXXFLAGS) $(LIBS) runtests.o $(OBJS) -o runtests
+	./runtests
+
+clean:
+	rm -f $(OBJS) *core _test
+
+clean_all: clean
+	rm -f Makefile
+

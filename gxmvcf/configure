@@ -1,0 +1,768 @@
+#!/bin/sh
+###############################################################################
+#
+#  Copyright (C) 2003-2008  Anders Gavare.  All rights reserved.
+#
+#  Redistribution and use in source and binary forms, with or without
+#  modification, are permitted provided that the following conditions are met:
+#
+#  1. Redistributions of source code must retain the above copyright
+#     notice, this list of conditions and the following disclaimer.
+#  2. Redistributions in binary form must reproduce the above copyright
+#     notice, this list of conditions and the following disclaimer in the
+#     documentation and/or other materials provided with the distribution.
+#  3. The name of the author may not be used to endorse or promote products
+#     derived from this software without specific prior written permission.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+#  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+#  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+#  ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+#  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+#  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+#  OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+#  HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+#  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+#  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+#  SUCH DAMAGE.
+#
+#
+#  This is a minimal configure script, hardcoded for GXmvcf. This script
+#  figures out which C++ compiler flags will work, and creates Makefiles in
+#  sub-directories. config.h and some other build-specific .h files are also
+#  created.
+#
+#
+#    --->     FOR NORMAL USE, JUST RUN ./configure WITHOUT OPTIONS!
+#
+#
+#  The main things that are detected by this script:
+#
+#    o)  special hacks for some OSes
+#    o)  which C++ compiler to use  (overridden by setting CXX)
+#    o)  which compiler flags to use  (overridden by setting CXXFLAGS)
+#
+#  The general philosophy regarding command line switches is that anything
+#  which can be incorporated into the program as a runtime command line option
+#  should be, instead of requiring a recompile.
+#
+###############################################################################
+
+# Default prefix for "make install"
+DEFAULTPREFIX=/usr/local
+
+#  Figure out if this is a stable version (0.x.x).
+X=`basename \`pwd\`|cut -d \- -f 2-|cut -c1-2`
+if [ z"$X" = z0. ]; then
+	#  Stable.
+	WITHOUTUNITTESTS=YES
+else
+	#  Development.
+	UNSTABLE=YES
+	WITHOUTUNITTESTS=NO
+fi
+
+if [ z"$*" != z ]; then
+	#  Parse command line options:
+	for a in $*; do
+		if [ z$a = z--debug ]; then
+			DEBUG=YES
+		else if [ z$a = z--with-unit-tests ]; then
+			WITHOUTUNITTESTS=NO
+		else if [ z$a = z--without-unit-tests ]; then
+			WITHOUTUNITTESTS=YES
+		else if [ z$a = z--help ]; then
+			printf "usage: $0 [options]\n\n"
+			if [ z"$UNSTABLE" = zYES ]; then
+				echo "  --debug                    configure" \
+					"for a debug build"
+				echo "  --without-unit-tests       build without" \
+					"unit tests"
+			else
+				echo "  --with-unit-tests          build with" \
+					"unit tests (increases binary size)"
+			fi
+			echo
+			echo "If the PREFIX environment variable is set," \
+			    "it will override the default"
+			echo "value, which is: $DEFAULTPREFIX"
+			echo
+			exit
+		else
+			echo "Invalid option: $a"
+			echo "Run  $0 --help  to get a list of" \
+			    "available options."
+			exit
+		fi; fi; fi; fi
+	done
+fi
+
+
+###############################################################################
+#
+#  Configure options:
+#
+#  This creates a config.h file, which is then included from include/misc.h.
+#
+###############################################################################
+
+#  Head of config.h:
+printf "/*
+ *  THIS FILE IS AUTOMATICALLY CREATED BY configure!
+ *  DON'T EDIT THIS FILE MANUALLY, IT WILL BE OVERWRITTEN.
+ */
+\n#ifndef CONFIG_H\n#define CONFIG_H\n\n" > config.h
+
+
+#  Figure out if VERSION should be defined.
+X=`basename \`pwd\`|cut -d \- -f 2-`
+if [ z"$X" = zgxmvcf ]; then
+	printf "#define VERSION \"(unknown version)\"\n" >> config.h
+else
+	printf "#define VERSION \"$X\"\n" >> config.h
+fi
+
+
+if [ z"$UNSTABLE" = zYES ]; then
+	printf "#define UNSTABLE_DEVEL\n" >> config.h
+fi
+
+if [ z"$WITHOUTUNITTESTS" = zYES ]; then
+	printf "#define WITHOUTUNITTESTS\n" >> config.h
+fi
+
+if [ z"$DEBUG" = zYES ]; then
+	CXXFLAGS="-D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC $CXXFLAGS"
+else
+	CXXFLAGS="-DNDEBUG $CXXFLAGS"
+fi
+
+
+###############################################################################
+#
+#  Special hacks for some host OSes:
+#
+###############################################################################
+
+if [ z"`uname|cut -c 1-6`" = zCYGWIN ]; then
+	CYGWIN=YES
+
+	#  Assume gcc/g++ on Cygwin (Windows) systems.
+	if [ z"$CC" = z ]; then
+		CC=gcc
+	fi
+	if [ z"$CXX" = z ]; then
+		CXX=g++
+	fi
+fi
+
+if [ z"`uname`" = zHP-UX ]; then
+	HPUX=YES
+
+	if [ z"$CC" = z ]; then
+		if [ -f /usr/local/pa64/bin/gcc ]; then
+			CC=/usr/local/pa64/bin/gcc
+		fi
+	fi
+	
+	# TODO: How about HP-UX C++?
+fi
+
+if [ z"`uname`" = zOSF1 ]; then
+	OSF1=YES
+fi
+
+
+###############################################################################
+#
+#  Create the Makefile header:
+#
+###############################################################################
+
+rm -f _Makefile.header
+
+printf "#
+#  DO NOT EDIT THIS FILE! It is automagically created by
+#  the configure script, based on Makefile.skel.
+#\n\n" >> _Makefile.header
+
+
+#  Try with the simplest possible test program.
+echo '#include <stdio.h>
+
+int main(int argc, char *argv[])
+{
+        static int x = 0;
+        static int y = 1;
+        printf("%i,%i", x, y);
+        return 0;
+}
+' > _testprog.cc
+
+
+#  Try to detect which C++ compiler to use, if CXX is not set:
+printf "checking which C++ compiler to use... "
+rm -f _testprog
+if [ z"$CXX" = z ]; then
+	#  Try g++ first:
+	printf "#!/bin/sh\ng++ $CXXFLAGS _testprog.cc -o _testprog >" > _test.sh
+	printf " /dev/null 2> /dev/null\n" >> _test.sh
+	chmod 755 _test.sh
+	./_test.sh > /dev/null 2> /dev/null
+	if [ -x _testprog ]; then
+		if [ z`./_testprog` = z0,1 ]; then
+			CXX=g++
+		fi
+	fi
+	rm -f _testprog
+
+	#  If both g++ and c++ exist, then c++ might be a vendor specific
+	#  compiler which produces faster code than g++.
+	printf "#!/bin/sh\nc++ $CXXFLAGS _testprog.cc -o _testprog >" > _test.sh
+	printf " /dev/null 2> /dev/null\n" >> _test.sh
+	chmod 755 _test.sh
+	./_test.sh > /dev/null 2> /dev/null
+	if [ -x _testprog ]; then
+		if [ z`./_testprog` = z0,1 ]; then
+			CXX=c++
+		else
+			printf "broken C++ compiler detected (c++)!\n"
+		fi
+	fi
+	rm -f _testprog
+
+	rm -f _test.sh
+fi
+
+rm -f _testprog
+
+if [ z"$CXX" = z ]; then
+	printf "no working C++ compiler detected\n"
+	printf "\nPlease set the CXX environment variable to a working C++ "
+	printf "compiler before running\nthe configure script, and make"
+	printf " sure that the CXXFLAGS environment variable\nis also valid"
+	printf " for that compiler.\n"
+	exit
+fi
+
+echo "$CXX"
+
+
+if [ z$HPUX = zYES ]; then
+	CXXFLAGS="-D_XOPEN_SOURCE_EXTENDED $CXXFLAGS"
+	printf "#define HPUX\n" >> config.h
+fi
+
+
+if [ z$OSF1 = zYES ]; then
+	CXXFLAGS="-D_XOPEN_SOURCE=500 -D_OSF_SOURCE -D_POSIX_PII_SOCKET $CXXFLAGS"
+fi
+
+
+#  -Wall:
+printf "checking whether -Wall can be used... "
+$CXX -Wall $CXXFLAGS _testprog.cc -o _testprog 2> /dev/null
+if [ -x _testprog ]; then
+	printf "yes\n"
+	CXXFLAGS="-Wall $CXXFLAGS"
+
+	if [ z"$UNSTABLE" = zYES ]; then
+		printf "checking whether -Werror can be used... "
+		rm -f _testprog
+		$CXX -Werror $CXXFLAGS _testprog.cc -o _testprog 2> /dev/null
+		if [ -x _testprog ]; then
+			printf "yes\n"
+			CXXFLAGS="-Werror $CXXFLAGS"
+		else
+			printf "no\n"
+		fi
+	fi
+else
+	printf "no\n"
+fi
+rm -f _testprog
+
+
+if [ z"$UNSTABLE" = zYES ]; then
+	printf "checking whether -ansi can be used... "
+	$CXX $CXXFLAGS -ansi _testprog.cc -o _testprog 2> /dev/null
+	if [ -x _testprog ]; then
+		printf "yes\n"
+		CXXFLAGS="$CXXFLAGS -ansi"
+	else
+		printf "no\n"
+	fi
+	rm -f _testprog
+fi
+
+
+if [ z"$UNSTABLE" = zYES ]; then
+	printf "checking whether -pedantic can be used... "
+	$CXX $CXXFLAGS -pedantic _testprog.cc -o _testprog 2> /dev/null
+	if [ -x _testprog ]; then
+		printf "yes\n"
+		CPEDANTIC="-pedantic"
+	else
+		printf "no\n"
+	fi
+	rm -f _testprog
+fi
+
+
+#  -O-style Optimization flags:
+if [ z"$SUNCC" = zYES ]; then
+	if [ ! z"$DEBUG" = zYES ]; then
+		CXXFLAGS="-xO5 -xdepend $CXXFLAGS"
+	fi
+else
+	if [ ! z"$DEBUG" = zYES ]; then
+		$CXX $CXXFLAGS -O _testprog.cc -o _testprog 2> /dev/null
+		if [ -x _testprog ]; then
+			rm -f _testprog
+			$CXX $CXXFLAGS -O3 _testprog.cc -o _testprog 2> /dev/null
+			if [ -x _testprog ]; then
+				CXXFLAGS="$CXXFLAGS -O3"
+			else
+				CXXFLAGS="$CXXFLAGS -O"
+			fi
+		fi
+	fi
+fi
+rm -f _testprog
+
+
+#  -fpeephole
+if [ ! z"$DEBUG" = zYES ]; then
+	printf "checking whether -fpeephole can be used... "
+	$CXX $CXXFLAGS -fpeephole _testprog.cc -o _testprog > _testprog.stdout 2>&1
+	cat _testprog.stdout >> _testprog.error
+	if grep peephole _testprog.error > /dev/null 2>&1; then
+		printf "no\n"
+	else
+		if [ -x _testprog ]; then
+			CXXFLAGS="$CXXFLAGS -fpeephole"
+			printf "yes\n"
+		else
+			printf "no\n"
+		fi
+	fi
+	rm -f _testprog _testprog.error _testprog.stdout
+fi
+
+
+#  -fomit-frame-pointer
+if [ ! z"$DEBUG" = zYES ]; then
+	printf "checking whether -fomit-frame-pointer can be used... "
+	$CXX $CXXFLAGS -fomit-frame-pointer _testprog.cc -o \
+	    _testprog 1> _testprog.stdout 2>&1
+	cat _testprog.stdout >> _testprog.error
+	if grep frame _testprog.error > /dev/null 2>&1; then
+		printf "no\n"
+	else
+		if [ -x _testprog ]; then
+			CXXFLAGS="$CXXFLAGS -fomit-frame-pointer"
+			printf "yes\n"
+		else
+			printf "no\n"
+		fi
+	fi
+	rm -f _testprog _testprog.error _testprog.stdout
+fi
+
+
+printf "checking whether -g can be used... "
+$CXX $CXXFLAGS -g _testprog.cc -o _testprog > _testprog.stdout 2>&1
+cat _testprog.stdout >> _testprog.error
+if [ -x _testprog ]; then
+	CXXFLAGS="$CXXFLAGS -g"
+	printf "yes\n"
+else
+	printf "no\n"
+fi
+rm -f _testprog _testprog.error _testprog.stdout
+
+
+#  -lrt for nanosleep?
+printf "checking whether -lrt is required for nanosleep... "
+printf "#include <time.h>\n#include <stdio.h>
+int main(int argc, char *argv[]){nanosleep(NULL,NULL);return 0;}\n" > _testns.cc
+$CXX $CXXFLAGS _testns.cc -o _testns 2> /dev/null
+if [ ! -x _testns ]; then
+	$CXX $CXXFLAGS -lrt _testns.cc -o _testns 2> /dev/null
+	if [ ! -x _testns ]; then
+		printf "WARNING! COULD NOT COMPILE WITH nanosleep AT ALL!\n"
+	else
+		#  -lrt for nanosleep
+		OTHERLIBS="-lrt $OTHERLIBS"
+		printf "yes\n"
+	fi
+else
+	printf "no\n"
+fi
+rm -f _testns*
+
+
+#  -lm?
+printf "checking for math libs..."
+printf "#include <math.h>\nint main(int argc, char *argv[]) { " > _testr.cc
+printf "double x = sqrt(sin((double)argc)); return (int)x; }\n" >> _testr.cc
+$CXX $CXXFLAGS _testr.cc -o _testr 2> /dev/null
+if [ ! -x _testr ]; then
+	$CXX $CXXFLAGS _testr.cc -lm -o _testr 2> /dev/null
+	if [ ! -x _testr ]; then
+		$CXX $CXXFLAGS _testr.cc -lm -lcpml -o _testr 2> /dev/null
+		if [ ! -x _testr ]; then
+			printf "\nWARNING! Could not compile math test "
+			printf "at all!\nContinuing anyway.\n\n"
+		else
+			#  -lm AND -lcpml
+			OTHERLIBS="-lm -lcpml $OTHERLIBS"
+			printf " -lm -lcpml\n"
+		fi
+	else
+		#  Normal -lm
+		OTHERLIBS="-lm $OTHERLIBS"
+		printf " -lm\n"
+	fi
+else
+	printf " none needed\n"
+fi
+rm -f _testr*
+
+
+#  fseeko missing?
+printf "checking for fseeko... "
+printf "#include <stdlib.h>
+#include <limits.h>
+#include <stdio.h>
+#include <sys/types.h>
+int main(int argc, char *argv[]) { fseeko(NULL, 0, 0); return 0;}\n" > _tests.cc
+$CXX $CXXFLAGS _tests.cc -o _tests 2> /dev/null
+if [ ! -x _tests ]; then
+	# Try with _LARGEFILE_SOURCE (hack to make fseeko
+	# work on 64-bit Linux):
+	$CXX $CXXFLAGS -D_LARGEFILE_SOURCE _tests.cc -o _tests 2> /dev/null
+	if [ ! -x _tests ]; then
+		printf "missing\n"
+		printf "WARNING! fseeko missing from libc. Using a hack, "
+		printf "which probably doesn't work.\n"
+		printf "#define HACK_FSEEKO\n" >> config.h
+	else
+		printf "using -D_LARGEFILE_SOURCE hack\n"
+		CXXFLAGS="$CXXFLAGS -D_LARGEFILE_SOURCE"
+	fi
+else
+	printf "found\n"
+fi
+rm -f _tests*
+
+
+#  MAP_ANON missing? (On some HP-UX systems? Use MAP_ANONYMOUS instead.)
+printf "checking for MAP_ANON... "
+rm -f _tests
+printf "#include <stdio.h>
+#include <sys/types.h>
+#include <sys/mman.h>
+int main(int argc, char *argv[]) { int x = MAP_ANON; return x*0;}\n" > _tests.cc
+$CXX $CXXFLAGS _tests.cc -o _tests 2> /dev/null
+if [ ! -x _tests ]; then
+	printf "#include <stdio.h>
+#include <sys/types.h>
+#include <sys/mman.h>
+int main(int argc, char *argv[])
+{ int x = MAP_ANONYMOUS; return x*0;}\n" > _tests.cc
+	$CXX $CXXFLAGS _tests.cc -o _tests 2> /dev/null
+	if [ ! -x _tests ]; then
+		printf "no\n\n"
+		printf "WARNING! Neither MAP_ANON nor MAP_ANONYMOUS work on "
+		printf "this system.\nPlease try to compile anyway, and report"
+		printf " to me whether it builds/runs or not.\n\n"
+		printf "#define MAP_ANON 0\n" >> config.h
+		printf "#define NO_MAP_ANON\n" >> config.h
+	else
+		printf "using MAP_ANONYMOUS\n"
+		printf "#define MAP_ANON MAP_ANONYMOUS\n" >> config.h
+	fi
+else
+	printf "yes\n"
+fi
+rm -f _tests*
+
+
+#  Check for PRIx64 in inttypes.h:
+printf "checking for PRIx64 in inttypes.h... "
+printf "#include <inttypes.h>\nint main(int argc, char *argv[])\n
+{\n#ifdef PRIx64\nreturn 0;\n#else\nreturn 1;\n#endif\n}\n" > _testpri.cc
+$CXX $CXXFLAGS _testpri.cc -o _testpri 2> /dev/null
+if [ ! -x _testpri ]; then
+	printf "\nERROR! COULD NOT COMPILE PRIx64 TEST PROGRAM AT ALL!\n"
+	exit
+else
+	if ./_testpri; then
+		printf "yes\n"
+	else
+		printf "no, using an ugly hack instead, "
+		printf "#define NO_C99_PRINTF_DEFINES\n" >> config.h
+
+		# Try llx first:
+		printf "#include <stdio.h>\n#include <inttypes.h>\nint main(int argc, char *argv[]){
+		    printf(\"%%llx\\\n\", (int64_t)128);return 0;}\n" > _testpri.cc
+		rm -f _testpri
+		$CXX $CXXFLAGS _testpri.cc -o _testpri 2> /dev/null
+		if [ z`./_testpri` = z80 ]; then
+			printf "PRIx64=llx\n"
+			printf "#define NO_C99_64BIT_LONGLONG\n" >> config.h
+		else
+			# Try lx too:
+			printf "#include <stdio.h>\n#include <inttypes.h>\nint main(int argc, char *argv[]){
+			    printf(\"%%lx\\\n\", (int64_t)128);return 0;}\n" > _testpri.cc
+			rm -f _testpri
+			$CXX $CXXFLAGS _testpri.cc -o _testpri 2> _testpri.result
+			if [ z`./_testpri` = z80 ]; then
+				printf "PRIx64=lx\n"
+			else
+				printf "\nFailed, neither lx nor llx worked!\n"
+				exit
+			fi
+		fi
+	fi
+fi
+rm -f _testpri*
+
+
+#  Check for 64-bit off_t:
+printf "checking for 64-bit off_t... "
+printf "#include <stdio.h>\n#include <inttypes.h>\n#include <sys/types.h>\n
+int main(int argc, char *argv[]){printf(\"%%i\\\n\",
+ (int)sizeof(off_t));return 0;}\n" > _testoff.cc
+$CXX $CXXFLAGS _testoff.cc -o _testoff 2> /dev/null
+if [ ! -x _testoff ]; then
+	printf "\nWARNING! COULD NOT COMPILE off_t TEST PROGRAM AT ALL!\n"
+else
+	if [ z`./_testoff` = z8 ]; then
+		printf "yes\n"
+	else
+		$CXX $CXXFLAGS -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE \
+		    _testoff.cc -o _testoff 2> /dev/null
+		if [ ! -x _testoff ]; then
+			printf "\nWARNING! COULD NOT COMPILE off_t TEST "
+			printf "PROGRAM!\n"
+		else
+			if [ z`./_testoff` = z8 ]; then
+				CXXFLAGS="-D_FILE_OFFSET_BITS=64 $CXXFLAGS"
+				CXXFLAGS="-D_LARGEFILE_SOURCE $CXXFLAGS"
+				printf "using -D_FILE_OFFSET_BITS=64"
+				printf " -D_LARGEFILE_SOURCE\n"
+			else
+				printf "NO\n"
+				printf "Warning! No 64-bit off_t. Continuing "
+				printf "anyway.\n"
+			fi
+		fi
+	fi
+fi
+rm -f _testoff*
+
+
+#  Check for u_int8_t etc:
+#  These are needed because some header files in src/include/ use u_int*
+#  instead of uint*, and I don't have time to rewrite them all.
+printf "checking for u_int8_t... "
+printf "#include <stdio.h>\n#include <inttypes.h>\n#include <sys/types.h>\n
+int main(int argc, char *argv[]){printf(\"%%i\\\n\",
+ (int)sizeof(u_int8_t));return 0;}\n" > _testuint.cc
+$CXX $CXXFLAGS _testuint.cc -o _testuint 2> /dev/null
+if [ ! -x _testuint ]; then
+	rm -f _testuint*
+	printf "#include <stdio.h>\n#include <inttypes.h>
+	\n#include <sys/types.h>\nint main(int argc, char *argv[])
+	{printf(\"%%i\\\n\", (int)sizeof(uint8_t));return 0;}\n" > _testuint.cc
+	$CXX $CXXFLAGS _testuint.cc -o _testuint 2> /dev/null
+	if [ ! -x _testuint ]; then
+		printf "no\n\nERROR: No u_int8_t or uint8_t. Aborting\n"
+		#  TODO: Automagically detect using various combinations
+		#  of char, int, short, long etc.
+		exit
+	fi
+
+	printf "typedef uint8_t u_int8_t;\n" >> config.h
+	printf "typedef uint16_t u_int16_t;\n" >> config.h
+	printf "typedef uint32_t u_int32_t;\n" >> config.h
+	printf "uint8_t\n"
+else
+	printf "yes\n"
+fi
+rm -f _testuint.c*
+
+printf "checking for u_int64_t... "
+printf "#include <stdio.h>\n#include <inttypes.h>\n#include <sys/types.h>\n
+int main(int argc, char *argv[]){printf(\"%%i\\\n\",
+ (int)sizeof(u_int64_t));return 0;}\n" > _testuint.cc
+$CXX $CXXFLAGS _testuint.cc -o _testuint 2> /dev/null
+if [ ! -x _testuint ]; then
+	rm -f _testuint*
+	printf "#include <stdio.h>\n#include <inttypes.h>
+	\n#include <sys/types.h>\nint main(int argc, char *argv[])
+	{printf(\"%%i\\\n\", (int)sizeof(uint64_t));return 0;}\n" > _testuint.cc
+	$CXX $CXXFLAGS _testuint.c -o _testuint 2> /dev/null
+	if [ ! -x _testuint ]; then
+		printf "no\n\nERROR: No u_int64_t or uint64_t. Aborting\n"
+		#  TODO: Automagically detect using various combinations
+		#  of char, int, short, long etc.
+		exit
+	fi
+
+	printf "typedef uint64_t u_int64_t;\n" >> config.h
+	printf "uint64_t\n"
+else
+	printf "yes\n"
+fi
+rm -f _testuint*
+
+printf "checking for __FUNCTION__... "
+printf "#include <stdio.h>\n\nint main(int argc, char *argv[]) {
+  printf(__FUNCTION__);\n  return 0;\n}\n" > _testfunction.cc
+$CXX $CXXFLAGS _testfunction.cc -o _testfunction 2> /dev/null
+if [ ! -x _testfunction ]; then
+	printf "no\n"
+else
+	if [ z`./_testfunction` = zmain ]; then
+		printf "yes\n"
+		printf "#define HAVE___FUNCTION__\n" >> config.h
+	else
+		printf "no\n"
+	fi
+fi
+rm -f _testfunction*
+
+
+###############################################################################
+
+#  Host byte order?
+printf "checking host endianness... "
+rm -f _test_end*
+printf '#include <stdio.h>
+int main(int argc, char *argv[])
+{  int x = 1; void *xp = (void *)&x; char *p = (char *)xp;
+if (*p) printf("little\\\n"); else printf("big\\\n"); }
+' > _test_end.cc
+$CXX $CXXFLAGS _test_end.cc -o _test_end 2> /dev/null
+X=`./_test_end`
+echo $X
+if [ z$X = zlittle ]; then
+	printf "#define HOST_LITTLE_ENDIAN\n" >> config.h
+else
+	if [ z$X = zbig ]; then
+		printf "#define HOST_BIG_ENDIAN\n" >> config.h
+	else
+		echo "Error! Could not determine host's endianness."
+		exit
+	fi
+fi
+rm -f _test_end*
+
+
+###############################################################################
+
+printf "checking for Doxygen... "
+
+if (doxygen --version > /dev/null); then
+	echo found
+	DOXYGEN=doxygen
+else
+	# Not found is already printed, if doxygen is not found.
+	DOXYGEN="\#"
+fi
+
+
+###############################################################################
+
+GLIBMM_VER="2.16.4"
+printf "checking for glibmm-2.4 >= $GLIBMM_VER... "
+
+if [ z$WITHOUTGLIBMM = zYES ]; then
+	echo skipping
+else
+	if pkg-config --atleast-version=$GLIBMM_VER glibmm-2.4; then
+		echo found
+		CXXFLAGS="$CXXFLAGS `pkg-config --cflags glibmm-2.4`"
+		OTHERLIBS="$OTHERLIBS `pkg-config --libs glibmm-2.4`"
+		CXXFLAGS="$CXXFLAGS -DWITH_GLIBMM"
+		WITHGLIBMM=YES
+	else
+		echo not found
+		if [ z$WITHGLIBMM = zYES ]; then
+			echo "Sorry, glibmm-2.4 version $GLIBMM_VER or newer" \
+			    "was not found. Aborting."
+			exit
+		fi
+	fi
+fi
+
+
+###############################################################################
+
+if [ "z$PREFIX" = z ]; then
+	PREFIX="$DEFAULTPREFIX"
+fi	
+echo "checking for 'make install' prefix (\$PREFIX): $PREFIX"
+
+
+###############################################################################
+
+INCLUDE1="-I."
+
+rm -f _testprog*
+
+# echo "C++ compiler flags: $CXXFLAGS"
+# echo "Pedantic flags (for most modules): $CPEDANTIC"
+# echo "Linker flags: $OTHERLIBS"
+
+echo "CXXFLAGSBASE=$CXXFLAGS" >> _Makefile.header
+echo "CPEDANTIC=$CPEDANTIC" >> _Makefile.header
+echo "INCLUDE1=$INCLUDE1" >> _Makefile.header
+echo "PREFIX=$PREFIX" >> _Makefile.header
+echo "CC=$CC" >> _Makefile.header
+echo "CXX=$CXX" >> _Makefile.header
+echo "OTHERLIBS=$OTHERLIBS" >> _Makefile.header
+
+echo "DOXYGEN=$DOXYGEN" >> _Makefile.header
+echo "" >> _Makefile.header
+
+#  Create list of unit testable classes:
+rm -f unittest.h unittest_h.h
+printf "// DO NOT EDIT. Automagically generated by the configure script.\n" >> unittest.h
+printf "// DO NOT EDIT. Automagically generated by the configure script.\n" >> unittest_h.h
+printf "// Will be removed by  make clean_all\n\n" >> unittest.h
+printf "// Will be removed by  make clean_all\n\n" >> unittest_h.h
+for a in `find src -name "*.cc" -print`; do grep UNITTESTS\( "$a";
+	done | cut -d \( -f 2|cut -d \) -f 1 > _unittests.tmp
+for a in `cat _unittests.tmp`; do
+	if [ ! z$a = zclassName ]; then
+		cd src/include
+		HNAME=`find . -name $a.h | cut -c 3-`
+		cd ../..
+		printf "#include \"$HNAME\"\n" >> unittest_h.h
+		printf "\t$a::RunUnitTests(nSucceeded, nFailed);\n" >> unittest.h
+	fi
+done
+rm -f _unittests.tmp
+
+#  Create the Makefiles:
+D=". src"
+for a in $D; do
+	echo "creating $a/Makefile"
+	touch $a/Makefile
+	cat _Makefile.header > $a/Makefile
+	cat $a/Makefile.skel >> $a/Makefile
+done
+
+#  Tail of config.h:
+printf "\n#endif  /*  CONFIG_H  */\n" >> config.h
+
+#  Remove temporary Makefile header:
+rm -f _Makefile.header
+
+
+echo Configured. You may now run make to build GXmvcf.
+
