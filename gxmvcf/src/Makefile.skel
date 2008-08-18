@@ -11,8 +11,8 @@ all: $(OBJS)
 
 $(OBJS): Makefile
 
-runtests: runtests.o $(OBJS)
-	$(CXX) $(CXXFLAGS) $(LIBS) runtests.o $(OBJS) -o runtests
+runtests: main.o $(OBJS)
+	$(CXX) $(CXXFLAGS) $(LIBS) main.o $(OBJS) -o runtests
 	./runtests
 
 clean:

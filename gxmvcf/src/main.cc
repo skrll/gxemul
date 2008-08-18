@@ -25,6 +25,21 @@
  *  SUCH DAMAGE.
  */
 
+/*! \mainpage Source code documentation
+ *  
+ * \section intro_sec Introduction
+ * 
+ * This is the automatically generated Doxygen documentation for GXmvcf,
+ * built from comments throughout the source code.
+ *      
+ * 
+ * \section concepts_sec Core concepts
+ * 
+ * \subsection components_subsec Model
+ *
+ * TODO
+ */
+
 #include <iostream>
 
 #include "misc.h"
