@@ -1,8 +1,26 @@
-GXmvcf  --  Gavare's eXperimental Model-View-Controller Framework
+GXmvcf  --  Gavare's eXperimental Model-View-Controller Framework  --  TODO
+---------------------------------------------------------------------------
 
-  x)	Separate project (not bound to GXemul).
+  x)	Core concepts:
 
-  x)	C++, BSD-style license, Doxygen for documentation, Unit tests.
+		Model, Nodes, Variables
+		Actions, Undo/Redo stack
+		Views
+		Triggers
+		Documents
+
+  x)	Model: Tree of nodes
+	   x)	Create, remove, move (even between Documents?)
+	   x)	Nodes may have subnodes and variables.
+	   x)	Nodes and variables have a human-readable path (a string).
+	   x)	Cross references are strings, which need to be updated
+		by the framework if nodes are renamed/moved.
+	   x)	Nodes have implicit serialization/deserialization functions,
+		so these do not need to be implemented.
+
+  x)	Triggers/callbacks for changes/write of the model.
+	   x)	What kind of triggers? Complex expressions? Sub-tree
+		triggers? (e.g. "any change of variable X in any subnodes")
 
   x)	Not bound to any specific UI; zero or more should be possible:
 		x) null (for testing)
@@ -24,21 +42,8 @@ GXmvcf  --  Gavare's eXperimental Model-View-Controller Framework
 
   x)	Support for zero or more simultaneous Documents.
 
-  x)	Model: Tree of nodes
-	   x)	Create, remove, move (even between Documents?)
-	   x)	Nodes may have subnodes and variables.
-	   x)	Nodes and variables have a human-readable path (a string).
-	   x)	Cross references are strings, which need to be updated
-		by the framework if nodes are renamed/moved.
-	   x)	Nodes have implicit serialization/deserialization functions,
-		so these do not need to be implemented.
-
   x)	Multithreading support (especially for _writing_ to the model).
 	   x)	Optional?  pthread?  Others?
-
-  x)	Triggers/callbacks for changes/write of the model.
-	   x)	What kind of triggers? Complex expressions? Sub-tree
-		triggers? (e.g. "any change of variable X in any subnodes")
 
   x)	Code examples for easy setup of e.g. a standard GTKMM application.
 	   x)	Menu entries for load/save/exit/undo/redo/help/about?
