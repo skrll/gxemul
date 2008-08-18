@@ -1,5 +1,5 @@
 /*
- * Modified for GXemul:
+ * Modified for GXemul/GXmvcf:
  *
  *      1. Better Doxygen comment for struct __nvwa_compile_time_error.
  */

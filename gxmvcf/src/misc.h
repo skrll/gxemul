@@ -41,6 +41,10 @@
 #define	GXMVCF_COPYRIGHT_MSG	"Copyright (C) 2008  Anders Gavare"
 
 
+#ifndef NDEBUG
+#include "debug_new.h"
+#endif
+
 // Use Glib::ustring if available, otherwise std::string. Define
 // stringchar to be the type of a character.
 #ifdef WITH_GTKMM
@@ -87,96 +91,9 @@ using std::max;
 using std::pair;
 
 
-#ifndef NDEBUG
-#include "debug_new.h"
-#endif
-
-
 // Reference counting is needed in lots of places, so it is best to
 // include it from this file.
 #include "refcount_ptr.h"  
-
-
-#ifdef NO_C99_PRINTF_DEFINES
-//
-// This is a SUPER-UGLY HACK which happens to work on some machines.
-// The correct solution is to upgrade your compiler to C99.
-//
-#ifdef NO_C99_64BIT_LONGLONG
-#define	PRIi8		"i"
-#define	PRIi16		"i"
-#define	PRIi32		"i"
-#define	PRIi64		"lli"
-#define	PRIx8		"x"
-#define	PRIx16		"x"
-#define	PRIx32		"x"
-#define	PRIx64		"llx"
-#else
-#define	PRIi8		"i"
-#define	PRIi16		"i"
-#define	PRIi32		"i"
-#define	PRIi64		"li"
-#define	PRIx8		"x"
-#define	PRIx16		"x"
-#define	PRIx32		"x"
-#define	PRIx64		"lx"
-#endif
-#endif
-
-
-#ifdef NO_MAP_ANON
-#error mmap for systems without MAP_ANON has not yet been implemented. \
-	The old implementation was too ugly. Please let me know about this \
-	if you see this error message. (Most likely IRIX systems.)
-#endif
-
-
-enum Endianness
-{
-	BigEndian = 0,
-	LittleEndian
-};
-
-
-#ifdef HOST_LITTLE_ENDIAN
-#define	LE16_TO_HOST(x)	    (x)
-#define	BE16_TO_HOST(x)	    ((((x) & 0xff00) >> 8) | (((x)&0xff) << 8))
-#else
-#define	LE16_TO_HOST(x)	    ((((x) & 0xff00) >> 8) | (((x)&0xff) << 8))
-#define	BE16_TO_HOST(x)	    (x)
-#endif
-
-#ifdef HOST_LITTLE_ENDIAN
-#define	LE32_TO_HOST(x)	    (x)
-#define	BE32_TO_HOST(x)	    ((((x) & 0xff000000) >> 24) | (((x)&0xff) << 24) | \
-			     (((x) & 0xff0000) >> 8) | (((x) & 0xff00) << 8))
-#else
-#define	LE32_TO_HOST(x)	    ((((x) & 0xff000000) >> 24) | (((x)&0xff) << 24) | \
-			     (((x) & 0xff0000) >> 8) | (((x) & 0xff00) << 8))
-#define	BE32_TO_HOST(x)	    (x)
-#endif
-
-#ifdef HOST_LITTLE_ENDIAN
-#define	LE64_TO_HOST(x)	    (x)
-#define BE64_TO_HOST(x)	    (	(((x) >> 56) & 0xff) +			\
-				((((x) >> 48) & 0xff) << 8) +		\
-				((((x) >> 40) & 0xff) << 16) +		\
-				((((x) >> 32) & 0xff) << 24) +		\
-				((((x) >> 24) & 0xff) << 32) +		\
-				((((x) >> 16) & 0xff) << 40) +		\
-				((((x) >> 8) & 0xff) << 48) +		\
-				(((x) & 0xff) << 56)  )
-#else
-#define	BE64_TO_HOST(x)	    (x)
-#define LE64_TO_HOST(x)	    (	(((x) >> 56) & 0xff) +			\
-				((((x) >> 48) & 0xff) << 8) +		\
-				((((x) >> 40) & 0xff) << 16) +		\
-				((((x) >> 32) & 0xff) << 24) +		\
-				((((x) >> 24) & 0xff) << 32) +		\
-				((((x) >> 16) & 0xff) << 40) +		\
-				((((x) >> 8) & 0xff) << 48) +		\
-				(((x) & 0xff) << 56)  )
-#endif
 
 
 #ifdef HAVE___FUNCTION__

@@ -1,5 +1,5 @@
 /*
- *  GXemul specific changes to debug_new.cc:
+ *  GXemul/GXmvcf specific changes to debug_new.cc:
  *
  *   x)	debug_new.cpp renamed debug_new.cc.
  *   x)	#include <alloca.h> commented out.

@@ -1,5 +1,5 @@
 /*
- * Modified for GXemul:
+ * Modified for GXemul/GXmvcf:
  *
  *	1. Classes have Doxygen brief sections, indicating that they are
  *	   part of Wu Yongwei's debug new/delete package.

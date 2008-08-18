@@ -93,7 +93,7 @@ class UnitTest
 {
 public:
 	/**
-	 * \brief Runs all unit tests in %GXemul.
+	 * \brief Runs all unit tests.
 	 *
 	 * If WITHOUTUNITTESTS was defined in config.h, nothing is tested,
 	 * and zero is returned.

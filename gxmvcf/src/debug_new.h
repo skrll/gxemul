@@ -1,5 +1,5 @@
 /*
- * Modified for GXemul:
+ * Modified for GXemul/GXmvcf:
  *
  *	1. Better Doxygen comment for class __debug_new_counter.
  */
