@@ -1,0 +1,6 @@
+Changelog for GXmvcf:
+---------------------
+
+20080818	Skeleton: configure script, Makefile.skel files, src and doc
+		directory, Doxygen setup, unit test (no tests written yet).
+
