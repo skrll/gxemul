@@ -29,6 +29,7 @@
  */
 
 #include "misc.h"
+#include "gxmvcf/gxmvcf.h"
 
 #include <exception>
 
@@ -61,28 +62,6 @@ public:
 
 private:
 	string	m_strMessage;
-};
-
-
-/**
- * \brief Base class for unit testable classes.
- *
- * A class which inherits from the UnitTestable class exposes a function,
- * RunUnitTests(int&, int&), which runs unit tests, and returns the number 
- * of failed test cases.
- */
-class UnitTestable
-{
-public:
-	/**
-	 * \brief Runs unit test cases.
-	 *
-	 * @param nSucceeded A reference to a variable which keeps count
-	 *	of the number of succeeded test cases.
-	 * @param nFailures A reference to a variable which keeps count
-	 *	of the number of failed test cases.
-	 */
-	static void RunUnitTests(int& nSucceeded, int& nFailures);
 };
 
 
@@ -210,9 +189,6 @@ public:
  *	}
  *
  *	\#endif // WITHOUTUNITTESTS</pre>
- *
- * Note that MyClass (in the example above) should inherit from the
- * UnitTestable class.
  */
 #define UNITTEST(functionname)	try {					\
 	std::cout << "### " #functionname "\n";				\

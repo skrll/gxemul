@@ -428,22 +428,26 @@ fi
 
 ###############################################################################
 
-GLIBMM_VER="2.16.4"
-printf "checking for glibmm-2.4 >= $GLIBMM_VER... "
+# NOTE/TODO: This should really be a dependency just for glibmm,
+# but that doesn't make /usr/local/include appear in the CXXFLAGS,
+# which makes it hard to find libintl.h. :-/  so requiring GTKMM is
+# just a hack until this is figured out.
+GTKMM_VER="2.12.8"
+printf "checking for gtkmm-2.4 >= $GTKMM_VER... "
 
-if [ z$WITHOUTGLIBMM = zYES ]; then
+if [ z$WITHOUTGTKMM = zYES ]; then
 	echo skipping
 else
-	if pkg-config --atleast-version=$GLIBMM_VER glibmm-2.4; then
+	if pkg-config --atleast-version=$GTKMM_VER gtkmm-2.4; then
 		echo found
-		CXXFLAGS="$CXXFLAGS `pkg-config --cflags glibmm-2.4`"
-		OTHERLIBS="$OTHERLIBS `pkg-config --libs glibmm-2.4`"
-		CXXFLAGS="$CXXFLAGS -DWITH_GLIBMM"
-		WITHGLIBMM=YES
+		CXXFLAGS="$CXXFLAGS `pkg-config --cflags gtkmm-2.4`"
+		OTHERLIBS="$OTHERLIBS `pkg-config --libs gtkmm-2.4`"
+		CXXFLAGS="$CXXFLAGS -DWITH_GTKMM"
+		WITHGTKMM=YES
 	else
 		echo not found
-		if [ z$WITHGLIBMM = zYES ]; then
-			echo "Sorry, glibmm-2.4 version $GLIBMM_VER or newer" \
+		if [ z$WITHGTKMM = zYES ]; then
+			echo "Sorry, gtkmm-2.4 version $GTKMM_VER or newer" \
 			    "was not found. Aborting."
 			exit
 		fi

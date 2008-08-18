@@ -1,8 +1,8 @@
-#ifndef	MISC_H
-#define	MISC_H
+#ifndef	GXMVCF_H
+#define	GXMVCF_H
 
 /*
- *  Copyright (C) 2003-2008  Anders Gavare.  All rights reserved.
+ *  Copyright (C) 2008  Anders Gavare.  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
@@ -26,45 +26,64 @@
  *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  *  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  *  SUCH DAMAGE.
- *
- *  Misc. definitions for GXmvcf.
  */
 
 
 #include <sys/types.h>
 #include <inttypes.h>
 
+#define	GXMVCF_COPYRIGHT_MSG	"Copyright (C) 2008  Anders Gavare"
 
-// config.h contains #defines set by the configure script.
-#include "../config.h"
 
-#ifndef NDEBUG
-#include "debug_new.h"
+// Use Glib::ustring if available, otherwise std::string. Define
+// stringchar to be the type of a character.
+#ifdef WITH_GTKMM
+#include <glibmm/ustring.h>
+typedef Glib::ustring string;
+typedef gunichar stringchar;
+#else   // !WITH_GTKMM
+#include <string>
+typedef std::string string;
+typedef char stringchar;
 #endif
 
+#include <iostream>
+using std::ostream;
 
-#ifdef HAVE___FUNCTION__
+// Use Glib's I18N support if available
+#ifdef WITH_GTKMM
+#include <glibmm/i18n.h>
+#else   // !WITH_GTKMM
+#define	_(x)	(x)
+#endif
 
-#define	FAILURE(error_msg)					{	\
-		char where_msg[400];					\
-		snprintf(where_msg, sizeof(where_msg),			\
-		    "%s, line %i, function %s().\n",			\
-		    __FILE__, __LINE__, __FUNCTION__);			\
-        	fprintf(stderr, "\n%s, in %s\n", error_msg, where_msg);	\
-		exit(1);						\
-	}
+#include <memory>
+using std::auto_ptr;
 
-#else
+#include <list>
+using std::list;
 
-#define	FAILURE(error_msg)					{	\
-		char where_msg[400];					\
-		snprintf(where_msg, sizeof(where_msg),			\
-		    "%s, line %i\n", __FILE__, __LINE__);		\
-        	fprintf(stderr, "\n%s, in %s.\n", error_msg, where_msg);\
-		exit(1);						\
-	}
+#include <map>
+using std::map;
+using std::multimap;
 
-#endif	/*  !HAVE___FUNCTION__  */
+#include <set>
+using std::set;
+
+#include <sstream>
+using std::stringstream;
+
+#include <vector>
+using std::vector;
+
+using std::min;
+using std::max;
+using std::pair;
 
 
-#endif	/*  MISC_H  */
+// Reference counting is needed in lots of places, so it is best to
+// include it from this file.
+#include "refcount_ptr.h"  
+
+
+#endif	/*  GXMVCF_H  */

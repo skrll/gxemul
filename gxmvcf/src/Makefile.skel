@@ -16,7 +16,7 @@ runtests: main.o $(OBJS)
 	./runtests
 
 clean:
-	rm -f $(OBJS) *core _test
+	rm -f $(OBJS) runtests *core _test
 
 clean_all: clean
 	rm -f Makefile
