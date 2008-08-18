@@ -331,45 +331,6 @@ fi
 rm -f _testprog
 
 
-#  -fpeephole
-if [ ! z"$DEBUG" = zYES ]; then
-	printf "checking whether -fpeephole can be used... "
-	$CXX $CXXFLAGS -fpeephole _testprog.cc -o _testprog > _testprog.stdout 2>&1
-	cat _testprog.stdout >> _testprog.error
-	if grep peephole _testprog.error > /dev/null 2>&1; then
-		printf "no\n"
-	else
-		if [ -x _testprog ]; then
-			CXXFLAGS="$CXXFLAGS -fpeephole"
-			printf "yes\n"
-		else
-			printf "no\n"
-		fi
-	fi
-	rm -f _testprog _testprog.error _testprog.stdout
-fi
-
-
-#  -fomit-frame-pointer
-if [ ! z"$DEBUG" = zYES ]; then
-	printf "checking whether -fomit-frame-pointer can be used... "
-	$CXX $CXXFLAGS -fomit-frame-pointer _testprog.cc -o \
-	    _testprog 1> _testprog.stdout 2>&1
-	cat _testprog.stdout >> _testprog.error
-	if grep frame _testprog.error > /dev/null 2>&1; then
-		printf "no\n"
-	else
-		if [ -x _testprog ]; then
-			CXXFLAGS="$CXXFLAGS -fomit-frame-pointer"
-			printf "yes\n"
-		else
-			printf "no\n"
-		fi
-	fi
-	rm -f _testprog _testprog.error _testprog.stdout
-fi
-
-
 printf "checking whether -g can be used... "
 $CXX $CXXFLAGS -g _testprog.cc -o _testprog > _testprog.stdout 2>&1
 cat _testprog.stdout >> _testprog.error
@@ -380,54 +341,6 @@ else
 	printf "no\n"
 fi
 rm -f _testprog _testprog.error _testprog.stdout
-
-
-#  -lrt for nanosleep?
-printf "checking whether -lrt is required for nanosleep... "
-printf "#include <time.h>\n#include <stdio.h>
-int main(int argc, char *argv[]){nanosleep(NULL,NULL);return 0;}\n" > _testns.cc
-$CXX $CXXFLAGS _testns.cc -o _testns 2> /dev/null
-if [ ! -x _testns ]; then
-	$CXX $CXXFLAGS -lrt _testns.cc -o _testns 2> /dev/null
-	if [ ! -x _testns ]; then
-		printf "WARNING! COULD NOT COMPILE WITH nanosleep AT ALL!\n"
-	else
-		#  -lrt for nanosleep
-		OTHERLIBS="-lrt $OTHERLIBS"
-		printf "yes\n"
-	fi
-else
-	printf "no\n"
-fi
-rm -f _testns*
-
-
-#  -lm?
-printf "checking for math libs..."
-printf "#include <math.h>\nint main(int argc, char *argv[]) { " > _testr.cc
-printf "double x = sqrt(sin((double)argc)); return (int)x; }\n" >> _testr.cc
-$CXX $CXXFLAGS _testr.cc -o _testr 2> /dev/null
-if [ ! -x _testr ]; then
-	$CXX $CXXFLAGS _testr.cc -lm -o _testr 2> /dev/null
-	if [ ! -x _testr ]; then
-		$CXX $CXXFLAGS _testr.cc -lm -lcpml -o _testr 2> /dev/null
-		if [ ! -x _testr ]; then
-			printf "\nWARNING! Could not compile math test "
-			printf "at all!\nContinuing anyway.\n\n"
-		else
-			#  -lm AND -lcpml
-			OTHERLIBS="-lm -lcpml $OTHERLIBS"
-			printf " -lm -lcpml\n"
-		fi
-	else
-		#  Normal -lm
-		OTHERLIBS="-lm $OTHERLIBS"
-		printf " -lm\n"
-	fi
-else
-	printf " none needed\n"
-fi
-rm -f _testr*
 
 
 #  Check for u_int8_t etc:
