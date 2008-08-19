@@ -49,39 +49,20 @@
 ###############################################################################
 
 # Default prefix for "make install"
-DEFAULTPREFIX=/usr/local
+DEFAULTPREFIX=/usr/local/include
 
-#  Figure out if this is a stable version (0.x.x).
-X=`basename \`pwd\`|cut -d \- -f 2-|cut -c1-2`
-if [ z"$X" = z0. ]; then
-	#  Stable.
-	WITHOUTUNITTESTS=YES
-else
-	#  Development.
-	UNSTABLE=YES
-	WITHOUTUNITTESTS=NO
-fi
+WITHOUTUNITTESTS=NO
+DEBUG=YES
 
 if [ z"$*" != z ]; then
 	#  Parse command line options:
 	for a in $*; do
-		if [ z$a = z--debug ]; then
-			DEBUG=YES
-		else if [ z$a = z--with-unit-tests ]; then
-			WITHOUTUNITTESTS=NO
-		else if [ z$a = z--without-unit-tests ]; then
-			WITHOUTUNITTESTS=YES
+		if [ z$a = z--ndebug ]; then
+			DEBUG=NO
 		else if [ z$a = z--help ]; then
 			printf "usage: $0 [options]\n\n"
-			if [ z"$UNSTABLE" = zYES ]; then
-				echo "  --debug                    configure" \
-					"for a debug build"
-				echo "  --without-unit-tests       build without" \
-					"unit tests"
-			else
-				echo "  --with-unit-tests          build with" \
-					"unit tests (increases binary size)"
-			fi
+			echo "  --ndebug                   configure" \
+				"for a non-debug build"
 			echo
 			echo "If the PREFIX environment variable is set," \
 			    "it will override the default"
@@ -93,7 +74,7 @@ if [ z"$*" != z ]; then
 			echo "Run  $0 --help  to get a list of" \
 			    "available options."
 			exit
-		fi; fi; fi; fi
+		fi; fi
 	done
 fi
 
@@ -122,10 +103,6 @@ else
 	printf "#define VERSION \"$X\"\n" >> config.h
 fi
 
-
-if [ z"$UNSTABLE" = zYES ]; then
-	printf "#define UNSTABLE_DEVEL\n" >> config.h
-fi
 
 if [ z"$WITHOUTUNITTESTS" = zYES ]; then
 	printf "#define WITHOUTUNITTESTS\n" >> config.h
@@ -266,16 +243,14 @@ if [ -x _testprog ]; then
 	printf "yes\n"
 	CXXFLAGS="-Wall $CXXFLAGS"
 
-	if [ z"$UNSTABLE" = zYES ]; then
-		printf "checking whether -Werror can be used... "
-		rm -f _testprog
-		$CXX -Werror $CXXFLAGS _testprog.cc -o _testprog 2> /dev/null
-		if [ -x _testprog ]; then
-			printf "yes\n"
-			CXXFLAGS="-Werror $CXXFLAGS"
-		else
-			printf "no\n"
-		fi
+	printf "checking whether -Werror can be used... "
+	rm -f _testprog
+	$CXX -Werror $CXXFLAGS _testprog.cc -o _testprog 2> /dev/null
+	if [ -x _testprog ]; then
+		printf "yes\n"
+		CXXFLAGS="-Werror $CXXFLAGS"
+	else
+		printf "no\n"
 	fi
 else
 	printf "no\n"
@@ -283,30 +258,26 @@ fi
 rm -f _testprog
 
 
-if [ z"$UNSTABLE" = zYES ]; then
-	printf "checking whether -ansi can be used... "
-	$CXX $CXXFLAGS -ansi _testprog.cc -o _testprog 2> /dev/null
-	if [ -x _testprog ]; then
-		printf "yes\n"
-		CXXFLAGS="$CXXFLAGS -ansi"
-	else
-		printf "no\n"
-	fi
-	rm -f _testprog
+printf "checking whether -ansi can be used... "
+$CXX $CXXFLAGS -ansi _testprog.cc -o _testprog 2> /dev/null
+if [ -x _testprog ]; then
+	printf "yes\n"
+	CXXFLAGS="$CXXFLAGS -ansi"
+else
+	printf "no\n"
 fi
+rm -f _testprog
 
 
-if [ z"$UNSTABLE" = zYES ]; then
-	printf "checking whether -pedantic can be used... "
-	$CXX $CXXFLAGS -pedantic _testprog.cc -o _testprog 2> /dev/null
-	if [ -x _testprog ]; then
-		printf "yes\n"
-		CPEDANTIC="-pedantic"
-	else
-		printf "no\n"
-	fi
-	rm -f _testprog
+printf "checking whether -pedantic can be used... "
+$CXX $CXXFLAGS -pedantic _testprog.cc -o _testprog 2> /dev/null
+if [ -x _testprog ]; then
+	printf "yes\n"
+	CPEDANTIC="-pedantic"
+else
+	printf "no\n"
 fi
+rm -f _testprog
 
 
 #  -O-style Optimization flags:
@@ -342,59 +313,6 @@ else
 fi
 rm -f _testprog _testprog.error _testprog.stdout
 
-
-#  Check for u_int8_t etc:
-printf "checking for u_int8_t... "
-printf "#include <stdio.h>\n#include <inttypes.h>\n#include <sys/types.h>\n
-int main(int argc, char *argv[]){printf(\"%%i\\\n\",
- (int)sizeof(u_int8_t));return 0;}\n" > _testuint.cc
-$CXX $CXXFLAGS _testuint.cc -o _testuint 2> /dev/null
-if [ ! -x _testuint ]; then
-	rm -f _testuint*
-	printf "#include <stdio.h>\n#include <inttypes.h>
-	\n#include <sys/types.h>\nint main(int argc, char *argv[])
-	{printf(\"%%i\\\n\", (int)sizeof(uint8_t));return 0;}\n" > _testuint.cc
-	$CXX $CXXFLAGS _testuint.cc -o _testuint 2> /dev/null
-	if [ ! -x _testuint ]; then
-		printf "no\n\nERROR: No u_int8_t or uint8_t. Aborting\n"
-		#  TODO: Automagically detect using various combinations
-		#  of char, int, short, long etc.
-		exit
-	fi
-
-	printf "typedef uint8_t u_int8_t;\n" >> config.h
-	printf "typedef uint16_t u_int16_t;\n" >> config.h
-	printf "typedef uint32_t u_int32_t;\n" >> config.h
-	printf "uint8_t\n"
-else
-	printf "yes\n"
-fi
-rm -f _testuint.c*
-
-printf "checking for u_int64_t... "
-printf "#include <stdio.h>\n#include <inttypes.h>\n#include <sys/types.h>\n
-int main(int argc, char *argv[]){printf(\"%%i\\\n\",
- (int)sizeof(u_int64_t));return 0;}\n" > _testuint.cc
-$CXX $CXXFLAGS _testuint.cc -o _testuint 2> /dev/null
-if [ ! -x _testuint ]; then
-	rm -f _testuint*
-	printf "#include <stdio.h>\n#include <inttypes.h>
-	\n#include <sys/types.h>\nint main(int argc, char *argv[])
-	{printf(\"%%i\\\n\", (int)sizeof(uint64_t));return 0;}\n" > _testuint.cc
-	$CXX $CXXFLAGS _testuint.c -o _testuint 2> /dev/null
-	if [ ! -x _testuint ]; then
-		printf "no\n\nERROR: No u_int64_t or uint64_t. Aborting\n"
-		#  TODO: Automagically detect using various combinations
-		#  of char, int, short, long etc.
-		exit
-	fi
-
-	printf "typedef uint64_t u_int64_t;\n" >> config.h
-	printf "uint64_t\n"
-else
-	printf "yes\n"
-fi
-rm -f _testuint*
 
 printf "checking for __FUNCTION__... "
 printf "#include <stdio.h>\n\nint main(int argc, char *argv[]) {

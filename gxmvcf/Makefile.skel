@@ -8,6 +8,9 @@ all:
 documentation:
 	$(DOXYGEN) doc/Doxyfile
 
+install:
+	@echo TODO
+
 clean:
 	rm -rf doc/doxygen
 	cd src; $(MAKE) clean

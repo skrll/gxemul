@@ -41,7 +41,7 @@
 using std::string;
 
 #ifndef NDEBUG
-#include "debug_new.h"
+#include "thirdparty/debug_new.h"
 #endif
 
 
