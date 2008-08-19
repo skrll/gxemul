@@ -1,3 +1,10 @@
+=========================================================================
+
+Note:  GXmvcf is still under development, so don't expect it to work yet.
+
+=========================================================================
+
+
 GXmvcf  --  a small Model-View-Controller framework
 ---------------------------------------------------
 
@@ -8,6 +15,7 @@ Simply put, the Model is your data, independent of how it is presented.
 Your Views are presentation only (reads from the data), and the Controller 
 is what holds Model and Views together. Any changes to the Model go via 
 the Controller.
+
 
 GXmvcf's characteristics are:
 
@@ -20,6 +28,36 @@ GXmvcf's characteristics are:
   o)  Undo/redo history, for all changes to the Model.
 
   o)  Not bound to any specific UI (e.g. GUI).
+
+
+When is GXmvcf suitable?
+
+  o)  When you create a new end-user application from scratch, i.e.
+      you are not already using any other MVC framework,
+
+  o)  you need to save and load the state of all the application's data
+      in files (persistant storage)
+
+  o)  you need undo/redo capability
+
+  o)  you need a clean separation between model (data) and view (UI),
+      potentially planning multiple UIs (either graphical or non-
+      graphical).
+
+
+INSTALLATION:
+
+Copy the .h files from src/gxmvcf to your project, and use them.
+
+
+RUNNING UNIT TESTS:
+
+./configure && make test
+
+
+BUILDING HTML DOCUMENTATION:
+
+./configure && make documentation
 
 
 =========================================================================

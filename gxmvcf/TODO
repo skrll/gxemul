@@ -2,7 +2,6 @@ GXmvcf  --  Gavare's eXperimental Model-View-Controller Framework  --  TODO
 ---------------------------------------------------------------------------
 
   x)	Core concepts:
-
 		Model, Nodes, Variables
 		Actions, Undo/Redo stack
 		Views
@@ -40,11 +39,16 @@ GXmvcf  --  Gavare's eXperimental Model-View-Controller Framework  --  TODO
 		x)  other file formats could be hooked in?
 		x)  undo/redo stack saved? (optionally)
 
-  x)	Support for zero or more simultaneous Documents.
-
-  x)	Multithreading support (especially for _writing_ to the model).
-	   x)	Optional?  pthread?  Others?
+  x)	Document "dirty" flag.
 
   x)	Code examples for easy setup of e.g. a standard GTKMM application.
 	   x)	Menu entries for load/save/exit/undo/redo/help/about?
+
+
+Not planned for first release:
+
+  x)	Support multiple simultaneous Documents.
+
+  x)	Multithreading support (especially for _writing_ to the model).
+	   x)	Optional?  pthread?  Others?
 
