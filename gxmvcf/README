@@ -1,0 +1,30 @@
+GXmvcf  --  a small Model-View-Controller framework
+---------------------------------------------------
+
+GXmvcf is a small MVC (http://en.wikipedia.org/wiki/Model-view-controller)
+framework, which can be helpful when creating end-user applications.
+
+Simply put, the Model is your data, independent of how it is presented. 
+Your Views are presentation only (reads from the data), and the Controller 
+is what holds Model and Views together. Any changes to the Model go via 
+the Controller.
+
+GXmvcf's characteristics are:
+
+  o)  Implemented as C++ .h files only. When you wish to build an application
+      that uses GXmvcf, you may simply copy the .h files and place them
+      in a subdirectory called "gxmvcf".
+
+  o)  BSD-style license.
+
+  o)  Undo/redo history, for all changes to the Model.
+
+  o)  Not bound to any specific UI (e.g. GUI).
+
+
+=========================================================================
+
+Note:  GXmvcf is still under development, so don't expect it to work yet.
+
+=========================================================================
+
