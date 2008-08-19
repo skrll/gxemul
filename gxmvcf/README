@@ -52,7 +52,7 @@ Copy the .h files from src/gxmvcf to your project, and use them.
 
 RUNNING UNIT TESTS:
 
-./configure && make test
+./configure && make
 
 
 BUILDING HTML DOCUMENTATION:
