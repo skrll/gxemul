@@ -35,7 +35,7 @@
  * 
  * \section concepts_sec Core concepts
  * 
- * \subsection components_subsec Model
+ * \subsection components_subsec Model, View, and Controller
  *
  * TODO
  */
