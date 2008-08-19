@@ -32,8 +32,6 @@ GXmvcf  --  Gavare's eXperimental Model-View-Controller Framework  --  TODO
   x)	Undo/redo stack of Actions.
 		(An Action is something which modifies the Model.)
 
-  x)	I18N support if glib is included (i.e. string = Glib::ustring).
-
   x)	Documents saved as XML files by default.
 		x)  Some extremely simple other kind of fallback?
 		x)  other file formats could be hooked in?

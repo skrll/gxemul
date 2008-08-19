@@ -2,13 +2,8 @@
 #  Makefile for GXmvcf
 #
 
-all: buildsrc
-
-buildsrc:
+all:
 	cd src; $(MAKE)
-
-test: buildsrc
-	cd src; $(MAKE) runtests
 
 documentation:
 	$(DOXYGEN) doc/Doxyfile

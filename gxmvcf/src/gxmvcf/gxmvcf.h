@@ -34,28 +34,8 @@
 
 #define	GXMVCF_COPYRIGHT_MSG	"Copyright (C) 2008  Anders Gavare"
 
-
-// Use Glib::ustring if available, otherwise std::string. Define
-// stringchar to be the type of a character.
-#ifdef WITH_GTKMM
-#include <glibmm/ustring.h>
-typedef Glib::ustring string;
-typedef gunichar stringchar;
-#else   // !WITH_GTKMM
-#include <string>
-typedef std::string string;
-typedef char stringchar;
-#endif
-
 #include <iostream>
 using std::ostream;
-
-// Use Glib's I18N support if available
-#ifdef WITH_GTKMM
-#include <glibmm/i18n.h>
-#else   // !WITH_GTKMM
-#define	_(x)	(x)
-#endif
 
 #include <memory>
 using std::auto_ptr;
@@ -79,7 +59,6 @@ using std::vector;
 using std::min;
 using std::max;
 using std::pair;
-
 
 // Reference counting is needed in lots of places, so it is best to
 // include it from this file.

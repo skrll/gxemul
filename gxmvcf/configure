@@ -428,35 +428,6 @@ fi
 
 ###############################################################################
 
-# NOTE/TODO: This should really be a dependency just for glibmm,
-# but that doesn't make /usr/local/include appear in the CXXFLAGS,
-# which makes it hard to find libintl.h. :-/  so requiring GTKMM is
-# just a hack until this is figured out.
-GTKMM_VER="2.12.8"
-printf "checking for gtkmm-2.4 >= $GTKMM_VER... "
-
-if [ z$WITHOUTGTKMM = zYES ]; then
-	echo skipping
-else
-	if pkg-config --atleast-version=$GTKMM_VER gtkmm-2.4; then
-		echo found
-		CXXFLAGS="$CXXFLAGS `pkg-config --cflags gtkmm-2.4`"
-		OTHERLIBS="$OTHERLIBS `pkg-config --libs gtkmm-2.4`"
-		CXXFLAGS="$CXXFLAGS -DWITH_GTKMM"
-		WITHGTKMM=YES
-	else
-		echo not found
-		if [ z$WITHGTKMM = zYES ]; then
-			echo "Sorry, gtkmm-2.4 version $GTKMM_VER or newer" \
-			    "was not found. Aborting."
-			exit
-		fi
-	fi
-fi
-
-
-###############################################################################
-
 if [ "z$PREFIX" = z ]; then
 	PREFIX="$DEFAULTPREFIX"
 fi	

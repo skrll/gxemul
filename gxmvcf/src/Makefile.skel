@@ -7,11 +7,7 @@ LIBS=$(XLIB) $(OTHERLIBS)
 
 OBJS=debug_new.o UnitTest.o
 
-all: $(OBJS)
-
-$(OBJS): Makefile
-
-runtests: main.o $(OBJS)
+all: $(OBJS) main.o
 	$(CXX) $(CXXFLAGS) $(LIBS) main.o $(OBJS) -o runtests
 	./runtests
 
