@@ -404,5 +404,5 @@ printf "\n#endif  /*  CONFIG_H  */\n" >> config.h
 rm -f _Makefile.header
 
 
-echo Configured. You may now run make to build GXmvcf.
+echo Configured. You may now run make to build and test GXmvcf.
 
