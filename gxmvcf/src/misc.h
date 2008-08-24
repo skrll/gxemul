@@ -31,14 +31,10 @@
  */
 
 
-#include <sys/types.h>
-#include <inttypes.h>
-
 // config.h contains #defines set by the configure script.
 #include "../config.h"
 
-#include <string>
-using std::string;
+#include <iostream>
 
 #ifndef NDEBUG
 #include "thirdparty/debug_new.h"

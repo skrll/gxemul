@@ -1,5 +1,5 @@
-#ifndef	GXMVCF_H
-#define	GXMVCF_H
+#ifndef	GXMVCF_VARIABLE_H
+#define	GXMVCF_VARIABLE_H
 
 /*
  *  Copyright (C) 2008  Anders Gavare.  All rights reserved.
@@ -28,33 +28,20 @@
  *  SUCH DAMAGE.
  */
 
-/*! \mainpage Source code documentation
- *  
- * This is the automatically generated Doxygen documentation for GXmvcf,
- * built from comments throughout the source code.
- *      
- * \section intro_sec Introduction - What is GXmvcf?
- *
- * GXmvcf is a lightweight (.h files only) <a href=
- * "http://en.wikipedia.org/wiki/Model-view-controller">Model-View-Controller
- * framework</a>, written in and for C++.
- * 
- * \section concepts_sec Core concepts
- * 
- * \subsection components_subsec Model, View, and Controller
- *
- * TODO
+#include "gxmvcf.h"  
+
+namespace GXmvcf
+{
+
+/**
+ * \brief A model variable.
  */
+template<class T>
+class Variable
+{
+public:
+};
 
-#include <string>
-using std::string;
+}
 
-#include <sstream>
-using std::stringstream;
-
-// Reference counting is needed in lots of places, so it is best to
-// include it from this file.
-#include "refcount_ptr.h"  
-
-
-#endif	/*  GXMVCF_H  */
+#endif	/*  GXMVCF_VARIABLE_H  */

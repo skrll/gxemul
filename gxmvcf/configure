@@ -51,7 +51,6 @@
 # Default prefix for "make install"
 DEFAULTPREFIX=/usr/local/include
 
-WITHOUTUNITTESTS=NO
 DEBUG=YES
 
 if [ z"$*" != z ]; then
@@ -103,10 +102,6 @@ else
 	printf "#define VERSION \"$X\"\n" >> config.h
 fi
 
-
-if [ z"$WITHOUTUNITTESTS" = zYES ]; then
-	printf "#define WITHOUTUNITTESTS\n" >> config.h
-fi
 
 if [ z"$DEBUG" = zYES ]; then
 	CXXFLAGS="-D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC $CXXFLAGS"
@@ -354,7 +349,7 @@ echo "checking for 'make install' prefix (\$PREFIX): $PREFIX"
 
 ###############################################################################
 
-INCLUDE1="-I."
+INCLUDE1="-I. -Igxmvcf"
 
 rm -f _testprog*
 
@@ -383,11 +378,12 @@ for a in `find src -name "*.cc" -print`; do grep UNITTESTS\( "$a";
 	done | cut -d \( -f 2|cut -d \) -f 1 > _unittests.tmp
 for a in `cat _unittests.tmp`; do
 	if [ ! z$a = zclassName ]; then
-		cd src/include
+		cd src/gxmvcf
 		HNAME=`find . -name $a.h | cut -c 3-`
 		cd ../..
 		printf "#include \"$HNAME\"\n" >> unittest_h.h
-		printf "\t$a::RunUnitTests(nSucceeded, nFailed);\n" >> unittest.h
+		printf "void RunUnitTests_$a(int &nSucceeded, int &nFailed);\n" >> unittest_h.h
+		printf "\tRunUnitTests_$a(nSucceeded, nFailed);\n" >> unittest.h
 	fi
 done
 rm -f _unittests.tmp

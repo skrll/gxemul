@@ -74,10 +74,7 @@ public:
 	/**
 	 * \brief Runs all unit tests.
 	 *
-	 * If WITHOUTUNITTESTS was defined in config.h, nothing is tested,
-	 * and zero is returned.
-	 *
-	 * Otherwise, unit tests for all classes that the <tt>configure</tt>
+	 * Unit tests for all classes that the <tt>configure</tt>
 	 * script detected as using UNITTESTS(classname) are executed.
 	 *
 	 * If a test fails, the UNITTEST(testname) macro in the unit testing
@@ -147,7 +144,6 @@ public:
 };
 
 
-#ifndef WITHOUTUNITTESTS
 #include <iostream>
 /**
  * \brief Helper for unit test case execution.
@@ -161,7 +157,7 @@ public:
  * See the comment for UNITTEST for details on how to use it.
  */
 #define UNITTESTS(class) \
-	void class::RunUnitTests(int& nSucceeded, int& nFailures)
+	void RunUnitTests_ ## class (int& nSucceeded, int& nFailures)
 
 /**
  * \brief Helper for unit test case execution.
@@ -200,8 +196,6 @@ public:
 		"    > " << ex.GetMessage() << "\n";			\
 	++ (nFailures);   						\
 }
-
-#endif
 
 
 #endif	// UNITTEST_H
