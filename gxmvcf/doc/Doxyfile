@@ -1024,7 +1024,7 @@ SEARCH_INCLUDES        = YES
 # the preprocessor.
 
 #INCLUDE_PATH           = 
-INCLUDE_PATH           = /usr/local/include/gtkmm-2.4 /usr/local/include/glibmm-2.4
+#INCLUDE_PATH           = /usr/local/include/gtkmm-2.4 /usr/local/include/glibmm-2.4
 
 # You can use the INCLUDE_FILE_PATTERNS tag to specify one or more wildcard 
 # patterns (like *.h and *.hpp) to filter out the header-files in the 
