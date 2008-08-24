@@ -2,11 +2,17 @@ GXmvcf  --  Gavare's eXperimental Model-View-Controller Framework  --  TODO
 ---------------------------------------------------------------------------
 
   x)	Core concepts:
-		Model, Nodes, Variables
-		Actions, Undo/Redo stack
-		Views
-		Triggers
-		Documents
+	   [/]	Model ("Document")
+		[ ]	Nodes
+			[ ]	Initialization
+			[ ]	Serialization/deserialization
+		[ ]	Variables
+			[/]	Initialization
+			[ ]	Serialization/deserialization
+	   [ ]	Actions
+	   [ ]	Undo/Redo stack of Actions
+	   [ ]	Views
+	   [ ]	Triggers
 
   x)	Model: Tree of nodes
 	   x)	Create, remove, move (even between Documents?)

@@ -30,14 +30,42 @@
 
 #include "UnitTest.h"
 
-        
-static void Test_Variable_Dummy()
-{       
-      UnitTest::Assert("hi", true);
+using namespace GXmvcf;
+
+
+static void Test_Variable_DefaultConstructor()
+{
+	Variable<string> v;
+	UnitTest::Assert("v should contain an empty string",
+	    v.GetValue() == "");
+
+	Variable<int> v2;
+	UnitTest::Assert("v2 should be 0", v2.GetValue() == 0);
+
+	Variable<double> v3;
+	UnitTest::Assert("v3 should be 0.0", v3.GetValue() == 0.0);
+}
+
+static void Test_Variable_ConstructorWithArg()
+{
+	Variable<string> v("hello");
+	UnitTest::Assert("v should contain the specified string",
+	    v.GetValue() == "hello");
+	UnitTest::Assert("v should contain the specified string",
+	    v.GetValueRef() == "hello");
+
+	Variable<int> v2(42);
+	UnitTest::Assert("v2 should match", v2.GetValue() == 42);
+	UnitTest::Assert("v2 should match", v2.GetValueRef() == 42);
+
+	Variable<double> v3(-1.293);
+	UnitTest::Assert("v3 should match", v3.GetValue() == -1.293);
+	UnitTest::Assert("v3 should match", v3.GetValueRef() == -1.293);
 }
 
 UNITTESTS(Variable)
 {
-        UNITTEST(Test_Variable_Dummy);
+        UNITTEST(Test_Variable_DefaultConstructor);
+        UNITTEST(Test_Variable_ConstructorWithArg);
 }
- 
+

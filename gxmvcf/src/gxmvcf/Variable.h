@@ -35,11 +35,57 @@ namespace GXmvcf
 
 /**
  * \brief A model variable.
+ *
+ * A variable holds a value of a specific type. A model node has zero
+ * or more variables.
  */
 template<class T>
 class Variable
 {
 public:
+	/**
+	 * \brief Constructs a variable of type T with a default initial value.
+	 *
+	 * (For POD types, the value will be 0.)
+	 */
+	Variable()
+		: m_value()	// Note: POD types will be initialized
+				// to zeroes!
+	{
+	}
+
+	/**
+	 * \brief Constructs a variable of type T with a specific initial value.
+	 *
+	 * @param value The initial value.
+	 */
+	Variable(T value)
+		: m_value(value)
+	{
+	}
+	
+	/**
+	 * \brief Gets a const reference to the variable value.
+	 *
+	 * @return A const reference to the variable value.
+	 */
+	const T& GetValueRef() const
+	{
+		return m_value;
+	}
+
+	/**
+	 * \brief Gets a copy of the variable value.
+	 *
+	 * @return A copy of the variable value.
+	 */
+	T GetValue() const
+	{
+		return m_value;
+	}
+
+private:
+	T	m_value;
 };
 
 }
