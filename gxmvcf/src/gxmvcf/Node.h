@@ -34,6 +34,9 @@
 #include <map>
 using std::map;
 
+#include <sstream>
+using std::stringstream;
+
 namespace GXmvcf
 {
 
@@ -54,6 +57,12 @@ public:
 	
 	virtual ~Node()
 	{
+	}
+
+	string Serialize()
+	{
+		stringstream ss;
+		ss << m_name << std::endl;
 	}
 
 protected:

@@ -4,7 +4,7 @@ GXmvcf  --  Gavare's eXperimental Model-View-Controller Framework  --  TODO
   x)	Core concepts:
 	   [/]	Model ("Document")
 		[ ]	Nodes
-			[ ]	Initialization
+			[/]	Initialization
 			[ ]	Serialization/deserialization
 		[ ]	Variables
 			[/]	Initialization
