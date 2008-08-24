@@ -1,3 +1,6 @@
+#ifndef	GXMVCF_NODE_H
+#define	GXMVCF_NODE_H
+
 /*
  *  Copyright (C) 2008  Anders Gavare.  All rights reserved.
  *
@@ -25,47 +28,44 @@
  *  SUCH DAMAGE.
  */
 
-#include "misc.h"
-#include "gxmvcf/Variable.h"
+#include "gxmvcf.h"  
+#include "Variable.h"
 
-#include "UnitTest.h"
+#include <map>
+using std::map;
 
-using namespace GXmvcf;
-
-
-static void Test_Variable_DefaultConstructor()
+namespace GXmvcf
 {
-	Variable<string> v("someName");
-	UnitTest::Assert("v should contain an empty string",
-	    v.GetValue() == "");
 
-	Variable<int> v2("someName");
-	UnitTest::Assert("v2 should be 0", v2.GetValue() == 0);
+/**
+ * \brief A model node.
+ *
+ * The entire model in %GXmvcf is made up of a tree of nodes. A node may have
+ * a parent (or NULL if it is the root node), and zero or more child-nodes.
+ *
+ * Each node may also have zero or more variables.
+ */
+class Node
+{
+public:
+	Node()
+	{
+	}
+	
+	virtual ~Node()
+	{
+	}
 
-	Variable<double> v3("someName");
-	UnitTest::Assert("v3 should be 0.0", v3.GetValue() == 0.0);
+protected:
+	void AttachVariable(VariableBase* variable)
+	{
+		m_variables[variable->GetName()] = variable;
+	}
+
+private:
+	map<string,VariableBase*>	m_variables;
+};
+
 }
 
-static void Test_Variable_ConstructorWithArg()
-{
-	Variable<string> v("someName", "hello");
-	UnitTest::Assert("v should contain the specified string",
-	    v.GetValue() == "hello");
-	UnitTest::Assert("v should contain the specified string",
-	    v.GetValueRef() == "hello");
-
-	Variable<int> v2("someName", 42);
-	UnitTest::Assert("v2 should match", v2.GetValue() == 42);
-	UnitTest::Assert("v2 should match", v2.GetValueRef() == 42);
-
-	Variable<double> v3("someName", -1.293);
-	UnitTest::Assert("v3 should match", v3.GetValue() == -1.293);
-	UnitTest::Assert("v3 should match", v3.GetValueRef() == -1.293);
-}
-
-UNITTESTS(Variable)
-{
-        UNITTEST(Test_Variable_DefaultConstructor);
-        UNITTEST(Test_Variable_ConstructorWithArg);
-}
-
+#endif	/*  GXMVCF_NODE_H  */

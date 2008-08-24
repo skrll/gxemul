@@ -33,6 +33,23 @@
 namespace GXmvcf
 {
 
+class VariableBase
+{
+public:
+	VariableBase(const string& name)
+		: m_name(name)
+	{
+	}
+
+	const string& GetName() const
+	{
+		return m_name;
+	}
+
+private:	
+	string	m_name;
+};
+
 /**
  * \brief A model variable.
  *
@@ -40,16 +57,19 @@ namespace GXmvcf
  * or more variables.
  */
 template<class T>
-class Variable
+class Variable : public VariableBase
 {
 public:
 	/**
 	 * \brief Constructs a variable of type T with a default initial value.
 	 *
 	 * (For POD types, the value will be 0.)
+	 *
+	 * @param value The variable's name.
 	 */
-	Variable()
-		: m_value()	// Note: POD types will be initialized
+	Variable(const string& name)
+		: VariableBase(name)
+		, m_value()	// Note: POD types will be initialized
 				// to zeroes!
 	{
 	}
@@ -57,13 +77,15 @@ public:
 	/**
 	 * \brief Constructs a variable of type T with a specific initial value.
 	 *
+	 * @param value The variable's name.
 	 * @param value The initial value.
 	 */
-	Variable(T value)
-		: m_value(value)
+	Variable(const string& name, T value)
+		: VariableBase(name)
+		, m_value(value)
 	{
 	}
-	
+
 	/**
 	 * \brief Gets a const reference to the variable value.
 	 *

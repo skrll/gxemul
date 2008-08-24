@@ -26,46 +26,39 @@
  */
 
 #include "misc.h"
-#include "gxmvcf/Variable.h"
+#include "gxmvcf/Node.h"
 
 #include "UnitTest.h"
 
 using namespace GXmvcf;
 
 
-static void Test_Variable_DefaultConstructor()
+class MyModelNode : public Node
 {
-	Variable<string> v("someName");
-	UnitTest::Assert("v should contain an empty string",
-	    v.GetValue() == "");
+public:
+	MyModelNode()
+		: m_myString("stringvarname")
+		, m_myInt("intvarname")
+	{
+		AttachVariable(&m_myString);	
+		AttachVariable(&m_myInt);
+	}
 
-	Variable<int> v2("someName");
-	UnitTest::Assert("v2 should be 0", v2.GetValue() == 0);
+private:
+	Variable<string>	m_myString;
+	Variable<int>		m_myInt;
+};
 
-	Variable<double> v3("someName");
-	UnitTest::Assert("v3 should be 0.0", v3.GetValue() == 0.0);
+
+static void Test_Node_DefaultConstructor()
+{
+	Node n;
+
+	UnitTest::Assert("hi", 2==2);
 }
 
-static void Test_Variable_ConstructorWithArg()
+UNITTESTS(Node)
 {
-	Variable<string> v("someName", "hello");
-	UnitTest::Assert("v should contain the specified string",
-	    v.GetValue() == "hello");
-	UnitTest::Assert("v should contain the specified string",
-	    v.GetValueRef() == "hello");
-
-	Variable<int> v2("someName", 42);
-	UnitTest::Assert("v2 should match", v2.GetValue() == 42);
-	UnitTest::Assert("v2 should match", v2.GetValueRef() == 42);
-
-	Variable<double> v3("someName", -1.293);
-	UnitTest::Assert("v3 should match", v3.GetValue() == -1.293);
-	UnitTest::Assert("v3 should match", v3.GetValueRef() == -1.293);
-}
-
-UNITTESTS(Variable)
-{
-        UNITTEST(Test_Variable_DefaultConstructor);
-        UNITTEST(Test_Variable_ConstructorWithArg);
+        UNITTEST(Test_Node_DefaultConstructor);
 }
 
