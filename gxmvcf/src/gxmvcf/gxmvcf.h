@@ -43,7 +43,18 @@
  * 
  * \subsection components_subsec Model, View, and Controller
  *
- * TODO
+ * The Model contains the plain data.
+ *
+ * Views are parts of the UI, which render the Model in a form appropriate for
+ * the end-user. For example, a text UI renders the data in text form, and
+ * a GUI renders the data using various graphical components.
+ *
+ * The Controller is the glue binding it all together, i.e. it controls how
+ * Model classes and View classes talk to each other. Whenever the user (via
+ * the UI) wishes to modify the data in the model, the corresponding View
+ * asks the Controller to do the modification.
+ *
+ * TODO: Longer description.
  */
 
 #include <string>
