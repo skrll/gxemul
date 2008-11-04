@@ -3725,3 +3725,7 @@ Changelog for GXemul:
 20081103	Fix for a free() bug in bootblock_iso9660.c.
 		Updating the OpenBSD/landisk installation instructions from
 		4.2 to 4.4, after verifying that it works.
+
+(Note: gxemul-legacy/trunk is no longer updated; I've moved it all to
+gxemul/trunk again. The experimental C++ branch is moved to gxemul/branches)
+
