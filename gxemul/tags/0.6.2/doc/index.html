@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>GXemul</title>
+  <meta name="robots" content="noarchive,nofollow,noindex">
+</head>
+<body style="font-family : sans-serif;">
+
+<!-- 10 lines header.  -->
+
+<h1>GXemul</h1>
+<p>
+
+<!--
+
+Copyright (C) 2003-2019  Anders Gavare.  All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+3. The name of the author may not be used to endorse or promote products
+   derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGE.
+
+-->
+
+<h3>Contents:</h3>
+
+<p>
+<ul>
+  <li><a href="intro.html">Introduction</a>
+  <ul>
+    <li><a href="intro.html#overview">Overview</a>
+    <li><a href="intro.html#build">How to compile/build the emulator</a>
+    <li><a href="intro.html#run">How to run the emulator</a>
+    <li><a href="intro.html#emulmodes">Which CPUs and machines does GXemul emulate?</a>
+    <li><a href="intro.html#free">Is GXemul Free software?</a>
+  </ul>
+
+  <p>
+  
+  <li><a href="RELEASE.html">Release notes</a>
+
+  <p>
+
+  <li><a href="experiments.html">Experimenting with GXemul</a>
+  <ul>
+    <li><a href="experiments.html#hello">Hello world</a>
+    <li><a href="experiments.html#testmachines">Test machines</a>
+    <li><a href="experiments.html#expdevices">Experimental devices</a>
+  </ul>
+
+  <p>
+
+  <li><a href="debugging.html">Debugging code using GXemul</a>
+  <ul>
+	<li><a href="debugging.html#intro">Introduction to debugging code using GXemul</a>
+	<li><a href="debugging.html#launching">Launching the emulator</a>
+	<li><a href="debugging.html#unassemble">Unassembling machine code</a>
+	<li><a href="debugging.html#reg">Dumping CPU registers</a>
+	<li><a href="debugging.html#dump">Dumping memory contents</a>
+	<li><a href="debugging.html#step">Continuing execution or Single-stepping</a>
+	<li><a href="debugging.html#breakpoints">Breakpoints</a>
+	<li><a href="debugging.html#trace">Function call tracing</a>
+  </ul>
+
+  <p>
+
+  <li><a href="configfiles.html">Configuration files</a>
+  <ul>
+    <li><a href="configfiles.html#intro">Introduction</a>
+    <li><a href="configfiles.html#config">Configuration file syntax</a>
+    <li><a href="configfiles.html#minimal">A minimal example</a>
+  </ul>
+
+  <p>
+
+  <li><a href="networking.html">Networking</a>
+  <ul>
+    <li><a href="networking.html#intro">Introduction</a>
+    <li><a href="networking.html#multihost">Network across multiple hosts</a>
+    <li><a href="networking.html#direct_example_1">Direct-access example 1: udp_snoop</a>
+  </ul>
+
+  <p>
+
+  <li><a href="misc.html">Miscellaneous</a>
+  <ul>
+    <li><a href="misc.html#accuracy">Emulation accuracy</a>
+    <li><a href="misc.html#devel">Writing operating system code, or
+	developing firmware, using GXemul</a>
+    <li><a href="misc.html#compilercontruct">Using GXemul in compiler contruction courses</a>
+    <li><a href="misc.html#disk">How to start the emulator with a disk image</a>
+    <li><a href="misc.html#tape_images">How to start the emulator with tape images</a>
+    <li><a href="misc.html#disk_overlays">How to use disk image overlays</a>
+    <li><a href="misc.html#filexfer">Transfering files to/from the guest OS</a>
+    <li><a href="misc.html#largeimages">How to extract large gzipped disk images</a>
+    <li><a href="misc.html#promdump">Using a PROM dump from a real machine</a>
+  </ul>
+
+  <p>
+
+  <li><a href="translation.html">Dynamic Translation Internals</a>
+
+  <p>
+
+  <li><a href="technical.html">Technical details</a>
+  <ul>
+    <li><a href="technical.html#net">Networking</a>
+    <li><a href="technical.html#devices">Emulation of hardware devices</a>
+  </ul>
+
+  <p>
+
+  <li><a href="framework.html">Description of the new framework (under development)</a>
+  <ul>
+	<li><a href="machines.html">Machines</a> <small>(new framework)</small>
+	<li><a href="components.html">Components</a> <small>(new framework)</small>
+	<li><a href="doxygen/html/index.html">Source code documentation (Doxygen)</a> <small>(new framework)</small>
+  </ul>
+
+  <p>
+  
+  <li><a href="TODO.html">TODO list</a>
+
+</ul>
+
+
+
+
+<p><br>
+<a name="feedback"></a>
+<h3>Feedback:</h3>
+
+<p>If you have found a bug in GXemul, if you have comments or suggestions,
+or if you have questions and you can't find the answers you
+seek in the documentation, then consider asking in the <tt>#GXemul</tt> IRC channel on
+on <a href="http://freenode.net/">FreeNode</a>, or mail me
+(gavare@gmail.com).
+
+</p>
+
+</body>
+</html>
