@@ -163,7 +163,6 @@ int arm_cpu_new(struct cpu *cpu, struct memory *mem,
 	if (cpu->machine->prom_emulation) {
 		cpu->cd.arm.of_emul_addr = cpu->machine->physical_ram_in_mb
 		    * 1048576 - 8;
-		store_32bit_word(cpu, cpu->cd.arm.of_emul_addr, 0xef8c64be);
 	}
 
 	cpu->cd.arm.flags = cpu->cd.arm.cpsr >> 28;
